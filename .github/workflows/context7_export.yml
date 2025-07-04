@@ -55,19 +55,28 @@ jobs:
           - branch: ptr
             library_name: "/RagedUnicorn/wow-ui-source-ptr"
 
-    # Only run for the current branch or manually selected branch
-    if: |
-      (github.event_name == 'push' && github.ref_name == matrix.branch) ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.branch == matrix.branch)
-
     steps:
+      # Skip if branch doesn't match
+      - name: Check if should run
+        id: should_run
+        run: |
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == "${{ matrix.branch }}" ]]; then
+            echo "run=true" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.branch }}" == "${{ matrix.branch }}" ]]; then
+            echo "run=true" >> $GITHUB_OUTPUT
+          else
+            echo "run=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout specific branch
+        if: steps.should_run.outputs.run == 'true'
         uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branch }}
           fetch-depth: 0  # Fetch full history for better documentation parsing
 
       - name: Update Context7 Documentation
+        if: steps.should_run.outputs.run == 'true'
         id: context7
         uses: rennf93/upsert-context7@v1.0
         with:
@@ -77,6 +86,7 @@ jobs:
         continue-on-error: true
 
       - name: Show result
+        if: steps.should_run.outputs.run == 'true'
         run: |
           echo "Branch: ${{ matrix.branch }}"
           echo "Library: ${{ matrix.library_name }}"
@@ -85,7 +95,7 @@ jobs:
           echo "Message: ${{ steps.context7.outputs.message }}"
 
       - name: Handle failure
-        if: steps.context7.outputs.success == 'false'
+        if: steps.should_run.outputs.run == 'true' && steps.context7.outputs.success == 'false'
         run: |
           echo "❌ Context7 update failed for ${{ matrix.branch }}"
           echo "Error: ${{ steps.context7.outputs.message }}"
