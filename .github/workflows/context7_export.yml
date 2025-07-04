@@ -78,7 +78,7 @@ jobs:
       - name: Update Context7 Documentation
         if: steps.should_run.outputs.run == 'true'
         id: context7
-        uses: rennf93/upsert-context7@v1.0
+        uses: rennf93/upsert-context7@1.0
         with:
           operation: ${{ github.event.inputs.operation || 'refresh' }}
           library-name: ${{ matrix.library_name }}
@@ -112,7 +112,7 @@ jobs:
           ref: ${{ github.event.inputs.branch }}
 
       - name: Add new library to Context7
-        uses: rennf93/upsert-context7@v1.0
+        uses: rennf93/upsert-context7@1.0
         with:
           operation: add
           # Context7 will auto-detect the repo URL from the current context
