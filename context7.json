@@ -1,0 +1,20 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "WoW UI Source - Classic Era",
+  "description": "World of Warcraft Classic Era UI source code with Lua API and XML definitions",
+  "folders": [
+    "Interface/AddOns/**/*.lua",
+    "Interface/AddOns/**/*.xml"
+  ],
+  "excludeFolders": [],
+  "excludeFiles": [
+    "ui-code-list.txt",
+    "ui-gen-addon-list.txt",
+    "ui-toc-list.txt"
+  ],
+  "rules": [
+    "This is Classic Era WoW API - not retail",
+    "Lua 5.1 syntax only",
+    "XML files define UI layouts"
+  ]
+}
