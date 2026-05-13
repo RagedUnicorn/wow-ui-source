@@ -2,11 +2,12 @@ local Expansion =
 {
 	Name = "Expansion",
 	Type = "System",
+	Environment = "All",
 
 	Functions =
 	{
 		{
-			Name = "CanUpgradeExpansion",
+			Name = "CanUpgradeToCurrentExpansion",
 			Type = "Function",
 
 			Returns =
@@ -48,7 +49,7 @@ local Expansion =
 			Arguments =
 			{
 				{ Name = "expansionLevel", Type = "number", Nilable = false },
-				{ Name = "desiredReleaseType", Type = "number", Nilable = false },
+				{ Name = "desiredReleaseType", Type = "ReleaseType", Nilable = true },
 			},
 
 			Returns =
@@ -99,6 +100,24 @@ local Expansion =
 			{
 				{ Name = "expansionLevel", Type = "number", Nilable = false },
 			},
+
+			Returns =
+			{
+				{ Name = "maxLevel", Type = "number", Nilable = false },
+			},
+		},
+		{
+			Name = "GetMaxLevelForLatestExpansion",
+			Type = "Function",
+
+			Returns =
+			{
+				{ Name = "maxLevel", Type = "number", Nilable = false },
+			},
+		},
+		{
+			Name = "GetMaxLevelForPlayerExpansion",
+			Type = "Function",
 
 			Returns =
 			{
@@ -176,11 +195,13 @@ local Expansion =
 			Name = "MaxExpansionLevelUpdated",
 			Type = "Event",
 			LiteralName = "MAX_EXPANSION_LEVEL_UPDATED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "MinExpansionLevelUpdated",
 			Type = "Event",
 			LiteralName = "MIN_EXPANSION_LEVEL_UPDATED",
+			SynchronousEvent = true,
 		},
 	},
 
@@ -194,6 +215,12 @@ local Expansion =
 				{ Name = "logo", Type = "fileID", Nilable = false },
 				{ Name = "banner", Type = "textureAtlas", Nilable = false },
 				{ Name = "features", Type = "table", InnerType = "ExpansionDisplayInfoFeature", Nilable = false },
+				{ Name = "highResBackgroundID", Type = "fileID", Nilable = false },
+				{ Name = "lowResBackgroundID", Type = "fileID", Nilable = false },
+				{ Name = "textureKit", Type = "textureKit", Nilable = false },
+				{ Name = "glueAmbianceSoundKit", Type = "number", Nilable = true },
+				{ Name = "glueMusicSoundKit", Type = "number", Nilable = true },
+				{ Name = "glueCreditsSoundKit", Type = "number", Nilable = true },
 			},
 		},
 		{
@@ -205,6 +232,9 @@ local Expansion =
 				{ Name = "text", Type = "cstring", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

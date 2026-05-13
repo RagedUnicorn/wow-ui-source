@@ -2,6 +2,7 @@ local Font =
 {
 	Name = "Font",
 	Type = "System",
+	Environment = "All",
 
 	Functions =
 	{
@@ -44,11 +45,12 @@ local Font =
 			Type = "Structure",
 			Fields =
 			{
-				{ Name = "color", Type = "colorRGBA", Mixin = "ColorMixin", Nilable = false },
+				{ Name = "color", Type = "colorRGBA", Nilable = false },
 				{ Name = "height", Type = "number", Nilable = false },
-				{ Name = "outline", Type = "cstring", Nilable = false },
+				{ Name = "outline", Type = "string", Nilable = false },
 				{ Name = "shadow", Type = "FontScriptShadowInfo", Nilable = true },
 				{ Name = "fontObject", Type = "SimpleFont", Nilable = false },
+				{ Name = "canBeUserScaled", Type = "bool", Nilable = false },
 			},
 		},
 		{
@@ -56,11 +58,14 @@ local Font =
 			Type = "Structure",
 			Fields =
 			{
-				{ Name = "color", Type = "colorRGBA", Mixin = "ColorMixin", Nilable = false },
+				{ Name = "color", Type = "colorRGBA", Nilable = false },
 				{ Name = "x", Type = "number", Nilable = false },
 				{ Name = "y", Type = "number", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

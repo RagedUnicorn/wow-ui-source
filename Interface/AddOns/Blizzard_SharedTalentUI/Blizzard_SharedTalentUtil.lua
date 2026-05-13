@@ -2,11 +2,23 @@
 local TemplatesByTalentType = {
 	[Enum.TraitNodeEntryType.SpendSquare] = "TalentButtonSquareTemplate",
 	[Enum.TraitNodeEntryType.SpendCircle] = "TalentButtonCircleTemplate",
+	[Enum.TraitNodeEntryType.SpendSmallCircle] = "TalentButtonSmallCircleTemplate",
+	[Enum.TraitNodeEntryType.RedButton] = "TalentRedButtonTemplate",
+	[Enum.TraitNodeEntryType.ArmorSet] = "TalentArmorSetTemplate",
+	[Enum.TraitNodeEntryType.SpendCapstoneCircle] = "TalentButtonCapstoneCircleTemplate",
+	[Enum.TraitNodeEntryType.SpendCapstoneSquare] = "TalentButtonCapstoneSquareTemplate",
 };
 
 local LargeTemplatesByTalentType = {
 	[Enum.TraitNodeEntryType.SpendSquare] = "TalentButtonLargeSquareTemplate",
 	[Enum.TraitNodeEntryType.SpendCircle] = "TalentButtonLargeCircleTemplate",
+	[Enum.TraitNodeEntryType.RedButton] = "TalentRedButtonTemplate",
+	[Enum.TraitNodeEntryType.ArmorSet] = "TalentArmorSetTemplate",
+};
+
+local EntryTypeUsesArtMixin = {
+	[Enum.TraitNodeEntryType.SpendSquare] = true,
+	[Enum.TraitNodeEntryType.SpendCircle] = true,
 };
 
 local TemplatesByEdgeVisualStyle = {
@@ -43,7 +55,7 @@ function TalentUtil.GetTalentNameFromInfo(definitionInfo)
 end
 
 function TalentUtil.GetTalentName(overrideName, spellID)
-	if overrideName then
+	if overrideName and (overrideName ~= "") then
 		return overrideName;
 	end
 
@@ -203,6 +215,28 @@ function TalentFrameUtil.GetNormalizedSubTreeNodePosition(talentFrame, nodeInfo)
 	return tPosX, tPosY;
 end
 
+function TalentFrameUtil.GenerateTreeCurrencyDisplayCallback(defaultWidth, defaultHeight)
+	defaultWidth = defaultWidth or 24;
+	defaultHeight = defaultHeight or 24;
+
+	return function (treeCurrency, width, height)
+		width = width or defaultWidth;
+		height = height or defaultHeight;
+
+		local currencyTypesID, overrideIcon = select(3, C_Traits.GetTraitCurrencyInfo(treeCurrency.traitCurrencyID));
+		if overrideIcon then
+			return CreateSimpleTextureMarkup(overrideIcon, width, height);
+		elseif currencyTypesID then
+			local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(currencyTypesID);
+			if currencyInfo and currencyInfo.iconFileID then
+				return CreateSimpleTextureMarkup(currencyInfo.iconFileID, width, height);
+			end
+		end
+
+		return CreateSimpleTextureMarkup([[INTERFACE\ICONS\INV_MISC_QUESTIONMARK]], width, height);
+	end
+end
+
 
 TalentButtonUtil = {};
 
@@ -224,6 +258,139 @@ TalentButtonUtil.BaseVisualState = {
 	DisplayError = 9,
 };
 
+TalentButtonUtil.SizingAdjustment = {
+	Circle = {
+		{ region = "Icon", adjust = 0, },
+		{ region = "DisabledOverlay", adjust = 0, },
+		{ region = "BorderShadow", adjust = -2, },
+		{ region = "StateBorder", adjust = -4, },
+		{ region = "Border2", adjust = -4, },
+		{ region = "Border", adjust = -7, },
+		{ region = "IconMask", adjust = -8, },
+		{ region = "BorderMask", adjust = -7, },
+		{ region = "Border2Mask", adjust = -4, },
+		{ region = "BorderShadowMask", adjust = -2, },
+		{ region = "DisabledOverlayMask", adjust = -3, },
+	},
+
+	ProfessionPerk = {
+		{ region = "Icon", adjust = 0, },
+		{ region = "DisabledOverlay", adjust = 0, },
+		{ region = "BorderShadow", adjust = 2, },
+		{ region = "StateBorder", adjust = 0, },
+		{ region = "Border2", adjust = 0, },
+		{ region = "Border", adjust = -3, },
+	},
+
+	Large = {
+		{ region = "Icon", adjust = 0, },
+		{ region = "IconMask", adjust = 0, },
+		{ region = "DisabledOverlay", adjust = 0, },
+		{ region = "DisabledOverlayMask", adjust = 0, },
+		{ region = "StateBorder", adjust = 0, },
+		{ region = "Ghost", adjust = 0, },
+		{ region = "Glow", adjust = 0, },
+		{ region = "SelectableGlow", adjust = 0, },
+		{ region = "SpendText", anchorX = 20 },
+	},
+
+	Small = {
+		{ region = "Icon", adjust = 0, },
+		{ region = "IconMask", adjust = -2, },
+		{ region = "DisabledOverlay", adjust = 0, },
+		{ region = "DisabledOverlayMask", adjust = 0, },
+		{ region = "StateBorder", adjust = 0, },
+		{ region = "Ghost", adjust = 0, },
+		{ region = "Glow", adjust = 0, },
+		{ region = "SelectableGlow", adjust = 0, },
+		{ region = "SpendText", anchorX = 6, anchorY = -6, },
+		{ region = "Shadow", adjust = 0, },
+	},
+
+	LegionInfinite = {
+		{ region = "Icon", adjust = -8, },
+		{ region = "IconMask", adjust = -8, },
+		{ region = "DisabledOverlay", adjust = 0, },
+		{ region = "BorderShadow", adjust = 0, },
+		{ region = "StateBorder", adjust = 0, anchorX = 4, anchorY = -4 },
+		{ region = "StateBorderHover", adjust = 0, anchorX = 4, anchorY = -4},
+		{ region = "Border2", adjust = 0, },
+		{ region = "Border", adjust = 0, },
+		{ region = "BorderMask", adjust = 0, },
+		{ region = "Border2Mask", adjust = 0, },
+		{ region = "BorderShadowMask", adjust = 0, },
+		{ region = "DisabledOverlayMask", adjust = 0, },
+		{ region = "SpendText", anchorX = 14, anchorY = 6, },
+	},
+
+	CapstoneCircle = {
+		{ region = "Icon", adjust = -3, },
+		{ region = "IconMask", adjust = -3, },
+		{ region = "DisabledOverlay", adjust = 0, },
+		{ region = "BorderShadow", adjust = 0, },
+		{ region = "StateBorder", adjust = 0,},
+		{ region = "StateBorderHover", adjust = 0 },
+		{ region = "Border2", adjust = 0, },
+		{ region = "Border", adjust = 0, },
+		{ region = "BorderMask", adjust = 0, },
+		{ region = "Border2Mask", adjust = 0, },
+		{ region = "BorderShadowMask", adjust = 0, },
+		{ region = "DisabledOverlayMask", adjust = 0, },
+		{ region = "SelectableGlow", adjust = 90, },
+		{ region = "SpendText", anchorX = 2, anchorY = -10, },
+	},
+
+	CapstoneSquare = {
+		{ region = "Icon", adjust = -3, },
+		{ region = "IconMask", adjust = -3, },
+		{ region = "DisabledOverlay", adjust = 0, },
+		{ region = "BorderShadow", adjust = 0, },
+		{ region = "StateBorder", adjust = 0,},
+		{ region = "StateBorderHover", adjust = 0 },
+		{ region = "Border2", adjust = 0, },
+		{ region = "Border", adjust = 0, },
+		{ region = "BorderMask", adjust = 0, },
+		{ region = "Border2Mask", adjust = 0, },
+		{ region = "BorderShadowMask", adjust = 0, },
+		{ region = "DisabledOverlayMask", adjust = 0, },
+		{ region = "SelectableGlow", adjust = 90, },
+		{ region = "SpendText", anchorX = 2, anchorY = -10, },
+	},
+
+	CapstonePipCircle = {
+		{ region = "Icon", adjust = 0, },
+		{ region = "DisabledOverlay", adjust = 0, },
+		{ region = "BorderShadow", adjust = 0, },
+		{ region = "StateBorder", adjust = 0, },
+		{ region = "Border2", adjust = 0, },
+		{ region = "Border", adjust = 0, },
+		{ region = "IconMask", adjust = 0, },
+		{ region = "Ghost", adjust = 6, },
+		{ region = "BorderMask", adjust = 0, },
+		{ region = "Border2Mask", adjust = 0, },
+		{ region = "BorderShadowMask", adjust = 0, },
+		{ region = "DisabledOverlayMask", adjust = 0, },
+		{ region = "BorderSheen", anchorY = 0 },
+		{ region = "BorderSheenMask", adjust = 12 },
+		{ region = "Shadow", adjust = 0, },
+		{ region = "SpendText", anchorX = 2, anchorY = -7, },
+	},
+
+	DelveChallengeCircle = {
+		{ region = "Icon", adjust = 12, },
+		{ region = "DisabledOverlay", adjust = 13, },
+		{ region = "BorderShadow", adjust = -2, },
+		{ region = "StateBorder", adjust = -4, },
+		{ region = "Border2", adjust = 14, },
+		{ region = "Border", adjust = 17, },
+		{ region = "IconMask", adjust = 4, },
+		{ region = "BorderMask", adjust = -7, },
+		{ region = "Border2Mask", adjust = -4, },
+		{ region = "BorderShadowMask", adjust = -2, },
+		{ region = "DisabledOverlayMask", adjust = 9, },
+	},
+};
+
 local HoverAlphaByVisualState = {
 	[TalentButtonUtil.BaseVisualState.Normal] = 1,
 	[TalentButtonUtil.BaseVisualState.Gated] = 0.4,
@@ -239,9 +406,24 @@ local HoverAlphaByVisualState = {
 function TalentButtonUtil.GetTemplateForTalentType(nodeInfo, talentType, useLarge)
 	-- By default, any use of SubTreeSelection nodes without a bespoke override will treat them like regular Selection nodes
 	if nodeInfo and (nodeInfo.type == Enum.TraitNodeType.Selection or nodeInfo.type == Enum.TraitNodeType.SubTreeSelection) then
-		if FlagsUtil.IsSet(nodeInfo.flags, Enum.TraitNodeFlag.ShowMultipleIcons) then
+		if FlagsUtil.IsSet(nodeInfo.flags, Enum.TraitNodeFlag.ShowExpandedSelection) then
+			return "TalentButtonSelectExpandedTemplate";
+		elseif FlagsUtil.IsSet(nodeInfo.flags, Enum.TraitNodeFlag.ShowMultipleIcons) then
 			return "TalentButtonChoiceTemplate";
 		end
+	end
+
+	if nodeInfo and (nodeInfo.type == Enum.TraitNodeType.Tiered) and FlagsUtil.IsSet(nodeInfo.flags, Enum.TraitNodeFlag.ShowTierTrack) then
+		if talentType == Enum.TraitNodeEntryType.SpendCapstoneCircle then
+			return "TalentButtonCapstoneWithTrackCircleTemplate";
+		elseif talentType == Enum.TraitNodeEntryType.SpendCapstoneSquare then
+			return "TalentButtonCapstoneWithTrackSquareTemplate";
+		end
+	end
+
+	local isCapstoneChildDisplayElement = not nodeInfo and (talentType == Enum.TraitNodeEntryType.SpendCapstoneCircle or talentType == Enum.TraitNodeEntryType.SpendCapstoneSquare);
+	if isCapstoneChildDisplayElement then
+		return "TalentButtonCapstonePipCircleTemplate";
 	end
 
 	if useLarge then
@@ -255,18 +437,58 @@ end
 function TalentButtonUtil.GetSpecializedMixin(nodeInfo, talentType)
 	-- By default, any use of SubTreeSelection nodes without a bespoke override will treat them like regular Selection nodes
 	if nodeInfo and (nodeInfo.type == Enum.TraitNodeType.Selection or nodeInfo.type == Enum.TraitNodeType.SubTreeSelection) then
-		if FlagsUtil.IsSet(nodeInfo.flags, Enum.TraitNodeFlag.ShowMultipleIcons) then
+		if FlagsUtil.IsSet(nodeInfo.flags, Enum.TraitNodeFlag.ShowExpandedSelection) then
+			return TalentButtonSelectExpandedButtonMixin;
+		elseif FlagsUtil.IsSet(nodeInfo.flags, Enum.TraitNodeFlag.ShowMultipleIcons) then
 			return TalentButtonSplitSelectMixin;
 		else
 			return TalentButtonSelectMixin;
 		end
 	end
 
+	if nodeInfo and (nodeInfo.type == Enum.TraitNodeType.Tiered) and FlagsUtil.IsSet(nodeInfo.flags, Enum.TraitNodeFlag.ShowTierTrack) then
+		if talentType == Enum.TraitNodeEntryType.SpendCapstoneCircle or talentType == Enum.TraitNodeEntryType.SpendCapstoneSquare then
+			return TalentButtonCapstoneWithTrackMixin;
+		end
+	end
+
 	return TalentButtonSpendMixin;
+end
+
+function TalentButtonUtil.GetSpecializedChoiceMixin(_entryInfo, talentType)
+	if EntryTypeUsesArtMixin[talentType] then
+		return TalentSelectionChoiceArtMixin;
+	end
+
+	return TalentSelectionChoiceMixin;
 end
 
 function TalentButtonUtil.GetTemplateForEdgeVisualStyle(visualStyle)
 	return TemplatesByEdgeVisualStyle[visualStyle];
+end
+
+-- Force all square templates.
+function TalentButtonUtil.GetSquareTemplateForTalentType(_nodeInfo, _talentType, useLarge)
+	if useLarge then
+		return "TalentButtonLargeSquareTemplate";
+	end
+
+	return "TalentButtonSquareTemplate";
+end
+
+-- Force all spend templates. Note: this should only be used with display-only frames since
+-- otherwise the appropriate button behavior may not be supported properly.
+function TalentButtonUtil.GetSpendSpecializedMixin(_nodeInfo, _talentType)
+	return TalentButtonSpendMixin;
+end
+
+-- Not used yet but available for future use.
+function TalentButtonUtil.GetDescriptionCardTemplate(_nodeInfo, _talentType)
+	return "TalentDescriptionCardTemplate";
+end
+
+function TalentButtonUtil.GetNameCardTemplate(_nodeInfo, _talentType)
+	return "TalentNameCardTemplate";
 end
 
 function TalentButtonUtil.ApplyPosition(button, talentFrame, posX, posY)
@@ -496,7 +718,7 @@ C_Traits.GetConditionInfo = function (...)
 
 		-- Designers can use tokens (e.g. $@spellname1234) for condition tooltips and the parsing code
 		-- automatically applies colorization that isn't desired so remove it prior to coloring the entire string red.
-		local strippedTooltipText = StripHyperlinks(tooltipText);
+		local strippedTooltipText = C_StringUtil.StripHyperlinks(tooltipText);
 
 		local coloredTooltipText = RED_FONT_COLOR:WrapTextInColorCode(strippedTooltipText);
 		return coloredTooltipText;

@@ -3,6 +3,7 @@ local AddOnProfiler =
 	Name = "AddOnProfiler",
 	Type = "System",
 	Namespace = "C_AddOnProfiler",
+	Environment = "All",
 
 	Functions =
 	{
@@ -19,6 +20,7 @@ local AddOnProfiler =
 		{
 			Name = "AddPerformanceMessageShown",
 			Type = "Function",
+			HasRestrictions = true,
 			Documentation = { "Internal API for telemetry." },
 
 			Arguments =
@@ -127,13 +129,13 @@ local AddOnProfiler =
 			Arguments =
 			{
 				{ Name = "func", Type = "LuaValueVariant", Nilable = false },
-				{ Name = "unpackedPrimitiveType", Type = "number", Nilable = false, StrideIndex = 1 },
+				{ Name = "arguments", Type = "LuaValueVariant", Nilable = false, StrideIndex = 1 },
 			},
 
 			Returns =
 			{
 				{ Name = "results", Type = "AddOnProfilerCallResults", Nilable = false },
-				{ Name = "unpackedPrimitiveType", Type = "number", Nilable = false, StrideIndex = 1 },
+				{ Name = "returns", Type = "LuaValueVariant", Nilable = false, StrideIndex = 1 },
 			},
 		},
 	},
@@ -189,6 +191,9 @@ local AddOnProfiler =
 				{ Name = "metricValue", Type = "number", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

@@ -17,28 +17,28 @@ StaticPopupDialogs["BATTLE_PET_RENAME"] = {
 	button2 = CANCEL,
 	hasEditBox = 1,
 	maxLetters = 16,
-	OnAccept = function(self)
-		local text = self.editBox:GetText();
-		C_PetJournal.SetCustomName(self.data, text);
+	OnAccept = function(dialog, data)
+		local text = dialog:GetEditBox():GetText();
+		C_PetJournal.SetCustomName(data, text);
 		PetJournal_UpdateAll();
 	end,
-	OnAlt = function(self)
-		C_PetJournal.SetCustomName(self.data, "");
+	OnAlt = function(dialog, data)
+		C_PetJournal.SetCustomName(data, "");
 		PetJournal_UpdateAll();
 	end,
-	EditBoxOnEnterPressed = function(self)
-		local parent = self:GetParent();
-		local text = parent.editBox:GetText();
-		C_PetJournal.SetCustomName(parent.data, text);
+	EditBoxOnEnterPressed = function(editBox, data)
+		local dialog = editBox:GetParent();
+		local text = editBox:GetText();
+		C_PetJournal.SetCustomName(data, text);
 		PetJournal_UpdateAll();
-		parent:Hide();
+		dialog:Hide();
 	end,
-	OnShow = function(self)
-		self.editBox:SetFocus();
+	OnShow = function(dialog, data)
+		dialog:GetEditBox():SetFocus();
 	end,
-	OnHide = function(self)
-		ChatEdit_FocusActiveWindow();
-		self.editBox:SetText("");
+	OnHide = function(dialog, data)
+		ChatFrameUtil.FocusActiveWindow();
+		dialog:GetEditBox():SetText("");
 	end,
 	timeout = 0,
 	exclusive = 1,
@@ -50,10 +50,10 @@ StaticPopupDialogs["BATTLE_PET_PUT_IN_CAGE"] = {
 	button1 = OKAY,
 	button2 = CANCEL,
 	maxLetters = 30,
-	OnAccept = function(self)
-		PetJournal_SetPendingCage(self.data);
-		C_PetJournal.CagePetByID(self.data);
-		if (PetJournalPetCard.petID == self.data) then
+	OnAccept = function(dialog, data)
+		PetJournal_SetPendingCage(data);
+		C_PetJournal.CagePetByID(data);
+		if (PetJournalPetCard.petID == data) then
 			PetJournal_ShowPetCard(1);
 		end
 	end,
@@ -68,9 +68,9 @@ StaticPopupDialogs["BATTLE_PET_RELEASE"] = {
 	button1 = OKAY,
 	button2 = CANCEL,
 	maxLetters = 30,
-	OnAccept = function(self)
-		C_PetJournal.ReleasePetByID(self.data);
-		if (PetJournalPetCard.petID == self.data) then
+	OnAccept = function(dialog, data)
+		C_PetJournal.ReleasePetByID(data);
+		if (PetJournalPetCard.petID == data) then
 			PetJournal_ShowPetCard(1);
 		end
 	end,
@@ -176,7 +176,19 @@ function PetJournal_InitFilterDropdown(self)
 		rootDescription:CreateCheckbox(NOT_COLLECTED, PetJournalFilterDropdown_GetNotCollectedFilter, function()
 			PetJournalFilterDropdown_SetNotCollectedFilter(not PetJournalFilterDropdown_GetNotCollectedFilter());
 		end);
-		
+
+		rootDescription:CreateDivider();
+
+		rootDescription:CreateTitle(PET_FILTER_TYPES);
+
+		rootDescription:CreateCheckbox(PET_FILTER_BATTLE_PETS, PetJournalFilterDropdown_GetBattlePetsFilter, function()
+			PetJournalFilterDropdown_SetBattlePetsFilter(not PetJournalFilterDropdown_GetBattlePetsFilter());
+		end);
+
+		rootDescription:CreateCheckbox(PET_FILTER_NON_COMBAT_PETS, PetJournalFilterDropdown_GetNonCombatPetsFilter, function()
+			PetJournalFilterDropdown_SetNonCombatPetsFilter(not PetJournalFilterDropdown_GetNonCombatPetsFilter());
+		end);
+
 		local familiesSubmenu = rootDescription:CreateButton(PET_FAMILIES);
 		familiesSubmenu:CreateButton(CHECK_ALL, PetJournalFilterDropdown_SetAllPetTypes, true);
 		familiesSubmenu:CreateButton(UNCHECK_ALL, PetJournalFilterDropdown_SetAllPetTypes, false);
@@ -189,9 +201,7 @@ function PetJournal_InitFilterDropdown(self)
 		sourceSubmenu:CreateButton(CHECK_ALL, PetJournalFilterDropdown_SetAllPetSources, true);
 		sourceSubmenu:CreateButton(UNCHECK_ALL, PetJournalFilterDropdown_SetAllPetSources, false);
 
-		local filterIndexList = CollectionsUtil.GetSortedFilterIndexList("BATTLEPETS", petSourceOrderPriorities);
-		for index = 1, C_PetJournal.GetNumPetSources() do
-			local filterIndex = filterIndexList[i] and filterIndexList[i].index or index;
+		for filterIndex = 1, C_PetJournal.GetNumPetSources() do
 			sourceSubmenu:CreateCheckbox(_G["BATTLE_PET_SOURCE_"..filterIndex], IsSourceChecked, SetSourceChecked, filterIndex);
 		end
 		
@@ -331,7 +341,9 @@ function PetJournalHealPetSpellFrameMixin:OnLoad()
 end
 
 function PetJournalHealPetSpellFrameMixin:IsAvailable()
-	return IsSpellKnown(self.spellID) and C_PetJournal.IsJournalUnlocked();
+	local spellBank = Enum.SpellBookSpellBank.Player;
+	local includeOverrides = false;
+	return C_SpellBook.IsSpellInSpellBook(self.spellID, spellBank, includeOverrides) and C_PetJournal.IsJournalUnlocked();
 end
 
 function PetJournalHealPetSpellFrameMixin:IsLocked()
@@ -339,7 +351,9 @@ function PetJournalHealPetSpellFrameMixin:IsLocked()
 end
 
 function PetJournalHealPetSpellFrameMixin:OnSetTooltip(tooltip)
-	if not IsSpellKnown(self.spellID) then
+	local spellBank = Enum.SpellBookSpellBank.Player;
+	local includeOverrides = false;
+	if not C_SpellBook.IsSpellInSpellBook(self.spellID, spellBank, includeOverrides) then
 		GameTooltip_AddErrorLine(tooltip, PET_BATTLE_HEAL_SPELL_UNKNOWN);
 	elseif not C_PetJournal.IsJournalUnlocked() then
 		GameTooltip_AddErrorLine(tooltip, PET_JOURNAL_HEAL_SPELL_LOCKED);
@@ -958,7 +972,7 @@ function PetJournalListItemMixin:OnClick(button)
 			-- Macros are not yet supported
 		elseif (id) then
 			local petLink = C_PetJournal.GetBattlePetLink(id);
-			ChatEdit_InsertLink(petLink);
+			ChatFrameUtil.InsertLink(petLink);
 		end
 	elseif button == "RightButton" then
 		if self.owned then
@@ -1016,7 +1030,7 @@ function PetJournalDragButtonMixin:OnClick(button)
 			-- Macros are not yet supported
 		elseif (id) then
 			local petLink = C_PetJournal.GetBattlePetLink(id);
-			ChatEdit_InsertLink(petLink);
+			ChatFrameUtil.InsertLink(petLink);
 		end
 	elseif ( button == "RightButton" ) then
 		local parent = self:GetParent();
@@ -1074,7 +1088,7 @@ function PetJournalLoadoutDragButtonMixin:OnClick(button)
 			-- Macros are not yet supported
 		elseif (id) then
 			local petLink = C_PetJournal.GetBattlePetLink(id);
-			ChatEdit_InsertLink(petLink);
+			ChatFrameUtil.InsertLink(petLink);
 		end
 	else
 		PetJournalDragButtonMixin.OnDragStart(self);
@@ -1183,7 +1197,7 @@ function PetJournalPetCard_OnClick(self, button)
 			-- Macros are not yet supported
 		elseif (id) then
 			local petLink = C_PetJournal.GetBattlePetLink(id);
-			ChatEdit_InsertLink(petLink);
+			ChatFrameUtil.InsertLink(petLink);
 		end
 	elseif button == "RightButton" then
 		if ( PetJournalPetCard.petID ) then
@@ -1393,6 +1407,11 @@ function PetJournal_UpdatePetCard(self, forceSceneChange)
 	self.AbilitiesBG2:SetShown(canBattle);
 	self.AbilitiesBG3:SetShown(canBattle);
 	self.CannotBattleText:SetShown(not canBattle);
+	
+	PetJournalLoadout:SetShown(canBattle);
+	PetJournalLoadoutBorder:SetShown(canBattle);
+	PetJournalRightInset:SetShown(canBattle);
+	PetJournalFindBattle:SetShown(canBattle);
 
 	--Update pet abilites
 	local abilities, levels = C_PetJournal.GetPetAbilityList(speciesID);
@@ -1473,6 +1492,22 @@ end
 
 function PetJournalFilterDropdown_GetNotCollectedFilter()
 	return C_PetJournal.IsFilterChecked(LE_PET_JOURNAL_FILTER_NOT_COLLECTED);
+end
+
+function PetJournalFilterDropdown_SetBattlePetsFilter(value)
+	C_PetJournal.SetFilterChecked(LE_PET_JOURNAL_FILTER_TYPE_BATTLE_PETS, value);
+end
+
+function PetJournalFilterDropdown_GetBattlePetsFilter()
+	return C_PetJournal.IsFilterChecked(LE_PET_JOURNAL_FILTER_TYPE_BATTLE_PETS);
+end
+
+function PetJournalFilterDropdown_SetNonCombatPetsFilter(value)
+	C_PetJournal.SetFilterChecked(LE_PET_JOURNAL_FILTER_TYPE_NON_COMBAT_PETS, value);
+end
+
+function PetJournalFilterDropdown_GetNonCombatPetsFilter()
+	return C_PetJournal.IsFilterChecked(LE_PET_JOURNAL_FILTER_TYPE_NON_COMBAT_PETS);
 end
 
 function PetJournalFilterDropdown_SetAllPetTypes(value)

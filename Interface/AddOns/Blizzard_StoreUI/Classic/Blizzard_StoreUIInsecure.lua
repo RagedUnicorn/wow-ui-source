@@ -21,10 +21,12 @@ end
 
 function StorePreviewFrame_OnShow()
 	StoreFrame_PreviewFrameIsShown(true);
+	ModelPreviewFrame.Display.ModelScene:SetAllowOverlappedModels(true); -- CLASS-44103: Automatically allow overlapped models for shop scenes
 end
 
 function StorePreviewFrame_OnHide()
 	StoreFrame_PreviewFrameIsShown(false);
+	ModelPreviewFrame.Display.ModelScene:SetAllowOverlappedModels(false); -- CLASS-44103: Automatically allow overlapped models for shop scenes
 end
 
 function HidePreviewFrame()
@@ -36,9 +38,7 @@ if (InGlue()) then
 	StaticPopupDialogs["VAS_PRODUCT_DELIVERED"] = {
 		button1 = OKAY,
 		escapeHides = true,
-		OnAccept = function()
-			local data = GlueDialog.data;
-
+		OnAccept = function(dialog, data)
 			if (not data.shouldHandle) then
 				if (data.guid and GetServerName() == data.realmName) then
 					-- We're about to throw out the character list,
@@ -95,7 +95,9 @@ if (InGlue()) then
 	end
 
 	function StoreFrame_ShowGlueDialog(text, guid, realmName, shouldHandle)
-		GlueDialog_Show("VAS_PRODUCT_DELIVERED", text, { ["guid"] = guid, ["realmName"] = realmName, ["shouldHandle"] = shouldHandle });
+		local text2 = nil;
+		local data = { ["guid"] = guid, ["realmName"] = realmName, ["shouldHandle"] = shouldHandle };
+		StaticPopup_Show("VAS_PRODUCT_DELIVERED", text, text2, data);
 	end
 end
 

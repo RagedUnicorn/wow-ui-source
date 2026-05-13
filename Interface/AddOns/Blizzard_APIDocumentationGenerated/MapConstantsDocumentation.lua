@@ -18,6 +18,18 @@ local MapConstants =
 			},
 		},
 		{
+			Name = "MapobjEventTypes",
+			Type = "Enumeration",
+			NumValues = 2,
+			MinValue = 0,
+			MaxValue = 1,
+			Fields =
+			{
+				{ Name = "PlayAnim", Type = "MapobjEventTypes", EnumValue = 0 },
+				{ Name = "SetAnimSpeed", Type = "MapobjEventTypes", EnumValue = 1 },
+			},
+		},
+		{
 			Name = "UIMapFlag",
 			Type = "Enumeration",
 			NumValues = 22,
@@ -91,6 +103,9 @@ local MapConstants =
 				{ Name = "Orphan", Type = "UIMapType", EnumValue = 6 },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

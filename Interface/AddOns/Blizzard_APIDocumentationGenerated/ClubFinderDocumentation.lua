@@ -3,12 +3,14 @@ local ClubFinder =
 	Name = "ClubFinderInfo",
 	Type = "System",
 	Namespace = "C_ClubFinder",
+	Environment = "All",
 
 	Functions =
 	{
 		{
 			Name = "ApplicantAcceptClubInvite",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -18,6 +20,7 @@ local ClubFinder =
 		{
 			Name = "ApplicantDeclineClubInvite",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -27,6 +30,7 @@ local ClubFinder =
 		{
 			Name = "CancelMembershipRequest",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -363,6 +367,7 @@ local ClubFinder =
 		{
 			Name = "PostClub",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -393,6 +398,7 @@ local ClubFinder =
 		{
 			Name = "RequestClubsList",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -404,6 +410,7 @@ local ClubFinder =
 		{
 			Name = "RequestMembershipToClub",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -457,6 +464,7 @@ local ClubFinder =
 		{
 			Name = "RespondToApplicant",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -591,6 +599,7 @@ local ClubFinder =
 			Name = "ClubFinderApplicantInviteRecieved",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_APPLICANT_INVITE_RECIEVED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "clubFinderGUIDs", Type = "table", InnerType = "WOWGUID", Nilable = false },
@@ -600,6 +609,7 @@ local ClubFinder =
 			Name = "ClubFinderApplicationsUpdated",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_APPLICATIONS_UPDATED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "type", Type = "ClubFinderRequestType", Nilable = false },
@@ -610,6 +620,7 @@ local ClubFinder =
 			Name = "ClubFinderCanWhisperApplicant",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_CAN_WHISPER_APPLICANT",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "applicant", Type = "WOWGUID", Nilable = false },
@@ -619,6 +630,7 @@ local ClubFinder =
 			Name = "ClubFinderClubListReturned",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_CLUB_LIST_RETURNED",
+			SynchronousEvent = true,
 			Documentation = { "Signals when we recieve club data that can be used" },
 			Payload =
 			{
@@ -629,6 +641,7 @@ local ClubFinder =
 			Name = "ClubFinderClubReported",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_CLUB_REPORTED",
+			SynchronousEvent = true,
 			Documentation = { "Sends an update to the UI about a reported guild or community." },
 			Payload =
 			{
@@ -640,6 +653,7 @@ local ClubFinder =
 			Name = "ClubFinderCommunityOfflineJoin",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_COMMUNITY_OFFLINE_JOIN",
+			SynchronousEvent = true,
 			Documentation = { "Signals to the UI that you (the player) have joined a community offline." },
 			Payload =
 			{
@@ -650,12 +664,14 @@ local ClubFinder =
 			Name = "ClubFinderEnabledOrDisabled",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_ENABLED_OR_DISABLED",
+			SynchronousEvent = true,
 			Documentation = { "Sends an update to the UI that the club finder feature has been enabled or disabled." },
 		},
 		{
 			Name = "ClubFinderGuildRealmNameUpdated",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_GUILD_REALM_NAME_UPDATED",
+			SynchronousEvent = true,
 			Documentation = { "Sends an update to the UI if the realm name of a guild was found asynchronously." },
 			Payload =
 			{
@@ -667,6 +683,7 @@ local ClubFinder =
 			Name = "ClubFinderLinkedClubReturned",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_LINKED_CLUB_RETURNED",
+			SynchronousEvent = true,
 			Documentation = { "When a player clicks a club link, this returns that information back about the club they clicked on" },
 			Payload =
 			{
@@ -677,11 +694,13 @@ local ClubFinder =
 			Name = "ClubFinderMembershipListChanged",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_MEMBERSHIP_LIST_CHANGED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "ClubFinderPlayerPendingListRecieved",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_PLAYER_PENDING_LIST_RECIEVED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "type", Type = "ClubFinderRequestType", Nilable = false },
@@ -691,6 +710,7 @@ local ClubFinder =
 			Name = "ClubFinderPostUpdated",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_POST_UPDATED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "clubFinderGUIDs", Type = "table", InnerType = "WOWGUID", Nilable = false },
@@ -700,11 +720,13 @@ local ClubFinder =
 			Name = "ClubFinderRecruitListChanged",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_RECRUIT_LIST_CHANGED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "ClubFinderRecruitmentPostReturned",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_RECRUITMENT_POST_RETURNED",
+			SynchronousEvent = true,
 			Documentation = { "Signals when our recruitment post we just requested is returned back to us" },
 			Payload =
 			{
@@ -715,6 +737,7 @@ local ClubFinder =
 			Name = "ClubFinderRecruitsUpdated",
 			Type = "Event",
 			LiteralName = "CLUB_FINDER_RECRUITS_UPDATED",
+			SynchronousEvent = true,
 			Documentation = { "Signals when we recieve the recruits list" },
 			Payload =
 			{
@@ -926,6 +949,9 @@ local ClubFinder =
 				{ Name = "realmName", Type = "string", Nilable = true },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

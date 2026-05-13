@@ -2,6 +2,7 @@ local SimpleModelAPI =
 {
 	Name = "SimpleModelAPI",
 	Type = "ScriptObject",
+	Environment = "All",
 
 	Functions =
 	{
@@ -532,6 +533,18 @@ local SimpleModelAPI =
 			},
 		},
 		{
+			Name = "SetGradientMask",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "grad0", Type = "number", Nilable = false },
+				{ Name = "grad1", Type = "number", Nilable = false },
+				{ Name = "grad2", Type = "number", Nilable = false },
+				{ Name = "grad3", Type = "number", Nilable = false },
+			},
+		},
+		{
 			Name = "SetLight",
 			Type = "Function",
 
@@ -659,9 +672,19 @@ local SimpleModelAPI =
 
 			Arguments =
 			{
-				{ Name = "translation", Type = "vector3", Mixin = "Vector3DMixin", Nilable = true },
-				{ Name = "rotation", Type = "vector3", Mixin = "Vector3DMixin", Nilable = true },
+				{ Name = "translation", Type = "vector3", Nilable = true },
+				{ Name = "rotation", Type = "vector3", Nilable = true },
 				{ Name = "scale", Type = "number", Nilable = true },
+			},
+		},
+		{
+			Name = "SetUseGBuffer",
+			Type = "Function",
+			HasRestrictions = true,
+
+			Arguments =
+			{
+				{ Name = "useGBuffer", Type = "bool", Nilable = false },
 			},
 		},
 		{
@@ -692,12 +715,12 @@ local SimpleModelAPI =
 
 			Arguments =
 			{
-				{ Name = "cameraPosition", Type = "vector3", Mixin = "Vector3DMixin", Nilable = false },
+				{ Name = "cameraPosition", Type = "vector3", Nilable = false },
 			},
 
 			Returns =
 			{
-				{ Name = "modelPosition", Type = "vector3", Mixin = "Vector3DMixin", Nilable = false },
+				{ Name = "modelPosition", Type = "vector3", Nilable = false },
 			},
 		},
 		{
@@ -716,6 +739,9 @@ local SimpleModelAPI =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

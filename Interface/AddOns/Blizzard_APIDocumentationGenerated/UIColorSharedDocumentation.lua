@@ -8,9 +8,12 @@ local UIColorShared =
 			Fields =
 			{
 				{ Name = "baseTag", Type = "cstring", Nilable = false },
-				{ Name = "color", Type = "colorRGBA", Mixin = "ColorMixin", Nilable = false },
+				{ Name = "color", Type = "colorRGBA", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

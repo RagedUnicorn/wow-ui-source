@@ -3,6 +3,7 @@ local UIMacros =
 	Name = "UIMacros",
 	Type = "System",
 	Namespace = "C_Macro",
+	Environment = "All",
 
 	Functions =
 	{
@@ -46,6 +47,7 @@ local UIMacros =
 		{
 			Name = "RunMacroText",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -56,6 +58,7 @@ local UIMacros =
 		{
 			Name = "SetMacroExecuteLineCallback",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -70,6 +73,7 @@ local UIMacros =
 			Name = "UpdateMacros",
 			Type = "Event",
 			LiteralName = "UPDATE_MACROS",
+			SynchronousEvent = true,
 		},
 	},
 
@@ -84,6 +88,9 @@ local UIMacros =
 				{ Name = "macroLine", Type = "cstring", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

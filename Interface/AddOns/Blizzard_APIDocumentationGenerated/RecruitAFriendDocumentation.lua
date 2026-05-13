@@ -3,6 +3,7 @@ local RecruitAFriend =
 	Name = "RecruitAFriend",
 	Type = "System",
 	Namespace = "C_RecruitAFriend",
+	Environment = "All",
 
 	Functions =
 	{
@@ -23,6 +24,7 @@ local RecruitAFriend =
 		{
 			Name = "ClaimActivityReward",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -38,6 +40,7 @@ local RecruitAFriend =
 		{
 			Name = "ClaimNextReward",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -52,6 +55,7 @@ local RecruitAFriend =
 		{
 			Name = "GenerateRecruitmentLink",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Returns =
 			{
@@ -147,6 +151,7 @@ local RecruitAFriend =
 		{
 			Name = "RemoveRAFRecruit",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -161,6 +166,7 @@ local RecruitAFriend =
 		{
 			Name = "RequestUpdatedRecruitmentInfo",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Returns =
 			{
@@ -185,6 +191,7 @@ local RecruitAFriend =
 			Name = "RafInfoUpdated",
 			Type = "Event",
 			LiteralName = "RAF_INFO_UPDATED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "info", Type = "RafInfo", Nilable = false },
@@ -194,6 +201,7 @@ local RecruitAFriend =
 			Name = "RafRecruitingEnabledStatus",
 			Type = "Event",
 			LiteralName = "RAF_RECRUITING_ENABLED_STATUS",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "enabled", Type = "bool", Nilable = false },
@@ -203,11 +211,13 @@ local RecruitAFriend =
 			Name = "RafRewardClaimFailed",
 			Type = "Event",
 			LiteralName = "RAF_REWARD_CLAIM_FAILED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "RafSystemEnabledStatus",
 			Type = "Event",
 			LiteralName = "RAF_SYSTEM_ENABLED_STATUS",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "enabled", Type = "bool", Nilable = false },
@@ -217,6 +227,7 @@ local RecruitAFriend =
 			Name = "RafSystemInfoUpdated",
 			Type = "Event",
 			LiteralName = "RAF_SYSTEM_INFO_UPDATED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "systemInfo", Type = "RafSystemInfo", Nilable = false },
@@ -436,6 +447,9 @@ local RecruitAFriend =
 				{ Name = "numRecruits", Type = "number", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

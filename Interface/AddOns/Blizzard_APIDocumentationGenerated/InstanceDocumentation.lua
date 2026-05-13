@@ -2,6 +2,7 @@ local Instance =
 {
 	Name = "Instance",
 	Type = "System",
+	Environment = "All",
 
 	Functions =
 	{
@@ -40,6 +41,20 @@ local Instance =
 			},
 		},
 		{
+			Name = "GetBaseDifficultyID",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "difficultyID", Type = "number", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "baseDifficultyID", Type = "number", Nilable = false },
+			},
+		},
+		{
 			Name = "GetDifficultyInfo",
 			Type = "Function",
 
@@ -60,6 +75,7 @@ local Instance =
 				{ Name = "isLFR", Type = "bool", Nilable = false },
 				{ Name = "minPlayers", Type = "number", Nilable = true },
 				{ Name = "maxPlayers", Type = "number", Nilable = true },
+				{ Name = "isUserSelectable", Type = "bool", Nilable = false },
 			},
 		},
 		{
@@ -96,6 +112,7 @@ local Instance =
 				{ Name = "instanceID", Type = "number", Nilable = false },
 				{ Name = "instanceGroupSize", Type = "number", Nilable = false },
 				{ Name = "lfgDungeonID", Type = "number", Nilable = true },
+				{ Name = "hasWorldTier", Type = "bool", Nilable = false, Default = false },
 			},
 		},
 		{
@@ -225,6 +242,7 @@ local Instance =
 				{ Name = "isLFR", Type = "bool", Nilable = false },
 				{ Name = "minPlayers", Type = "number", Nilable = true },
 				{ Name = "maxPlayers", Type = "number", Nilable = true },
+				{ Name = "isUserSelectable", Type = "bool", Nilable = false },
 			},
 		},
 		{
@@ -253,8 +271,12 @@ local Instance =
 				{ Name = "instanceID", Type = "number", Nilable = false },
 				{ Name = "instanceGroupSize", Type = "number", Nilable = false },
 				{ Name = "lfgDungeonID", Type = "number", Nilable = true },
+				{ Name = "hasWorldTier", Type = "bool", Nilable = false, Default = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

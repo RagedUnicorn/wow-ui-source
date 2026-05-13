@@ -1,4 +1,3 @@
-
 local InvalidationReason = EnumUtil.MakeEnum("DataProviderReassigned", "DataProviderContentsChanged");
 
 ScrollBoxListViewMixin = CreateFromMixins(ScrollBoxViewMixin, CallbackRegistryMixin);
@@ -21,13 +20,6 @@ function ScrollBoxListViewMixin:Init()
 
 	self.frameFactory = CreateFrameFactory();
 	self.templateInfoCache = self.frameFactory:GetTemplateInfoCache();
-	self.templateInfoCache:SetInfoAddedCallback(function(info)
-		-- We need to know when a new infos was added so we can reevaluate if
-		-- the extents of each template are identical. This state could be stored
-		-- in the cache, but it has no use for the dirty state, so we're subscribing
-		-- for it instead.
-		self.templateInfoDirty = true;
-	end);
 
 	self.factory = function(frameTemplateOrFrameType, initializer)
 		local frame, new = self.frameFactory:Create(self:GetScrollTarget(), frameTemplateOrFrameType, self.frameFactoryResetter);
@@ -36,12 +28,28 @@ function ScrollBoxListViewMixin:Init()
 		if not frame then
 			error(string.format("ScrollBoxListViewMixin: Failed to create a frame from pool for frame template or frame type '%s'", frameTemplateOrFrameType));
 		end
-		
+
 		-- The frame and new values are captured here instead of being returned to prevent the callee from having
 		-- access to the frame prior to it being properly anchored or arranged. The frame's initializer will be called
 		-- once all frames have been arranged in the layout step.
 		self.factoryFrame = frame;
 		self.factoryFrameIsNew = new;
+	end
+
+	-- For convenience of not having to call SetElementExtent during view setup, automatically set the element extent,
+	-- as long as it hasn't already been set, and the view isn't configured to calculate it instead.
+	if self.frameTemplateOrFrameType ~= nil then
+		if not self:HasBiaxalLayout() and not self:HasElementExtent() and not self:HasAnyExtentOrSizeCalculator() then
+			if C_XMLUtil.GetTemplateInfo(self.frameTemplateOrFrameType) == nil then
+				error("Failed to assign an explicit element extent or set an extent calculator.");
+			end
+
+			local extent = self:GetTemplateExtent(self.frameTemplateOrFrameType);
+			if extent > 0 then
+				self:SetElementExtent(extent);
+			end
+		end
+		self.frameTemplateOrFrameType = nil;
 	end
 end
 
@@ -53,9 +61,14 @@ function ScrollBoxListViewMixin:GetTemplateInfo(frameTemplate)
 	return self.templateInfoCache:GetTemplateInfo(frameTemplate);
 end
 
+function ScrollBoxListViewMixin:GetFirstTemplateInfo()
+	local infos = self.templateInfoCache:GetTemplateInfos();
+	return infos[next(infos)];
+end
+
 function ScrollBoxListViewMixin:AssignAccessors(frame, elementData)
-	--[[ 
-	Provides an accessor to the underlying data. If the elements in your data provider 
+	--[[
+	Provides an accessor to the underlying data. If the elements in your data provider
 	wrap this data in any way (as is done in TreeDataProvider), ensure that the data
 	can be retrieved via your view's TranslateElementDataToUnderlyingData function. Note
 	that this function was provided after all of the conversions occured in 10.0, so many
@@ -68,8 +81,8 @@ function ScrollBoxListViewMixin:AssignAccessors(frame, elementData)
 	frame.GetData = function(self)
 		return view:TranslateElementDataToUnderlyingData(elementData);
 	end
-	
-	--[[ 
+
+	--[[
 	Should always return the data stored in the data provider. Views require this function
 	to relate data provider elements with their frame counterpart. This elementData could be
 	the same as the underlying data, or it could be a tree node.
@@ -77,7 +90,7 @@ function ScrollBoxListViewMixin:AssignAccessors(frame, elementData)
 	frame.GetElementData = function(self)
 		return elementData;
 	end;
-	
+
 	frame.GetElementDataIndex = function(self)
 		return view:FindElementDataIndex(elementData);
 	end;
@@ -122,10 +135,13 @@ end
 
 function ScrollBoxListViewMixin:ForEachFrame(func)
 	for index, frame in ipairs(self:GetFrames()) do
-		if func(frame, frame:GetElementData()) then
-			return;
+		local result = func(frame, frame:GetElementData());
+		if result then
+			return result;
 		end
 	end
+
+	return nil;
 end
 
 function ScrollBoxListViewMixin:ReverseForEachFrame(func)
@@ -147,7 +163,7 @@ function ScrollBoxListViewMixin:FindFrame(elementData)
 		end
 	end
 end
- 
+
 function ScrollBoxListViewMixin:FindFrameElementDataIndex(findFrame)
 	local dataIndexBegin = self:GetDataIndexBegin();
 	for index, frame in ipairs(self:GetFrames()) do
@@ -157,10 +173,9 @@ function ScrollBoxListViewMixin:FindFrameElementDataIndex(findFrame)
 	end
 end
 
---[[ Accessor warning section
-You must ensure that if the data provider can contain items that are not displayed
-(ex. TreeListDataProvider), you must override these functions in the appropriate view
-(ex. ScrollBoxListView), otherwise the elementData or indices will not be correct.
+--[[ Accessor warnings
+DataProvider method overrides may be required if the view expects non-contiguous
+element ranges to be displayed. See TreeListDataProvider as an example.
 --]]
 function ScrollBoxListViewMixin:ForEachElementData(func)
 	self:GetDataProvider():ForEach(func);
@@ -188,16 +203,6 @@ end
 
 function ScrollBoxListViewMixin:FindByPredicate(predicate)
 	return self:GetDataProvider():FindByPredicate(predicate);
-end
-
--- Deprecated, use FindElementData
-function ScrollBoxListViewMixin:Find(index)
-	return self:FindElementData(index);
-end
-
--- Deprecated, use FindElementDataIndex
-function ScrollBoxListViewMixin:FindIndex(elementData)
-	return self:FindElementDataIndex(elementData);
 end
 
 function ScrollBoxListViewMixin:ContainsElementDataByPredicate(predicate)
@@ -237,15 +242,12 @@ function ScrollBoxListViewMixin:IsScrollToDataIndexSafe()
 end
 
 function ScrollBoxListViewMixin:PrepareScrollToElementDataByPredicate(predicate)
-	-- Optionally implemented by a derived view to ensure the view can
-	-- locate the required element.
+	-- Optionally derived to ensure the view can locate the required element. See ScrollBoxTreeView as an example.
 end
 
 function ScrollBoxListViewMixin:PrepareScrollToElementData(elementData)
-	-- Optionally implemented by a derived view to ensure the view can
-	-- locate the required element.
+	-- Optionally derived to ensure the view can locate the required element. See ScrollBoxTreeView as an example.
 end
-
 -- End of accessor warning section
 
 function ScrollBoxListViewMixin:GetDataProvider()
@@ -256,18 +258,20 @@ function ScrollBoxListViewMixin:HasDataProvider()
 	return self.dataProvider ~= nil;
 end
 
+function ScrollBoxListViewMixin:ClearCachedData()
+	error("ClearCachedData implementation required")
+end
+
 function ScrollBoxListViewMixin:RemoveDataProviderInternal()
 	local dataProvider = self:GetDataProvider();
 	if dataProvider then
-		dataProvider:UnregisterCallback(DataProviderMixin.Event.OnSizeChanged, self);
-		dataProvider:UnregisterCallback(DataProviderMixin.Event.OnSort, self);
+		self:DetachDataProviderCallbacks();
 	end
 
 	self.dataProvider = nil;
 
-	-- Anytime the data provider is discarded we also want to discard any cached extents.
-	self.templateExtents = nil;
-	self.calculatedElementExtents = nil;
+	-- Anytime the data provider is discarded we also want to discard any cached extent and size data.
+	self:ClearCachedData();
 end
 
 function ScrollBoxListViewMixin:RemoveDataProvider()
@@ -286,17 +290,30 @@ function ScrollBoxListViewMixin:SetDataProvider(dataProvider, retainScrollPositi
 	if dataProvider == nil then
 		error("SetDataProvider() dataProvider was nil. Call RemoveDataProvider() if this was your intent.");
 	end
-	
+
+	if self.elementFactory == nil then
+		error("SetDataProvider() elementFactory was nil. Call SetElementFactory() before setting the data provider.");
+	end
+
 	self:RemoveDataProviderInternal();
 
 	self.dataProvider = dataProvider;
 	if dataProvider then
-		dataProvider:RegisterCallback(DataProviderMixin.Event.OnSizeChanged, self.OnDataProviderSizeChanged, self);
-		dataProvider:RegisterCallback(DataProviderMixin.Event.OnSort, self.OnDataProviderSort, self);
+		self:AttachDataProviderCallbacks();
 	end
-	
+
 	self:TriggerEvent(ScrollBoxListViewMixin.Event.OnDataProviderReassigned);
 	self:SignalDataChangeEvent(InvalidationReason.DataProviderReassigned);
+end
+
+function ScrollBoxListViewMixin:AttachDataProviderCallbacks()
+	self.dataProvider:RegisterCallback(DataProviderMixin.Event.OnSizeChanged, self.OnDataProviderSizeChanged, self);
+	self.dataProvider:RegisterCallback(DataProviderMixin.Event.OnSort, self.OnDataProviderSort, self);
+end
+
+function ScrollBoxListViewMixin:DetachDataProviderCallbacks()
+	self.dataProvider:UnregisterCallback(DataProviderMixin.Event.OnSizeChanged, self);
+	self.dataProvider:UnregisterCallback(DataProviderMixin.Event.OnSort, self);
 end
 
 function ScrollBoxListViewMixin:OnDataProviderSizeChanged(pendingSort)
@@ -329,8 +346,8 @@ end
 
 function ScrollBoxListViewMixin:AcquireInternal(dataIndex, elementData)
 	if self:IsAcquireLocked() then
-		-- Report an error if an Acquire() call causes the ScrollBox to Acquire() again. This most likely means 
-		-- the data provider was changed in the Acquire() call, which is a no-no. This shouldn't occur due to a 
+		-- Report an error if an Acquire() call causes the ScrollBox to Acquire() again. This most likely means
+		-- the data provider was changed in the Acquire() call, which is a no-no. This shouldn't occur due to a
 		-- frame size change because our size change event handlers are deferred until the next UpdateImmediately call.
 		error("ScrollBoxListViewMixin:Acquire was reentrant.");
 	end
@@ -340,7 +357,7 @@ function ScrollBoxListViewMixin:AcquireInternal(dataIndex, elementData)
 	-- causes the view to generate a new element, we'll want to error.
 	self:SetAcquireLocked(true);
 
-	-- Acquire a frame from the factory. The frame and it's 'new' state will be cached upon return. 
+	-- Acquire a frame from the factory. The frame and it's 'new' state will be cached upon return.
 	-- We'll retrieve those and nil the cache fields to prevent misuse later.
 	self.elementFactory(self.factory, elementData);
 	local frame, new = self.factoryFrame, self.factoryFrameIsNew;
@@ -348,13 +365,8 @@ function ScrollBoxListViewMixin:AcquireInternal(dataIndex, elementData)
 	self.factoryFrame, self.factoryFrameIsNew = nil, nil;
 	table.insert(self:GetFrames(), frame);
 
-	-- If either SetElementExtent or SetElementExtentCalculator is assigned we'll set the extent now. 
-	-- Otherwise, the expectation is that the extent is defined in the XML.
-	if self.elementExtent or self.elementExtentCalculator then
-		local extent = self:CalculateFrameExtent(dataIndex, elementData);
-		local scrollBox = self:GetScrollBox();
-		scrollBox:SetFrameExtent(frame, extent);		
-	end
+	-- Resize the frame.
+	self:ResizeFrame(self:GetScrollBox(), frame, dataIndex, elementData);
 
 	-- Assign any accessors required by ScrollBox or this view on the frame.
 	self:AssignAccessors(frame, elementData);
@@ -376,8 +388,8 @@ function ScrollBoxListViewMixin:InvokeInitializer(frame, initializer)
 
 	-- OnInitializedFrame is still called even if there isn't an initializer because an addon
 	-- may still want this event. The cases where elements are used without an initializer (dividers, etc.)
-	-- imply they would be using a factory initializer instead of an element initializer, and 
-	-- since they are able to check the element data type there, they can also check it in the event callback. 
+	-- imply they would be using a factory initializer instead of an element initializer, and
+	-- since they are able to check the element data type there, they can also check it in the event callback.
 	-- To be safe, this is behavior will be configurable, but on by default.
 	if initializer or self.canSignalWithoutInitializer then
 		self:TriggerEvent(ScrollBoxListViewMixin.Event.OnInitializedFrame, frame, elementData);
@@ -429,7 +441,7 @@ function ScrollBoxListViewMixin:Release(frame)
 	end
 
 	self:TriggerEvent(ScrollBoxListViewMixin.Event.OnReleasedFrame, frame, elementData);
-	
+
 	tDeleteItem(self:GetFrames(), frame);
 	self.frameFactory:Release(frame);
 
@@ -445,7 +457,7 @@ end
 --[[]
 	Use SetElementInitializer if using a single template type or basic frame type.
 	local function Initializer(button, elementData)
-		button:Init(elementData); 
+		button:Init(elementData);
 	end
 	SetElementInitializer("MyButtonTemplate", Initializer);
 
@@ -459,21 +471,16 @@ end
 	SetElementInitializer("Button", Initializer);
 ]]
 function ScrollBoxListViewMixin:SetElementInitializer(frameTemplateOrFrameType, initializer)
-	local function Factory(factory, elementData)
+	self:SetElementFactory(function(factory, elementData)
 		factory(frameTemplateOrFrameType, initializer);
-	end;
-	self:SetElementFactory(Factory);
+	end);
 
-	-- For single type factories, we can default to setting the element extent.
-	-- We cannot do this for multiple type factories because the template type can only be known
-	-- after invoking the factory. See GetFactoryDataFromElementData for details on how this is
-	-- happening.
-	if not self.elementExtent and not self.elementExtentCalculator then
-		local extent = self:GetTemplateExtent(frameTemplateOrFrameType);
-		if extent and extent > 0 then
-			self:SetElementExtent(extent);
-		end
-	end
+	-- Store this frame type so that we can try to set the element extent in Init(), if appropriate.
+	-- We want to defer that so the order of initialization related function calls is unimportant.
+	-- (ex. Calling SetElementExtent before SetElementInitializer, and vice-versa). We cannot do
+	-- this for multiple element factories because element data is required to determine the template
+	-- type used.
+	self.frameTemplateOrFrameType = frameTemplateOrFrameType;
 end
 
 --[[
@@ -518,18 +525,6 @@ function ScrollBoxListViewMixin:SetVirtualized(virtualized)
 	self.virtualized = virtualized;
 end
 
-function ScrollBoxListViewMixin:CalculateFrameExtent(dataIndex, elementData)
-	if self.elementExtent then
-		return self.elementExtent;
-	end
-
-	if self.elementExtentCalculator then
-		return math.max(1, self.elementExtentCalculator(dataIndex, elementData));
-	end
-
-	return self:GetTemplateExtentFromElementData(elementData);
-end
-
 	-- This local factory function allows us to ask for the template and initializer
 	-- without actually creating a frame. This is useful in these cases:
 	-- 1) Asking for the template extents before a frame is created
@@ -542,30 +537,100 @@ do
 		template = frameTemplate;
 		initializer = frameInitializer;
 	end;
-	
+
 	function ScrollBoxListViewMixin:GetFactoryDataFromElementData(elementData)
 		self.elementFactory(factory, elementData);
 		return template, initializer;
 	end
 end
 
-function ScrollBoxListViewMixin:GetTemplateExtentFromElementData(elementData)
+-- An optimization to avoid unnecessarily fetching the template and template info
+-- is planned in a future version. In the meantime, this must occur before calculating
+-- the extent.
+function ScrollBoxListViewMixin:RebuildTemplateInfoCache()
+	local dataProvider = self:GetDataProvider();
+	if not dataProvider then
+		return;
+	end
+
+	local size = self:GetDataProviderSize();
+	if size == 0 then
+		return;
+	end
+
+	-- We have to flush the template info cache so that info contained is only representive
+	-- of the contents of the data provider. Otherwise, lingering info with different extents
+	-- would prevent equal template extent optimizations from occurring.
+	self.templateInfoCache:FlushTemplateInfos();
+
+	-- IndexRangeDataProvider is virtual and can represent thousands
+	-- of elements whom are only ever represented by a single template.
+	local enumerateSize = dataProvider:IsVirtual() and 1 or size;
+	for dataIndex, elementData in self:EnumerateDataProvider(1, enumerateSize) do
+		self:CacheTemplateInfoFromElementData(elementData);
+	end
+end
+
+function ScrollBoxListViewMixin:CacheTemplateInfoFromElementData(elementData)
 	local frameTemplate, initializer = self:GetFactoryDataFromElementData(elementData);
-	return self:GetTemplateExtent(frameTemplate);
+	self:GetTemplateInfo(frameTemplate);
 end
 
 function ScrollBoxListViewMixin:GetTemplateExtent(frameTemplate)
 	local info = self:GetTemplateInfo(frameTemplate);
 	if not info then
-		error(string.format("ScrollBoxListViewMixin: Failed to obtain template info for frame template '%s'", frameTemplate));
+		error(string.format("GetTemplateExtent: Failed to obtain template info for frame template '%s'", frameTemplate));
 	end
 	return self:GetExtentFromInfo(info);
 end
 
-function ScrollBoxListViewMixin:GetPanExtent(spacing)
+function ScrollBoxListViewMixin:IsVirtualized()
+	return self.virtualized ~= false;
+end
+
+function ScrollBoxListViewMixin:GetExtentUntil(scrollBox, dataIndexEnd)
+	error("GetExtentUntil implementation required")
+end
+
+function ScrollBoxListViewMixin:GetExtentTo(scrollBox, dataIndexEnd)
+	error("GetExtentTo implementation required")
+end
+
+function ScrollBoxListViewMixin:CalculateDataIndices(scrollBox)
+	error("CalculateDataIndices implementation required")
+end
+
+function ScrollBoxListViewMixin:RecalculateExtent(scrollBox)
+	error("RecalculateExtent implementation required")
+end
+
+function ScrollBoxListViewMixin:GetExtentSpacing(scrollBox)
+	error("GetExtentSpacing implementation required")
+end
+
+function ScrollBoxListViewMixin:GetElementExtent(dataIndex)
+	error("GetElementExtent implementation required")
+end
+
+function ScrollBoxListViewMixin:HasAnyExtentOrSizeCalculator()
+	error("HasAnyExtentOrSizeCalculator implementation required")
+end
+
+function ScrollBoxListViewMixin:CalculateFrameExtent(dataIndex, elementData)
+	error("CalculateFrameExtent implementation required")
+end
+
+function ScrollBoxListViewMixin:GetPanExtent(scrollBox)
 	if not self.panExtent and self:HasDataProvider() then
 		for dataIndex, elementData in self:EnumerateDataProvider() do -- luacheck: ignore 512 (loop is executed at most once)
-			self.panExtent = self:CalculateFrameExtent(dataIndex, elementData);
+			local panExtent = self:CalculateFrameExtent(dataIndex, elementData);
+			if type(panExtent) ~= "number" then
+				error(string.format("GetPanExtent expected a numeric frame extent at data index %d.", dataIndex));
+			end
+
+			if panExtent > 0 then
+				self.panExtent = panExtent;
+			end
 			break;
 		end
 	end
@@ -573,8 +638,8 @@ function ScrollBoxListViewMixin:GetPanExtent(spacing)
 	if not self.panExtent then
 		return 0;
 	end
-	
-	local panExtent = self.panExtent + spacing;
+
+	local panExtent = self.panExtent + self:GetExtentSpacing();
 	if self.maxPanExtent and (panExtent > self.maxPanExtent) then
 		return self.maxPanExtent;
 	end
@@ -582,266 +647,23 @@ function ScrollBoxListViewMixin:GetPanExtent(spacing)
 	return panExtent;
 end
 
-function ScrollBoxListViewMixin:IsVirtualized()
-	return self.virtualized ~= false;
-end
-
-local function CheckDataIndicesReturn(dataIndexBegin, dataIndexEnd)
-	-- Erroring here to prevent the client from lockup if 100,000 frames are requested. This can happen
-	-- if a frame doesn't correct frame extents (1 height/width), causing a much larger range to be displayed than expected.
-	local size = dataIndexEnd - dataIndexBegin;
-	local capacity = 500;
-	if size >= capacity then
-		error(string.format("ScrollBoxListViewMixin:CalculateDataIndices encountered an unsupported size. %d/%d", size, capacity));
-	end
-
-	return dataIndexBegin, dataIndexEnd;
-end
-
-function ScrollBoxListViewMixin:CalculateDataIndices(scrollBox, stride, spacing)
-	local size = self:GetDataProviderSize();
-	if size == 0 then
-		return 0, 0;
-	end
-
-	if scrollBox:GetVisibleExtent() == 0 then
-		return 0, 0;
-	end
-
-	if not self:IsVirtualized() then
-		return CheckDataIndicesReturn(1, size);
-	end
-
-	self:RecalculateExtent(scrollBox, stride, spacing); --prevents the assert in GetElementExtent
-
-	local dataIndexBegin;
-	local scrollOffset = Round(scrollBox:GetDerivedScrollOffset());
-	local upperPadding = scrollBox:GetUpperPadding();
-	local extentBegin = upperPadding;
-	-- For large element ranges (i.e. 10,000+), we're required to use identical element extents 
-	-- to avoid performance issues. We're calculating the number of elements that partially or fully
-	-- fit inside the extent of the scroll offset to obtain our reference position. If we happen to
-	-- be using a traditional data provider, this optimization is still useful.
-	if self:HasIdenticalElementExtents() then
-		local extentWithSpacing = self:GetIdenticalElementExtents() + spacing;
-		local intervals = math.floor(math.max(0, scrollOffset - upperPadding) / extentWithSpacing);
-		dataIndexBegin = 1 + (intervals * stride);
-		local extentTotal = (1 + intervals) * extentWithSpacing;
-		extentBegin = extentBegin + extentTotal;
-	else
-		do
-			dataIndexBegin = 1 - stride;
-			repeat
-				dataIndexBegin = dataIndexBegin + stride;
-				local extentWithSpacing = self:GetElementExtent(dataIndexBegin) + spacing;
-				extentBegin = extentBegin + extentWithSpacing;
-			until (extentBegin > scrollOffset);
-		end
-	end
-
-	-- Addon request to exclude the first element when only spacing is visible.
-	-- This will be revised when per-element spacing support is added.
-	if (spacing > 0) and ((extentBegin - spacing) < scrollOffset) then
-		dataIndexBegin = dataIndexBegin + stride;
-		extentBegin = extentBegin + self:GetElementExtent(dataIndexBegin) + spacing;
-	end
-
-	-- Optimization above for fixed element extents is not necessary here because we do
-	-- not need to iterate over the entire data range. The iteration is limited to the
-	-- number of elements that can fit in the displayable area.
-	local extentEnd = scrollBox:GetVisibleExtent() + scrollOffset;
-	local extentNext = extentBegin;
-	local dataIndexEnd = dataIndexBegin;
-	while (dataIndexEnd < size) and (extentNext < extentEnd) do
-		local nextDataIndex = dataIndexEnd + stride;
-		dataIndexEnd = nextDataIndex;
-
-		-- We're oor, which is expected in the case of stride > 1. In this case we're done
-		-- and the dataIndexEnd will be clamped into range of the data provider below.
-		local extent = self:GetElementExtent(nextDataIndex);
-		if extent == nil or extent == 0 then
-			break;
-		end
-
-		extentNext = extentNext + extent + spacing;
-	end
-
-	if stride > 1 then
-		dataIndexEnd = math.min(dataIndexEnd - (dataIndexEnd % stride) + stride, size);
-	else
-		dataIndexEnd = math.min(dataIndexEnd, size);
-	end
-
-	return CheckDataIndicesReturn(dataIndexBegin, dataIndexEnd);
-end
-
-function ScrollBoxListViewMixin:RecalculateExtent(scrollBox, stride, spacing)
-	local function CalculateExtents(extentsTbl, size)
-		local total = 0;
-
-		for dataIndex, elementData in self:EnumerateDataProvider() do
-			local extent = self:CalculateFrameExtent(dataIndex, elementData);
-			table.insert(extentsTbl, extent);
-		end
-
-		for dataIndex = 1, size, stride do
-			total = total + extentsTbl[dataIndex];
-		end
-
-		return total;
-	end
-
-	local extent = 0;
-	local size = 0;
-	if self:HasDataProvider() then
-		size = self:GetDataProviderSize();
-		
-		local function CalculateTemplateExtents()
-			self.templateExtents = {};
-			return CalculateExtents(self.templateExtents, size);
-		end
-
-		local templateExtentsMismatch = self.templateExtents and #self.templateExtents ~= size;
-		if templateExtentsMismatch then
-			extent = CalculateTemplateExtents();
-		elseif self:HasIdenticalElementExtents() then
-			extent = math.ceil(size/stride) * self:GetIdenticalElementExtents();
-		elseif self.elementExtentCalculator then
-			self.calculatedElementExtents = {};
-			extent = CalculateExtents(self.calculatedElementExtents, size);
-		else
-			extent = CalculateTemplateExtents();
-		end
-	end
-	
-	local space = ScrollBoxViewUtil.CalculateSpacingUntil(size, stride, spacing);
-	self:SetExtent(extent + space + scrollBox:GetUpperPadding() + scrollBox:GetLowerPadding());
-end
-
-function ScrollBoxListViewMixin:GetExtent(scrollBox, stride, spacing)
-	if not self:IsExtentValid() then
-		self:RecalculateExtent(scrollBox, stride, spacing);
-	end
-	return self.extent;
-end
-
-do
-	local function HasEqualTemplateInfoExtents(view, infos)
-		local refInfo = infos[next(infos)];
-		local refInfoExtent = view:GetExtentFromInfo(refInfo);
-		if not refInfo or refInfoExtent <= 0 then
-			return false;
-		end
-	
-		for frameTemplate, info in pairs(infos) do
-			local infoExtent = view:GetExtentFromInfo(info);
-			if not ApproximatelyEqual(refInfoExtent, infoExtent) then
-				return false;
-			end
-		end
-	
-		return true;
-	end
-	
-function ScrollBoxListViewMixin:HasIdenticalElementExtents()
-	if self.elementExtentCalculator then
-		return false;
-	end
-	
-	if self.elementExtent then
-		return true;
-	end
-
-		if self.templateInfoDirty then
-			self.templateInfoDirty = nil;
-	
-			local infos = self.templateInfoCache:GetTemplateInfos();
-			self.hasEqualTemplateInfoExtents = HasEqualTemplateInfoExtents(self, infos);
-		end
-		
-		return self.hasEqualTemplateInfoExtents;
-	end
-end
-
-function ScrollBoxListViewMixin:GetIdenticalElementExtents()
-	assert(self:HasIdenticalElementExtents());
-	if self.elementExtent then
-		return self.elementExtent;
-	end
-
-	local infos = self.templateInfoCache:GetTemplateInfos();
-	local info = infos[next(infos)];
-	return self:GetExtentFromInfo(info);
-end
-
--- Retained for debugging.
-local function ValidateExtent(extentsTbl, dataIndex)
-	if not extentsTbl[dataIndex] then
-		Dump(extentsTbl);
-		error(string.format("dataIndex %d not found in extents table", dataIndex));
-	end
-end
-
-function ScrollBoxListViewMixin:GetElementExtent(dataIndex)
-	if self:HasIdenticalElementExtents() then 
-		return self:GetIdenticalElementExtents();
-	end
-
-	local extent = 0;
-	if self.calculatedElementExtents then
-		extent = self.calculatedElementExtents[dataIndex];
-		--ValidateExtent(self.calculatedElementExtents, dataIndex);
-	elseif self.templateExtents then
-		extent = self.templateExtents[dataIndex];
-		--ValidateExtent(self.templateExtents, dataIndex);
-	end
-	return extent;
+function ScrollBoxListViewMixin:ClearElementExtentData()
+	self.elementExtent = nil;
 end
 
 function ScrollBoxListViewMixin:SetElementExtent(extent)
+	self:ClearElementExtentData();
 	self.elementExtent = math.max(extent, 1);
-	self.elementExtentCalculator = nil;
-	self.templateExtents = nil;
-	self.calculatedElementExtents = nil;
 end
 
-function ScrollBoxListViewMixin:SetElementExtentCalculator(elementExtentCalculator)
-	self.elementExtentCalculator = elementExtentCalculator;
-	self.elementExtent = nil;
-	self.templateExtents = nil;
-	self.calculatedElementExtents = nil;
+function ScrollBoxListViewMixin:HasElementExtent()
+	return self.elementExtent ~= nil;
 end
-
-function ScrollBoxListViewMixin:GetElementExtentCalculator()
-	return self.elementExtentCalculator;
-end
-
-function ScrollBoxListViewMixin:GetExtentUntil(scrollBox, dataIndex, stride, spacing)
-	if dataIndex == 0 then
-		return 0;
-	end
-
-	local index = dataIndex - stride;
-	local extent = 0;
-	if self:HasIdenticalElementExtents() then
-		extent = math.max(0, math.ceil(index / stride)) * self:GetIdenticalElementExtents();
-	else
-		while index > 0 do
-			extent = extent + self:GetElementExtent(index);
-			index = index - stride;
-		end
-	end
-	
-	
-	local space = ScrollBoxViewUtil.CalculateSpacingUntil(dataIndex, stride, spacing);
-	return extent + space + scrollBox:GetUpperPadding();
-end
-
 
 function ScrollBoxListViewMixin:GetDataScrollOffset(scrollBox)
 	local dataIndexBegin, dataIndexEnd = self:CalculateDataIndices(scrollBox);
-	local dataScrollOffset = self:GetExtentUntil(scrollBox, dataIndexBegin);
-	return dataScrollOffset;
+	local extent = self:GetExtentUntil(scrollBox, dataIndexBegin);
+	return extent + scrollBox:GetUpperPadding();
 end
 
 function ScrollBoxListViewMixin:ValidateDataRange(scrollBox)
@@ -853,10 +675,9 @@ function ScrollBoxListViewMixin:ValidateDataRange(scrollBox)
 	local invalidated = self:IsInvalidated();
 	local rangeChanged = invalidated or oldDataIndexBegin ~= dataIndexBegin or oldDataIndexEnd ~= dataIndexEnd;
 	if rangeChanged then
-		local dataProvider = self:GetDataProvider();
 		--[[
-			local size = dataProvider and dataProvider:GetSize() or 0;
-			print(string.format("%d - %d of %d, invalidated =", dataIndexBegin, dataIndexEnd, 
+			local size = self:GetDataProviderSize();
+			print(string.format("%d - %d of %d, invalidated =", dataIndexBegin, dataIndexEnd,
 				size), invalidated, GetTime());
 		--]]
 
@@ -873,7 +694,7 @@ function ScrollBoxListViewMixin:ValidateDataRange(scrollBox)
 				end
 			end
 		end
-		
+
 		if canRecycle then
 			local acquireList = {};
 			local releaseList = {};
@@ -913,7 +734,7 @@ function ScrollBoxListViewMixin:ValidateDataRange(scrollBox)
 				self:AcquireRange(range);
 			end
 		end
-		
+
 		self:ClearInvalidation();
 
 		self:SortFrames();

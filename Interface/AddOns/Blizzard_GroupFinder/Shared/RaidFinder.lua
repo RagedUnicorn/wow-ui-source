@@ -196,6 +196,7 @@ end
 function RaidFinderQueueFrame_OnShow(self)
 	self.SelectionDropdown:SetupMenu(function(dropdown, rootDescription)
 		rootDescription:SetTag("MENU_RAID_FINDER_QUEUE_FRAME");
+		rootDescription:SetScrollMode(600);
 
 		local sortedDungeons = { };
 		local function InsertDungeonData(id, name, mapName, isAvailable, mapID)
@@ -436,21 +437,22 @@ end
 
 function RaidFinderRoleButton_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-	GameTooltip:SetText(_G["ROLE_DESCRIPTION_"..self.role], nil, nil, nil, nil, true);
+	GameTooltip_SetTitle(GameTooltip, _G["ROLE_DESCRIPTION_"..self.role]);
+
 	if ( self.permDisabled ) then
 		if(self.permDisabledTip)then
-			GameTooltip:AddLine(self.permDisabledTip, 1, 0, 0, true);
+			GameTooltip_AddErrorLine(GameTooltip, self.permDisabledTip);
 		end
 	elseif ( self.disabledTooltip and not self:IsEnabled() ) then
-		GameTooltip:AddLine(self.disabledTooltip, 1, 0, 0, true);
+		GameTooltip_AddErrorLine(GameTooltip, self.disabledTooltip);
 	elseif ( self.lockedIndicator:IsVisible() ) then
 		local dungeonID = RaidFinderQueueFrame.raid;
 		local roleID = self:GetID();
-		GameTooltip:SetText(ERR_ROLE_UNAVAILABLE, 1.0, 1.0, 1.0, true);
+		GameTooltip_SetTitle(GameTooltip, ERR_ROLE_UNAVAILABLE);
 		if ( type(dungeonID) == "number" ) then
 			local textTable = LFGRoleButton_LockReasonsTextTable(dungeonID, roleID);
 			for text,_ in pairs( textTable ) do
-				GameTooltip:AddLine(text, nil, nil, nil, true);
+				GameTooltip_AddNormalLine(GameTooltip, text);
 			end
 		end
 		GameTooltip:Show();
@@ -465,15 +467,12 @@ function RaidFinderQueueFrameCooldownFrame_OnLoad(self)
 	self:SetFrameLevel(RaidFinderQueueFrame:GetFrameLevel() + 9);	--This value also needs to be set when SetParent is called in LFDQueueFrameRandomCooldownFrame_Update.
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");	--For logging in/reloading ui
-	self:RegisterEvent("UNIT_AURA");	--The cooldown is still technically a debuff
+	self:RegisterEvent("LFG_COOLDOWNS_UPDATED");
 	self:RegisterEvent("GROUP_ROSTER_UPDATE");
 end
 
 function RaidFinderQueueFrameCooldownFrame_OnEvent(self, event, ...)
-	local arg1 = ...;
-	if ( event ~= "UNIT_AURA" or arg1 == "player" or strsub(arg1, 1, 5) == "party" or strsub(arg1, 1, 5) == "raid" ) then
-		RaidFinderQueueFrameCooldownFrame_Update();
-	end
+	RaidFinderQueueFrameCooldownFrame_Update();
 end
 
 function RaidFinderQueueFrameCooldownFrame_OnUpdate(self, elapsed)

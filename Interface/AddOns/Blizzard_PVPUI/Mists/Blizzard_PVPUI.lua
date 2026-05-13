@@ -30,26 +30,29 @@ StaticPopupDialogs["CONFIRM_JOIN_SOLO"] = {
 -- PVP FRAME  (Unlike reference, this is now a tab of the GroupFinderFrame)
 ---------------------------------------------------------------
 
-local pvpFrames = { "HonorQueueFrame", "ConquestQueueFrame", "WarGamesQueueFrame" }
+local pvpFrames = { "HonorQueueFrame", "ConquestQueueFrame", "WarGamesQueueFrame", "LFGListPVPStub" }
 
 function PVPQueueFrame_OnLoad(self)
 	local englishFaction = UnitFactionGroup("player");
 	local currencyInfo;
 
-	SetPortraitToTexture(self.CategoryButton1.Icon, "Interface\\Icons\\achievement_bg_winwsg");
+	self.CategoryButton1.Icon:SetTexture("Interface\\Icons\\achievement_bg_winwsg");
 	self.CategoryButton1.Name:SetText(PVP_TAB_HONOR);
 	currencyInfo = C_CurrencyInfo.GetCurrencyInfo(Constants.CurrencyConsts.CLASSIC_HONOR_CURRENCY_ID);
 	self.CategoryButton1.CurrencyAmount:SetText(currencyInfo.quantity);
 	self.CategoryButton1.CurrencyIcon:SetTexture("Interface\\PVPFrame\\PVPCurrency-Honor-"..englishFaction);
 
-	SetPortraitToTexture(self.CategoryButton2.Icon, "Interface\\Icons\\achievement_bg_killxenemies_generalsroom");
+	self.CategoryButton2.Icon:SetTexture("Interface\\Icons\\achievement_bg_killxenemies_generalsroom");
 	self.CategoryButton2.Name:SetText(PVP_TAB_CONQUEST);
 	self.CategoryButton2.CurrencyIcon:SetTexture("Interface\\PVPFrame\\PVPCurrency-Conquest-"..englishFaction);
 	currencyInfo = C_CurrencyInfo.GetCurrencyInfo(Constants.CurrencyConsts.CONQUEST_POINTS_CURRENCY_ID);
 	self.CategoryButton2.CurrencyAmount:SetText(currencyInfo.quantity);
 
-	SetPortraitToTexture(self.CategoryButton3.Icon, "Interface\\Icons\\ability_warrior_offensivestance");
+	self.CategoryButton3.Icon:SetTexture("Interface\\Icons\\ability_warrior_offensivestance");
 	self.CategoryButton3.Name:SetText(WARGAMES);
+
+	self.CategoryButton4.Icon:SetTexture("Interface\\Icons\\Achievement_General_StayClassy");
+	self.CategoryButton4.Name:SetText(LFGLIST_NAME);
 
 	if (UnitFactionGroup("player") == PLAYER_FACTION_GROUP[0]) then
 		HonorQueueFrame.BonusFrame.BattlegroundTexture:SetTexCoord(HORDE_TEX_COORDS.left, HORDE_TEX_COORDS.right,
@@ -336,7 +339,7 @@ function HonorQueueFrame_UpdateQueueButtons()
 	local canQueue;
 	local isWorldPVP;
 	if ( HonorQueueFrame.type == "specific" ) then
-		if ( HonorQueueFrame.SpecificFrame.selectionID ) then
+		if ( HonorQueueFrame.SpecificFrame.bgID ) then
 			canQueue = true;
 		end
 	elseif ( HonorQueueFrame.type == "bonus" ) then
@@ -367,13 +370,13 @@ function HonorQueueFrame_Queue(isParty, forceSolo)
 		return;
 	end
 	local HonorQueueFrame = HonorQueueFrame;
-	if ( HonorQueueFrame.type == "specific" and HonorQueueFrame.SpecificFrame.selectionID ) then
-		JoinBattlefield(HonorQueueFrame.SpecificFrame.selectionID, isParty);
+	if ( HonorQueueFrame.type == "specific" and HonorQueueFrame.SpecificFrame.bgID ) then
+		C_PvP.JoinBattlefield(HonorQueueFrame.SpecificFrame.bgID, isParty);
 	elseif ( HonorQueueFrame.type == "bonus" and HonorQueueFrame.BonusFrame.selectedButton ) then
 		if ( HonorQueueFrame.BonusFrame.selectedButton.worldID ) then
 			JoinWorldPVPQueue(false, isParty, HonorQueueFrame.BonusFrame.selectedButton.bgID);
 		else
-			JoinBattlefield(HonorQueueFrame.BonusFrame.selectedButton.bgID, isParty);
+			C_PvP.JoinBattlefield(HonorQueueFrame.BonusFrame.selectedButton.bgID, isParty);
 		end
 	end
 end
@@ -386,7 +389,7 @@ function HonorQueueFrameSpecificList_Update()
 	local buttons = scrollFrame.buttons;
 	local numButtons = #buttons;
 	local numBattlegrounds = GetNumBattlegroundTypes();
-	local selectionID = scrollFrame.selectionID;
+	local bgID = scrollFrame.bgID;
 	local buttonCount = -offset;
 
 	for i = 1, numBattlegrounds do
@@ -400,7 +403,7 @@ function HonorQueueFrameSpecificList_Update()
 				button.SizeText:SetFormattedText(PVP_TEAMTYPE, maxPlayers, maxPlayers);
 				button.InfoText:SetText(gameType);
 				button.Icon:SetTexture(iconTexture or DEFAULT_BG_TEXTURE);
-				if ( selectionID == battleGroundID ) then
+				if ( bgID == battleGroundID ) then
 					button.SelectedTexture:Show();
 					button.NameText:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 					button.SizeText:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
@@ -447,6 +450,7 @@ function HonorQueueFrameSpecificList_FindAndSelectBattleground(bgID)
 	end
 
 	HonorQueueFrame.SpecificFrame.selectionID = bgButtonIndex;
+	HonorQueueFrame.SpecificFrame.bgID = bgID;
 	-- scroll the list if necessary
 	if ( numBattlegrounds > MAX_SHOWN_BATTLEGROUNDS ) then
 		local offset;
@@ -469,6 +473,7 @@ end
 function HonorQueueFrameSpecificBattlegroundButton_OnClick(self)
 	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 	HonorQueueFrame.SpecificFrame.selectionID = self.selectionID;
+	HonorQueueFrame.SpecificFrame.bgID = self.bgID;
 	HonorQueueFrameSpecificList_ResetInfo();
 	HonorQueueFrameSpecificList_Update();
 end
@@ -641,7 +646,11 @@ function HonorQueueFrameBonusFrame_Update()
 			button = HonorQueueFrame.BonusFrame["WorldPVP"..i.."Button"];
 			local worldPvpInfo = C_PvP.GetWorldPVPAreaInfo(index);
 			button.Contents.Title:SetText(worldPvpInfo.name);
-			HonorQueueFrameBonusFrame_SetButtonState(button, worldPvpInfo.canEnter, worldPvpInfo.minLevel);
+			local minLevelToDisplay = nil;
+			if not worldPvpInfo.canQueue then
+				minLevelToDisplay = worldPvpInfo.minLevel;
+			end
+			HonorQueueFrameBonusFrame_SetButtonState(button, worldPvpInfo.canEnter and worldPvpInfo.isActive, minLevelToDisplay);
 			if ( worldPvpInfo.canEnter ) then
 				HonorQueueFrameBonusFrame_UpdateWorldPVPTime(button, worldPvpInfo.isActive, worldPvpInfo.startTime);
 				if ( not selectButton ) then

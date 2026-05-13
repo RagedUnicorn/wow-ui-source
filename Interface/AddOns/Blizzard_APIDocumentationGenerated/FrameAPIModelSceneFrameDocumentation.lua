@@ -2,6 +2,7 @@ local FrameAPIModelSceneFrame =
 {
 	Name = "FrameAPIModelSceneFrame",
 	Type = "ScriptObject",
+	Environment = "All",
 
 	Functions =
 	{
@@ -30,6 +31,19 @@ local FrameAPIModelSceneFrame =
 			Arguments =
 			{
 				{ Name = "index", Type = "luaIndex", Nilable = false },
+			},
+		},
+		{
+			Name = "GetAllowOverlappedModels",
+			Type = "Function",
+
+			Arguments =
+			{
+			},
+
+			Returns =
+			{
+				{ Name = "allowOverlappedModels", Type = "bool", Nilable = false },
 			},
 		},
 		{
@@ -333,6 +347,15 @@ local FrameAPIModelSceneFrame =
 			},
 		},
 		{
+			Name = "SetAllowOverlappedModels",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "allowOverlappedModels", Type = "bool", Nilable = false },
+			},
+		},
+		{
 			Name = "SetCameraFarClip",
 			Type = "Function",
 
@@ -552,6 +575,9 @@ local FrameAPIModelSceneFrame =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

@@ -3,6 +3,12 @@ READY_CHECK_READY_TEXTURE = "Interface\\RaidFrame\\ReadyCheck-Ready";
 READY_CHECK_NOT_READY_TEXTURE = "Interface\\RaidFrame\\ReadyCheck-NotReady";
 READY_CHECK_AFK_TEXTURE = "Interface\\RaidFrame\\ReadyCheck-NotReady";
 
+-- Smaller icons that do not have a background shadow
+READY_CHECK_WAITING_TEXTURE_RAID = "UI-LFG-PendingMark-Raid";
+READY_CHECK_READY_TEXTURE_RAID = "UI-LFG-ReadyMark-Raid";
+READY_CHECK_NOT_READY_TEXTURE_RAID = "UI-LFG-DeclineMark-Raid";
+READY_CHECK_AFK_TEXTURE_RAID = "UI-LFG-DeclineMark-Raid";
+
 READY_CHECK_WAITING_ATLAS = "UI-LFG-PendingMark";
 READY_CHECK_READY_ATLAS = "UI-LFG-ReadyMark";
 READY_CHECK_NOT_READY_ATLAS = "UI-LFG-DeclineMark";
@@ -21,7 +27,22 @@ function ShowReadyCheck(initiator, timeLeft)
 			ReadyCheckListenerFrame:Hide();
 		else
 			SetPortraitTexture(ReadyCheckPortrait, initiator);
-			ReadyCheckFrameText:SetFormattedText(READY_CHECK_MESSAGE, initiator);
+			local _, _, difficultyID = GetInstanceInfo();
+			if ( not difficultyID or difficultyID == 0 ) then
+				-- not in an instance, go by current difficulty setting
+				if (UnitInRaid("player")) then
+					difficultyID = GetRaidDifficultyID();
+				else
+					difficultyID = GetDungeonDifficultyID();
+				end
+			end
+			local difficultyName, _, _, _, _, _, toggleDifficultyID = GetDifficultyInfo(difficultyID);
+			if ( toggleDifficultyID and toggleDifficultyID > 0 ) then
+				-- the current difficulty might change while inside an instance so show the difficulty on the ready check
+				ReadyCheckFrameText:SetFormattedText(READY_CHECK_MESSAGE.."\n"..RAID_DIFFICULTY..": "..difficultyName, initiator);
+			else
+				ReadyCheckFrameText:SetFormattedText(READY_CHECK_MESSAGE, initiator);
+			end
 			ReadyCheckListenerFrame:Show();
 		end
 	end
@@ -63,7 +84,7 @@ end
 function ReadyCheck_Start(readyCheckFrame)
 	readyCheckFrame:SetScript("OnUpdate", nil);
 
-	_G[readyCheckFrame:GetName().."Texture"]:SetTexture(READY_CHECK_WAITING_TEXTURE);
+	readyCheckFrame.Texture:SetTexture(READY_CHECK_WAITING_TEXTURE);
 	readyCheckFrame.state = "waiting";
 	readyCheckFrame:SetAlpha(1);
 	readyCheckFrame:Show();
@@ -73,10 +94,10 @@ function ReadyCheck_Confirm(readyCheckFrame, ready)
 	readyCheckFrame:SetScript("OnUpdate", nil);
 
 	if ( ready == 1 ) then
-		_G[readyCheckFrame:GetName().."Texture"]:SetTexture(READY_CHECK_READY_TEXTURE);
+		readyCheckFrame.Texture:SetTexture(READY_CHECK_READY_TEXTURE);
 		readyCheckFrame.state = "ready";
 	else
-		_G[readyCheckFrame:GetName().."Texture"]:SetTexture(READY_CHECK_NOT_READY_TEXTURE);
+		readyCheckFrame.Texture:SetTexture(READY_CHECK_NOT_READY_TEXTURE);
 		readyCheckFrame.state = "notready";
 	end
 	readyCheckFrame:SetAlpha(1);
@@ -85,7 +106,7 @@ end
 
 function ReadyCheck_Finish(readyCheckFrame, finishTime, fadeTime, onFinishFunc, onFinishFuncArg)
 	if ( readyCheckFrame.state == "waiting" ) then
-		_G[readyCheckFrame:GetName().."Texture"]:SetTexture(READY_CHECK_AFK_TEXTURE);
+		readyCheckFrame.Texture:SetTexture(READY_CHECK_AFK_TEXTURE);
 		readyCheckFrame.state = "afk";
 	end
 

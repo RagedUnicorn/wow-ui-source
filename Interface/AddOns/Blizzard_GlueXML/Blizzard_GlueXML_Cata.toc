@@ -1,7 +1,7 @@
 ## Title: Blizzard_GlueXML
 ## Author: Blizzard Entertainment
 ## DefaultState: enabled
-## Dependencies: Blizzard_GlueDialogs, Blizzard_LoginWarningDialogs, Blizzard_HelpPlate, Blizzard_GlueMenuFrame
+## Dependencies: Blizzard_StaticPopup_Glue, Blizzard_LoginWarningDialogs, Blizzard_HelpPlate, Blizzard_GlueMenuFrame
 ## LoadFirst: 1
 ## AllowLoad: Glue
 ## AllowLoadGameType: cata
@@ -10,6 +10,7 @@ Cata\Localization.lua
 Classic\GlueTooltip.lua
 Classic\GlueTooltip.xml
 ServerAlert.lua
+Classic\ServerAlert.xml
 ServerAlert.xml
 Classic\GlueGameLogo.lua
 Classic\GlueGameLogo.xml
@@ -18,6 +19,7 @@ Classic\AccountLogin.xml
 TBC\RealmList.lua
 Cata\RealmList.xml
 Classic\CharacterServicesPatchwerk.xml
+Shared\CharacterSelect\CharacterSelectUtil.lua
 Vanilla\CharacterSelectConstants.lua
 Classic\CharacterSelect\CharacterSelectUI.lua
 Classic\CharacterSelect\CharacterSelectUI.xml
@@ -25,8 +27,6 @@ Classic\CharacterSelect.lua
 Classic\CharacterSelect.xml
 Shared\AccountReactivate.lua
 Shared\AccountReactivate.xml
-Classic\KioskModeSplash.lua
-Classic\KioskModeSplash.xml
 Classic\CharacterServicesShared.lua
 Classic\CharacterServicesTemplatesUtil.lua
 Shared\CharacterServicesTemplates.lua
@@ -39,6 +39,8 @@ Classic\CharacterServicesPaidNameChange.lua
 Classic\CharacterServicesPaidNameChange.xml
 Classic\CharacterServicesPaidCharacterTransfer.lua
 Classic\CharacterServicesPaidCharacterTransfer.xml
+Classic\CharacterServicesFreeCharacterTransfer.lua
+Classic\CharacterServicesFreeCharacterTransfer.xml
 Classic\CharacterServicesPaidFactionChange.lua
 Classic\CharacterServicesPaidFactionChange.xml
 Classic\CharacterServicesPaidRaceChange.lua

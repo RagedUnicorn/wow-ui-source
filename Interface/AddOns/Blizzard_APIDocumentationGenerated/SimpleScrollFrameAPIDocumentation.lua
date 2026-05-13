@@ -2,6 +2,7 @@ local SimpleScrollFrameAPI =
 {
 	Name = "SimpleScrollFrameAPI",
 	Type = "ScriptObject",
+	Environment = "All",
 
 	Functions =
 	{
@@ -73,6 +74,7 @@ local SimpleScrollFrameAPI =
 		{
 			Name = "SetHorizontalScroll",
 			Type = "Function",
+			IsProtectedFunction = true,
 
 			Arguments =
 			{
@@ -82,6 +84,7 @@ local SimpleScrollFrameAPI =
 		{
 			Name = "SetScrollChild",
 			Type = "Function",
+			IsProtectedFunction = true,
 
 			Arguments =
 			{
@@ -91,6 +94,7 @@ local SimpleScrollFrameAPI =
 		{
 			Name = "SetVerticalScroll",
 			Type = "Function",
+			IsProtectedFunction = true,
 
 			Arguments =
 			{
@@ -112,6 +116,9 @@ local SimpleScrollFrameAPI =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

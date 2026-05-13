@@ -3,6 +3,7 @@ local Bank =
 	Name = "Bank",
 	Type = "System",
 	Namespace = "C_Bank",
+	Environment = "All",
 
 	Functions =
 	{
@@ -14,6 +15,7 @@ local Bank =
 			Name = "BankBagSlotFlagsUpdated",
 			Type = "Event",
 			LiteralName = "BANK_BAG_SLOT_FLAGS_UPDATED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "slot", Type = "number", Nilable = false },
@@ -23,21 +25,25 @@ local Bank =
 			Name = "BankframeClosed",
 			Type = "Event",
 			LiteralName = "BANKFRAME_CLOSED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "BankframeOpened",
 			Type = "Event",
 			LiteralName = "BANKFRAME_OPENED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "PlayerbankbagslotsChanged",
 			Type = "Event",
 			LiteralName = "PLAYERBANKBAGSLOTS_CHANGED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "PlayerbankslotsChanged",
 			Type = "Event",
 			LiteralName = "PLAYERBANKSLOTS_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "slot", Type = "number", Nilable = false },
@@ -46,6 +52,23 @@ local Bank =
 	},
 
 	Tables =
+	{
+		{
+			Name = "BankLockedReason",
+			Type = "Enumeration",
+			NumValues = 4,
+			MinValue = 0,
+			MaxValue = 3,
+			Fields =
+			{
+				{ Name = "None", Type = "BankLockedReason", EnumValue = 0 },
+				{ Name = "NoAccountInventoryLock", Type = "BankLockedReason", EnumValue = 1 },
+				{ Name = "BankDisabled", Type = "BankLockedReason", EnumValue = 2 },
+				{ Name = "BankConversionFailed", Type = "BankLockedReason", EnumValue = 3 },
+			},
+		},
+	},
+	Predicates =
 	{
 	},
 };

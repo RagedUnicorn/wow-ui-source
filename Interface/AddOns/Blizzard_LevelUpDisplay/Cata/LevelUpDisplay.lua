@@ -358,32 +358,31 @@ function LevelUpDisplay_BuildCharacterList(self)
 															};
 	end	
 	
-	local GUILD_EVENT_TEXTURE_PATH = "Interface\\LFGFrame\\LFGIcon-";
-	local dungeons = GetLevelUpInstances(self.level, false);
+	local dungeons = C_LFGInfo.GetLevelUpInstances(self.level, false);
 	for _,dungeon in pairs(dungeons) do
 		local dungeonInfo = C_LFGInfo.GetDungeonInfo(dungeon);
 		name, icon, link = dungeonInfo.name, dungeonInfo.iconID, dungeonInfo.link;
 		if link then -- link can come back as nil if there's no Dungeon Journal entry
-			self.unlockList[#self.unlockList +1] = { entryType = "dungeon", text = name, subText = LEVEL_UP_DUNGEON, icon = GUILD_EVENT_TEXTURE_PATH..icon, subIcon = SUBICON_TEXCOOR_LOCK,
+			self.unlockList[#self.unlockList +1] = { entryType = "dungeon", text = name, subText = LEVEL_UP_DUNGEON, icon = icon, subIcon = SUBICON_TEXCOOR_LOCK,
 																		link = LEVEL_UP_DUNGEON2.." "..link
 																	};
 		else
-			self.unlockList[#self.unlockList +1] = { entryType = "dungeon", text = name, subText = LEVEL_UP_DUNGEON, icon = GUILD_EVENT_TEXTURE_PATH..icon, subIcon = SUBICON_TEXCOOR_LOCK,
+			self.unlockList[#self.unlockList +1] = { entryType = "dungeon", text = name, subText = LEVEL_UP_DUNGEON, icon = icon, subIcon = SUBICON_TEXCOOR_LOCK,
 																		link = LEVEL_UP_DUNGEON2.." "..name
 																	};
 		end
 	end
 	
-	local raids = GetLevelUpInstances(self.level, true);
+	local raids = C_LFGInfo.GetLevelUpInstances(self.level, true);
 	for _,raid in pairs(raids) do
 		local raidInfo = C_LFGInfo.GetDungeonInfo(raid);
 		name, icon, link = raidInfo.name, raidInfo.iconID, raidInfo.link;
 		if link then -- link can come back as nil if there's no Dungeon Journal entry
-			self.unlockList[#self.unlockList +1] = { entryType = "dungeon", text = name, subText = LEVEL_UP_RAID, icon = GUILD_EVENT_TEXTURE_PATH..icon, subIcon = SUBICON_TEXCOOR_LOCK,
+			self.unlockList[#self.unlockList +1] = { entryType = "dungeon", text = name, subText = LEVEL_UP_RAID, icon = icon, subIcon = SUBICON_TEXCOOR_LOCK,
 																		link = LEVEL_UP_RAID2.." "..link
 																	};
 		else
-			self.unlockList[#self.unlockList +1] = { entryType = "dungeon", text = name, subText = LEVEL_UP_RAID, icon = GUILD_EVENT_TEXTURE_PATH..icon, subIcon = SUBICON_TEXCOOR_LOCK,
+			self.unlockList[#self.unlockList +1] = { entryType = "dungeon", text = name, subText = LEVEL_UP_RAID, icon = icon, subIcon = SUBICON_TEXCOOR_LOCK,
 																		link = LEVEL_UP_RAID2.." "..name
 																	};
 		end
@@ -595,13 +594,13 @@ function LevelUpDisplay_AddBattlePetLootReward(self, typeIdentifier, itemLink, q
 			quality = rarity, --Item quality
 		};
 	elseif ( typeIdentifier == "currency" ) then
-		local name, currencyQuantity, icon, earnedThisWeek, weeklyMax, maxQuantity, discovered, rarity = C_CurrencyInfo.GetCurrencyInfo(itemLink);
+		local currencyInfo = C_CurrencyInfo.GetCurrencyInfoFromLink(itemLink);
 		info = {
 			entryType = "petbattleloot",
 			text = BATTLE_PET_LOOT_RECEIVED,
-			subText = name,
-			icon = icon,
-			quality = rarity,
+			subText = currencyInfo.name,
+			icon = currencyInfo.iconFileID,
+			quality = currencyInfo.quality,
 		};
 	end
 
@@ -804,10 +803,10 @@ function LevelUpDisplay_AnimStep(self, fast)
 			self.spellFrame.rarityMiddleHuge:SetText(spellInfo.subText);
 			if (spellInfo.quality) then
 				self.spellFrame.iconBorder:Show();
-				self.spellFrame.iconBorder:SetVertexColor(ITEM_QUALITY_COLORS[spellInfo.quality-1].r, ITEM_QUALITY_COLORS[spellInfo.quality-1].g, ITEM_QUALITY_COLORS[spellInfo.quality-1].b);
+				self.spellFrame.iconBorder:SetVertexColor(ITEM_QUALITY_COLORS[spellInfo.quality].r, ITEM_QUALITY_COLORS[spellInfo.quality].g, ITEM_QUALITY_COLORS[spellInfo.quality].b);
 				self.spellFrame.rarityIcon:Show();
-				self.spellFrame.rarityValue:SetText(_G["BATTLE_PET_BREED_QUALITY"..spellInfo.quality]);
-				self.spellFrame.rarityValue:SetTextColor(ITEM_QUALITY_COLORS[spellInfo.quality-1].r, ITEM_QUALITY_COLORS[spellInfo.quality-1].g, ITEM_QUALITY_COLORS[spellInfo.quality-1].b);
+				self.spellFrame.rarityValue:SetText(_G["BATTLE_PET_BREED_QUALITY"..(spellInfo.quality+1)]);
+				self.spellFrame.rarityValue:SetTextColor(ITEM_QUALITY_COLORS[spellInfo.quality].r, ITEM_QUALITY_COLORS[spellInfo.quality].g, ITEM_QUALITY_COLORS[spellInfo.quality].b);
 				self.spellFrame.rarityValue:Show();
 			end
 			self.spellFrame.showAnim:Play();

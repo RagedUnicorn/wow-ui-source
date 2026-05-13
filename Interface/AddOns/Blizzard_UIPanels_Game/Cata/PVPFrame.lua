@@ -47,7 +47,7 @@ ARENABANNER_SMALLFONT = "GameFontNormalSmall"
 function PVPFrame_ExpansionSpecificOnLoad(self)
 	PanelTemplates_SetNumTabs(self, 4)
 	PVPFrame_TabClicked(PVPFrameTab1);
-	SetPortraitToTexture(PVPFramePortrait,"Interface\\BattlefieldFrame\\UI-Battlefield-Icon");
+	PVPFramePortrait:SetTexture("Interface\\BattlefieldFrame\\UI-Battlefield-Icon");
 	
 	self:RegisterEvent("UNIT_LEVEL");
 	
@@ -360,8 +360,9 @@ function PVPFrame_JoinClicked(self, isParty, wargame)
 		else
 			if PVPHonorFrame.selectedIsWorldPvp then
 				JoinWorldPVPQueue(false, isParty, PVPHonorFrame.bgTypeScrollBox.selectionID);
-			else 
-				JoinBattlefield(0, isParty);
+			else
+				local bgListID = select(5, GetBattlegroundInfo(PVPHonorFrame.selectedPvpID));
+				C_PvP.JoinBattlefield(bgListID, isParty);
 			end
 		end
 	elseif tabID == 2 then
@@ -1000,7 +1001,7 @@ function PVPFramePopup_SetupPopUp(event, challengerName, bgName, timeout)
 	PVPFramePopup.type = event;
 	PVPFramePopup.timeout = timeout  - 3;  -- add a 3 second buffer
 	PVPFramePopup.minimizeButton:Disable();
-	SetPortraitToTexture(PVPFramePopup.ringIcon,"Interface\\BattlefieldFrame\\UI-Battlefield-Icon");
+	PVPFramePopup.ringIcon:SetTexture("Interface\\BattlefieldFrame\\UI-Battlefield-Icon");
 	StaticPopupSpecial_Show(PVPFramePopup);
 	PlaySound("ReadyCheck");
 end

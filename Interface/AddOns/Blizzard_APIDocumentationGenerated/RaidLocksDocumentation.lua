@@ -3,6 +3,7 @@ local RaidLocks =
 	Name = "RaidLocks",
 	Type = "System",
 	Namespace = "C_RaidLocks",
+	Environment = "All",
 
 	Functions =
 	{
@@ -37,6 +38,15 @@ local RaidLocks =
 				{ Name = "encounterIsComplete", Type = "bool", Nilable = false },
 			},
 		},
+		{
+			Name = "IsRaidLockExtendFeatureEnabled",
+			Type = "Function",
+
+			Returns =
+			{
+				{ Name = "raidLockExtendFeatureEnabled", Type = "bool", Nilable = false },
+			},
+		},
 	},
 
 	Events =
@@ -44,6 +54,9 @@ local RaidLocks =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

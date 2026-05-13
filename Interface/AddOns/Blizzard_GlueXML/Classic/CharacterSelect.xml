@@ -464,6 +464,15 @@
 						<Anchor point="TOP"/>
 					</Anchors>
 				</Texture>
+				<MaskTexture parentKey="CircleMask" file="Interface\CHARACTERFRAME\TempPortraitAlphaMask" hWrapMode="CLAMPTOBLACKADDITIVE" vWrapMode="CLAMPTOBLACKADDITIVE">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Icon" relativePoint="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon" relativePoint="BOTTOMRIGHT"/>
+					</Anchors>
+					<MaskedTextures>
+						<MaskedTexture childKey="Icon"/>
+					</MaskedTextures>
+				</MaskTexture>
 			</Layer>
 			<Layer level="BORDER" textureSubLevel="2">
 				<Texture parentKey="Glow" inherits="services-ring-large-glow" alpha="0.8" hidden="true">
@@ -603,7 +612,7 @@
 			<OnEvent method="OnEvent"/>
 		</Scripts>
 	</Frame>
-	
+
 	<Frame name="CharacterSelect" toplevel="true" parent="GlueParent" setAllPoints="true" enableKeyboard="true" hidden="true" propagateMouseInput="Motion">
 		<Frames>
 			<Frame parentKey="GameLogoDarkBackdrop" inherits="GameLogoDarkBackdropTemplate"/>
@@ -790,33 +799,6 @@
 									</Layer>
 								</Layers>
 								<Frames>
-									<Button name="$parentExpandCollapseButton" parentKey="expandCollapseButton">
-										<Size x="32" y="32"/>
-										<Anchors>
-											<Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT" x="-34" y="2"/>
-										</Anchors>
-										<Layers>
-											<Layer level="OVERLAY">
-												<Texture name="$parentIconFrame" file="Interface\AchievementFrame\UI-Achievement-IconFrame">
-													<Size x="32" y="32"/>
-													<Anchors>
-														<Anchor point="CENTER"/>
-													</Anchors>
-													<TexCoords left="0" right="0.5625" top="0" bottom="0.5625"/>
-												</Texture>
-											</Layer>
-										</Layers>
-										<Scripts>
-											<OnClick>
-												PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-												AccountUpgradePanel_ToggleExpandState();
-											</OnClick>
-										</Scripts>
-										<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
-										<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
-										<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
-										<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
-									</Button>
 									<Frame name="$parentPointerFrame" parentKey="PointerFrame" hidden="true">
 										<Size x="64" y="64" />
 										<Anchors>
@@ -848,105 +830,12 @@
 									</Frame>
 								</Frames>
 								<Scripts>
-									<OnLoad>
-										self.isExpanded = GetCVarBool("expandUpgradePanel");
-										self:RegisterEvent("ACCOUNT_DATA_INITIALIZED");
-									</OnLoad>
-									<OnShow>
-										AccountUpgradePanel_UpdateExpandState();
-									</OnShow>
-									<OnEvent>
-										if ( event == "ACCOUNT_DATA_INITIALIZED" ) then
-											AccountUpgradePanel_UpdateExpandState();
-										end
-									</OnEvent>
+									<OnLoad function="AccountUpgradePanel_OnLoad"/>
+									<OnShow function="AccountUpgradePanel_Update"/>
+									<OnEvent function="AccountUpgradePanel_OnEvent"/>
 									<OnClick function="CharSelectAccountUpgradeButton_OnClick"/>
 								</Scripts>
 							</Button>
-							<Frame name="CharSelectAccountUpgradeMiniPanel" inherits="UpgradeFrameBorderedTemplate">
-								<Size x="200" y="100"/>
-								<Anchors>
-									<Anchor point="TOP" relativeTo="CharSelectAccountUpgradeButton" relativePoint="BOTTOM" x="0" y="15"/>
-								</Anchors>
-								<Layers>
-									<Layer level="BACKGROUND" textureSubLevel="-1">
-										<Texture name="$parentBG" setAllPoints="true">
-											<Color r="0.0" g="0.0" b="0.0"/>
-										</Texture>
-									</Layer>
-									<Layer level="ARTWORK">
-										<Texture name="$parentBanner" parentKey="banner" file="Interface\Glues\AccountUpgrade\banners">
-											<Size x="198" y="138"/>
-											<Anchors>
-												<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP" x="0" y="0"/>
-											</Anchors>
-										</Texture>
-									</Layer>
-									<Layer level="OVERLAY">
-										<Texture name="$parentUpgradeLogo" parentKey="logo">
-											<Size x="154" y="77"/>
-											<Anchors>
-												<Anchor point="CENTER" relativeTo="$parent" relativePoint="BOTTOM" x="0" y="0"/>
-											</Anchors>
-										</Texture>
-									</Layer>
-								</Layers>
-								<Scripts>
-									<OnLoad>
-										self:SetFrameLevel(CharSelectAccountUpgradeButton:GetFrameLevel() - 1);
-									</OnLoad>
-								</Scripts>
-							</Frame>
-							<Frame name="CharSelectAccountUpgradePanel" inherits="UpgradeFrameBorderedTemplate">
-								<Size x="200" y="250"/>
-								<Anchors>
-									<Anchor point="TOP" relativeTo="CharSelectAccountUpgradeButton" relativePoint="BOTTOM" x="0" y="-47"/>
-								</Anchors>
-								<Layers>
-									<Layer level="BACKGROUND" textureSubLevel="-1">
-										<Texture name="$parentChains1" file="Interface\Glues\AccountUpgrade\golden-main">
-											<Size x="20" y="67"/>
-											<Anchors>
-												<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="TOPLEFT" x="18" y="-3"/>
-											</Anchors>
-											<TexCoords left="0.148" right="0.227" top="0.293" bottom="0.508"/>
-										</Texture>
-										<Texture name="$parentChains2" file="Interface\Glues\AccountUpgrade\golden-main">
-											<Size x="20" y="67"/>
-											<Anchors>
-												<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT" x="-18" y="-3"/>
-											</Anchors>
-											<TexCoords left="0.148" right="0.227" top="0.293" bottom="0.508"/>
-										</Texture>
-										<Texture name="$parentBG" setAllPoints="true">
-											<Color r="0.0" g="0.0" b="0.0" a="0.8"/>
-										</Texture>
-									</Layer>
-									<Layer level="ARTWORK">
-										<Texture name="$parentBanner" parentKey="banner" file="Interface\Glues\AccountUpgrade\banners">
-											<Size x="198" y="138"/>
-											<Anchors>
-												<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP" x="0" y="0"/>
-											</Anchors>
-										</Texture>
-									</Layer>
-									<Layer level="OVERLAY">
-										<Texture name="$parentUpgradeLogo" parentKey="logo">
-											<Size x="154" y="77"/>
-											<Anchors>
-												<Anchor point="CENTER" relativeTo="$parent" relativePoint="TOP" x="0" y="10"/>
-											</Anchors>
-										</Texture>
-									</Layer>
-								</Layers>
-								<Frames>
-									<Frame name="$parentFeature1" inherits="UpgradeFrameFeatureTemplate">
-										<Anchors>
-											<Anchor point="TOPLEFT" x="-5" y="-90"/>
-										</Anchors>
-									</Frame>
-								</Frames>
-							</Frame>
 							<Button name="CharacterSelectBackButton" inherits="GlueButtonSmallTemplate" text="BACK">
 								<Size x="100" y="35"/>
 								<Anchors>
@@ -966,20 +855,12 @@
 								<Anchors>
 									<Anchor point="BOTTOMLEFT" x="30" y="25"/>
 								</Anchors>
-								<Layers>
-									<Layer level="OVERLAY">
-										<Texture name="$parentGlow" file="Interface\Glues\Common\Glue-Panel-Button-Glow" hidden="true" alphaMode="ADD">
-											<TexCoords left="0" right="0.578125" top="0" bottom="0.75"/>
-										</Texture>
-									</Layer>
-								</Layers>
 								<Scripts>
 									<OnClick>
 										PlaySound(SOUNDKIT.GS_CHARACTER_SELECTION_DEL_CHARACTER);
 										AddonList:Show();
 									</OnClick>
 									<OnUpdate>
-										GlueButtonMaster_OnUpdate(self, elapsed);
 										GlueParent_DeathKnightButtonSwap(self);
 									</OnUpdate>
 								</Scripts>
@@ -989,13 +870,6 @@
 								<Anchors>
 									<Anchor point="BOTTOMLEFT" x="30" y="52"/>
 								</Anchors>
-								<Layers>
-									<Layer level="OVERLAY">
-										<Texture name="$parentGlow" parentKey="Glow" file="Interface\Glues\Common\Glue-Panel-Button-Glow" hidden="true" alphaMode="ADD">
-											<TexCoords left="0" right="0.578125" top="0" bottom="0.75"/>
-										</Texture>
-									</Layer>
-								</Layers>
 								<Frames>
 									<Frame parentKey="New" inherits="NewFeatureLabelTemplate">
 										<Anchors>
@@ -1010,7 +884,6 @@
 									<OnEnter function="CharacterSelectHighResButton_OnEnter"/>
 									<OnLeave function="CharacterSelectHighResButton_OnLeave"/>
 									<OnUpdate>
-										GlueButtonMaster_OnUpdate(self, elapsed);
 										GlueParent_DeathKnightButtonSwap(self);
 									</OnUpdate>
 								</Scripts>
@@ -1020,13 +893,6 @@
 								<Anchors>
 									<Anchor point="TOP" relativeTo="CharacterSelectAddonsButton" relativePoint="BOTTOM" x="0" y="8"/>
 								</Anchors>
-								<Layers>
-									<Layer level="OVERLAY">
-										<Texture name="$parentGlow" file="Interface\Glues\Common\Glue-Panel-Button-Glow" hidden="true" alphaMode="ADD">
-											<TexCoords left="0" right="0.578125" top="0" bottom="0.75"/>
-										</Texture>
-									</Layer>
-								</Layers>
 								<Scripts>
 									<OnLoad>
 										self:SetShown(C_Login.IsLauncherLogin());
@@ -1039,7 +905,6 @@
 										GlueMenuFrameUtil.ShowMenu();
 									</OnClick>
 									<OnUpdate>
-										GlueButtonMaster_OnUpdate(self, elapsed);
 										GlueParent_DeathKnightButtonSwap(self);
 									</OnUpdate>
 								</Scripts>
@@ -1904,7 +1769,7 @@
 									<Anchor point="TOP" relativeTo="CharacterSelectCharacterFrame" relativePoint="BOTTOM" x="-260" y="0"/>
 								</Anchors>
 							</Button>
-							
+
 							<Button name="CharSelectUndeleteCharacterButtonSpecial" inherits="CharSelectUndeleteCharacterButtonTemplate" hidden="true">
 								<Anchors>
 									<Anchor point="LEFT" relativeTo="CreateCharacterButtonSpecial" relativePoint="RIGHT" x="-20"/>
@@ -2054,12 +1919,8 @@
 								<Scripts>
 									<OnLoad inherit="prepend" function="CharacterSelectServerAlert_OnLoad"/>
 									<OnEvent function="CharacterSelectServerAlert_OnEvent"/>
-									<OnShow>
-										AccountUpgradePanel_UpdateExpandState();
-									</OnShow>
-									<OnHide>
-										AccountUpgradePanel_UpdateExpandState();
-									</OnHide>
+									<OnShow function="AccountUpgradePanel_Update"/>
+									<OnHide function="AccountUpgradePanel_Update"/>
 								</Scripts>
 							</Frame>
 							<Frame name="BillingWarningFrame" hidden="true">
@@ -2256,114 +2117,6 @@
 			</OnShow>
 			<OnHide>
 				CharacterDeleteEditBox:SetText("");
-			</OnHide>
-		</Scripts>
-	</Frame>
-	<Frame name="CharacterRenameDialog" toplevel="true" parent="GlueParent" setAllPoints="true" enableMouse="true" enableKeyboard="true" frameStrata="DIALOG" hidden="true">
-		<Frames>
-			<Frame name="CharacterRenameBackground" inherits="BackdropTemplate">
-			<KeyValues>
-				<KeyValue key="backdropInfo" value="BACKDROP_DIALOG_32_32" type="global"/>
-			</KeyValues>
-				<Size x="512" y="256"/>
-				<Anchors>
-					<Anchor point="CENTER" x="0" y="0"/>
-				</Anchors>
-				<Layers>
-					<Layer level="ARTWORK">
-						<FontString name="CharacterRenameText1" inherits="GlueFontNormalLarge" text="CHAR_RENAME_DESCRIPTION">
-							<Size x="400" y="0"/>
-							<Anchors>
-								<Anchor point="TOP" x="0" y="-16"/>
-							</Anchors>
-						</FontString>
-						<FontString name="CharacterRenameText2" inherits="GlueFontNormalSmall" text="CHAR_RENAME_INSTRUCTIONS">
-							<Size x="400" y="0"/>
-							<Anchors>
-								<Anchor point="TOP" relativeTo="CharacterRenameText1" relativePoint="BOTTOM" x="0" y="-20"/>
-							</Anchors>
-						</FontString>
-						<Texture name="CharacterRenameAlertIcon" file="Interface\DialogFrame\UI-Dialog-Icon-AlertNew">
-							<Size x="48" y="48"/>
-							<Anchors>
-								<Anchor point="LEFT" x="24" y="10"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-				<Frames>
-					<Button name="CharacterRenameButton1" inherits="GlueDialogButtonTemplate" id="1" text="OKAY">
-						<Anchors>
-							<Anchor point="BOTTOMRIGHT" relativeTo="CharacterRenameBackground" relativePoint="BOTTOM" x="-6" y="16"/>
-						</Anchors>
-						<Scripts>
-							<OnClick>
-								if ( RenameCharacter(GetCharIDFromIndex(CharacterSelect.selectedIndex), CharacterRenameEditBox:GetText()) ) then
-									CharacterRenameDialog:Hide();
-								end
-							</OnClick>
-							<OnUpdate>
-								GlueParent_DeathKnightButtonSwap(self);
-							</OnUpdate>
-						</Scripts>
-					</Button>
-					<Button name="CharacterRenameButton2" inherits="GlueDialogButtonTemplate" id="2" text="CANCEL">
-						<Anchors>
-							<Anchor point="LEFT" relativeTo="CharacterRenameButton1" relativePoint="RIGHT" x="13" y="0"/>
-						</Anchors>
-						<Scripts>
-							<OnClick>
-								CharacterRenameDialog:Hide();
-							</OnClick>
-							<OnUpdate>
-								GlueParent_DeathKnightButtonSwap(self);
-							</OnUpdate>
-						</Scripts>
-					</Button>
-				</Frames>
-			</Frame>
-			<EditBox name="CharacterRenameEditBox" letters="12" historyLines="1">
-				<Size x="130" y="32"/>
-				<Anchors>
-					<Anchor point="TOP" relativeTo="CharacterRenameText2" relativePoint="BOTTOM" x="0" y="-5"/>
-				</Anchors>
-				<Layers>
-					<Layer level="ARTWORK">
-						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
-							<Size x="75" y="32"/>
-							<Anchors>
-								<Anchor point="LEFT" x="-10" y="0"/>
-							</Anchors>
-							<TexCoords left="0" right="0.29296875" top="0" bottom="1.0"/>
-						</Texture>
-						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
-							<Size x="75" y="32"/>
-							<Anchors>
-								<Anchor point="RIGHT" x="10" y="0"/>
-							</Anchors>
-							<TexCoords left="0.70703125" right="1.0" top="0" bottom="1.0"/>
-						</Texture>
-					</Layer>
-				</Layers>
-				<Scripts>
-					<OnEnterPressed>
-						if ( RenameCharacter(GetCharIDFromIndex(CharacterSelect.selectedIndex), CharacterRenameEditBox:GetText()) ) then
-							CharacterRenameDialog:Hide();
-						end
-					</OnEnterPressed>
-					<OnEscapePressed>
-						CharacterRenameDialog:Hide();
-					</OnEscapePressed>
-				</Scripts>
-				<FontString inherits="GlueFontHighlight"/>
-			</EditBox>
-		</Frames>
-		<Scripts>
-			<OnShow>
-				self:Raise();
-			</OnShow>
-			<OnHide>
-				CharacterRenameEditBox:SetText("");
 			</OnHide>
 		</Scripts>
 	</Frame>

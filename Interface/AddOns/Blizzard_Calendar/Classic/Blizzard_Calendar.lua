@@ -5,13 +5,13 @@ StaticPopupDialogs["CALENDAR_DELETE_EVENT"] = {
 	button1 = OKAY,
 	button2 = CANCEL,
 	whileDead = 1,
-	OnAccept = function (self)
+	OnAccept = function(dialog, data)
 		C_Calendar.ContextMenuEventRemove();
 	end,
-	OnShow = function (self)
-		CalendarFrame_PushModal(self);
+	OnShow = function(dialog, data)
+		CalendarFrame_PushModal(dialog);
 	end,
-	OnHide = function (self)
+	OnHide = function(dialog, data)
 		CalendarFrame_PopModal();
 	end,
 	timeout = 0,
@@ -22,11 +22,9 @@ StaticPopupDialogs["CALENDAR_ERROR"] = {
 	text = CALENDAR_ERROR,
 	button1 = OKAY,
 	whileDead = 1,
-	OnShow = function (self)
-		--CalendarFrame_PushModal(self);
+	OnShow = function(dialog, data)
 	end,
-	OnHide = function (self)
-		--CalendarFrame_PopModal();
+	OnHide = function(dialog, data)
 	end,
 	timeout = 0,
 	showAlert = 1,
@@ -2288,7 +2286,7 @@ function GenerateDayContextMenu(owner, rootDescription, flags, dayButton, eventB
 			dayButton:LockHighlight();
 		end);
 
-		rootDescription:AddMenuReleasedCallback(function(menuFrame)
+		rootDescription:AddMenuReleasedCallback(function(menuFrame, closeReason)
 			if CalendarFrame.selectedDayButton ~= dayButton then
 				dayButton:UnlockHighlight();
 			end
@@ -3158,7 +3156,7 @@ function CalendarViewEventInviteListButton_OnClick(self, button)
 					self:LockHighlight();
 				end);
 
-				rootDescription:AddMenuReleasedCallback(function(menuFrame)
+				rootDescription:AddMenuReleasedCallback(function(menuFrame, closeReason)
 					if CalendarFrame.selectedEventButton ~= self then
 						self:UnlockHighlight();
 					end
@@ -3227,6 +3225,7 @@ local function InitHourDropdown(self)
 
 	local width = 61;
 	self.HourDropdown:SetWidth(width);
+	self.HourDropdown.Text:SetJustifyH("CENTER");
 	self.HourDropdown:SetupMenu(function(dropdown, rootDescription)
 		rootDescription:SetTag("MENU_CALENDAR_HOUR");
 
@@ -3251,6 +3250,7 @@ local function InitMinuteDropdown(self)
 
 	local width = 61;
 	self.MinuteDropdown:SetWidth(width);
+	self.MinuteDropdown.Text:SetJustifyH("CENTER");
 	self.MinuteDropdown:SetupMenu(function(dropdown, rootDescription)
 		rootDescription:SetTag("MENU_CALENDAR_MINUTE");
 
@@ -3911,7 +3911,7 @@ function CalendarCreateEventInviteListButton_OnClick(self, button)
 				self:LockHighlight();
 			end);
 
-			rootDescription:AddMenuReleasedCallback(function(menuFrame)
+			rootDescription:AddMenuReleasedCallback(function(menuFrame, closeReason)
 				if CalendarFrame.selectedEventButton ~= self then
 					self:UnlockHighlight();
 				end

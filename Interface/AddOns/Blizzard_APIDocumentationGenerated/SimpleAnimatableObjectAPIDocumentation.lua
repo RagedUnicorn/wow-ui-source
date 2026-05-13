@@ -2,6 +2,7 @@ local SimpleAnimatableObjectAPI =
 {
 	Name = "SimpleAnimatableObjectAPI",
 	Type = "ScriptObject",
+	Environment = "All",
 
 	Functions =
 	{
@@ -30,7 +31,7 @@ local SimpleAnimatableObjectAPI =
 
 			Returns =
 			{
-				{ Name = "scriptObject", Type = "ScriptObject", Nilable = false, StrideIndex = 1 },
+				{ Name = "groups", Type = "SimpleAnimGroup", Nilable = false, StrideIndex = 1 },
 			},
 		},
 		{
@@ -48,6 +49,9 @@ local SimpleAnimatableObjectAPI =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

@@ -27,7 +27,7 @@ local MinimapConstants =
 				{ Name = "POI", Type = "MinimapTrackingFilter", EnumValue = 8192 },
 				{ Name = "Target", Type = "MinimapTrackingFilter", EnumValue = 16384 },
 				{ Name = "Focus", Type = "MinimapTrackingFilter", EnumValue = 32768 },
-				{ Name = "QuestPoIs", Type = "MinimapTrackingFilter", EnumValue = 65536 },
+				{ Name = "QuestPOIs", Type = "MinimapTrackingFilter", EnumValue = 65536 },
 				{ Name = "Digsites", Type = "MinimapTrackingFilter", EnumValue = 131072 },
 				{ Name = "TrainerClass", Type = "MinimapTrackingFilter", EnumValue = 262144 },
 				{ Name = "VendorAmmo", Type = "MinimapTrackingFilter", EnumValue = 524288 },
@@ -36,6 +36,9 @@ local MinimapConstants =
 				{ Name = "AccountBanker", Type = "MinimapTrackingFilter", EnumValue = 4194304 },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

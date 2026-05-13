@@ -32,7 +32,7 @@ StaticPopupDialogs["PET_BATTLE_FORFEIT"] = {
 	button1 = OKAY,
 	button2 = CANCEL,
 	maxLetters = 30,
-	OnAccept = function(self)
+	OnAccept = function(dialog, data)
 		C_PetBattles.ForfeitGame();
 	end,
 	timeout = 0,
@@ -45,7 +45,7 @@ StaticPopupDialogs["PET_BATTLE_FORFEIT_NO_PENALTY"] = {
 	button1 = OKAY,
 	button2 = CANCEL,
 	maxLetters = 30,
-	OnAccept = function(self)
+	OnAccept = function(dialog, data)
 		C_PetBattles.ForfeitGame();
 	end,
 	timeout = 0,
@@ -570,10 +570,10 @@ end
 
 function PetBattleCatchButton_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-	GameTooltip:SetText(self.name, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b, true);
-	GameTooltip:AddLine(self.description, nil, nil, nil, true);
+	GameTooltip_SetTitle(GameTooltip, self.name);
+	GameTooltip_AddNormalLine(GameTooltip, self.description);
 	if (self.additionalText) then
-		GameTooltip:AddLine(self.additionalText, RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b, true);
+		GameTooltip_AddErrorLine(GameTooltip, self.additionalText);
 	end
 	GameTooltip:Show();
 end

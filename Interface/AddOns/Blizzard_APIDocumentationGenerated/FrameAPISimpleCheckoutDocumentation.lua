@@ -2,12 +2,14 @@ local FrameAPISimpleCheckout =
 {
 	Name = "FrameAPISimpleCheckout",
 	Type = "ScriptObject",
+	Environment = "All",
 
 	Functions =
 	{
 		{
 			Name = "CancelOpenCheckout",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -24,6 +26,7 @@ local FrameAPISimpleCheckout =
 		{
 			Name = "CloseCheckout",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -40,6 +43,7 @@ local FrameAPISimpleCheckout =
 		{
 			Name = "OpenCheckout",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -70,6 +74,7 @@ local FrameAPISimpleCheckout =
 		{
 			Name = "SetZoom",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -83,6 +88,9 @@ local FrameAPISimpleCheckout =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

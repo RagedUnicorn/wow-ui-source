@@ -198,9 +198,9 @@ local ItemConstants =
 		{
 			Name = "ItemClass",
 			Type = "Enumeration",
-			NumValues = 20,
+			NumValues = 21,
 			MinValue = 0,
-			MaxValue = 19,
+			MaxValue = 20,
 			Fields =
 			{
 				{ Name = "Consumable", Type = "ItemClass", EnumValue = 0 },
@@ -223,14 +223,15 @@ local ItemConstants =
 				{ Name = "Battlepet", Type = "ItemClass", EnumValue = 17 },
 				{ Name = "WoWToken", Type = "ItemClass", EnumValue = 18 },
 				{ Name = "Profession", Type = "ItemClass", EnumValue = 19 },
+				{ Name = "Housing", Type = "ItemClass", EnumValue = 20 },
 			},
 		},
 		{
 			Name = "ItemConsumableSubclass",
 			Type = "Enumeration",
-			NumValues = 12,
+			NumValues = 13,
 			MinValue = 0,
-			MaxValue = 11,
+			MaxValue = 12,
 			Fields =
 			{
 				{ Name = "Generic", Type = "ItemConsumableSubclass", EnumValue = 0 },
@@ -245,6 +246,7 @@ local ItemConstants =
 				{ Name = "VantusRune", Type = "ItemConsumableSubclass", EnumValue = 9 },
 				{ Name = "UtilityCurio", Type = "ItemConsumableSubclass", EnumValue = 10 },
 				{ Name = "CombatCurio", Type = "ItemConsumableSubclass", EnumValue = 11 },
+				{ Name = "Relic", Type = "ItemConsumableSubclass", EnumValue = 12 },
 			},
 		},
 		{
@@ -285,7 +287,23 @@ local ItemConstants =
 				{ Name = "SingingThunder", Type = "ItemGemColor", EnumValue = 134217728 },
 				{ Name = "SingingSea", Type = "ItemGemColor", EnumValue = 268435456 },
 				{ Name = "SingingWind", Type = "ItemGemColor", EnumValue = 536870912 },
-				{ Name = "FutureUse", Type = "ItemGemColor", EnumValue = 1073741824 },
+				{ Name = "Fiber", Type = "ItemGemColor", EnumValue = 1073741824 },
+			},
+		},
+		{
+			Name = "ItemHousingSubclass",
+			Type = "Enumeration",
+			NumValues = 6,
+			MinValue = 0,
+			MaxValue = 5,
+			Fields =
+			{
+				{ Name = "Decor", Type = "ItemHousingSubclass", EnumValue = 0 },
+				{ Name = "Dye", Type = "ItemHousingSubclass", EnumValue = 1 },
+				{ Name = "Room", Type = "ItemHousingSubclass", EnumValue = 2 },
+				{ Name = "RoomCustomization", Type = "ItemHousingSubclass", EnumValue = 3 },
+				{ Name = "ExteriorCustomization", Type = "ItemHousingSubclass", EnumValue = 4 },
+				{ Name = "ServiceItem", Type = "ItemHousingSubclass", EnumValue = 5 },
 			},
 		},
 		{
@@ -402,7 +420,7 @@ local ItemConstants =
 				{ Name = "SingingThunder", Type = "ItemSocketType", EnumValue = 27 },
 				{ Name = "SingingSea", Type = "ItemSocketType", EnumValue = 28 },
 				{ Name = "SingingWind", Type = "ItemSocketType", EnumValue = 29 },
-				{ Name = "FutureUse", Type = "ItemSocketType", EnumValue = 30 },
+				{ Name = "Fiber", Type = "ItemSocketType", EnumValue = 30 },
 			},
 		},
 		{
@@ -512,26 +530,40 @@ local ItemConstants =
 			},
 		},
 		{
+			Name = "SleevesGeoRange",
+			Type = "Enumeration",
+			NumValues = 5,
+			MinValue = 0,
+			MaxValue = 4,
+			Fields =
+			{
+				{ Name = "None", Type = "SleevesGeoRange", EnumValue = 0 },
+				{ Name = "Default", Type = "SleevesGeoRange", EnumValue = 1 },
+				{ Name = "Flared", Type = "SleevesGeoRange", EnumValue = 2 },
+				{ Name = "Puffy", Type = "SleevesGeoRange", EnumValue = 3 },
+				{ Name = "PandaCollar", Type = "SleevesGeoRange", EnumValue = 4 },
+			},
+		},
+		{
 			Name = "SlotRegion",
 			Type = "Enumeration",
-			NumValues = 7,
+			NumValues = 6,
 			MinValue = 0,
-			MaxValue = 6,
+			MaxValue = 5,
 			Fields =
 			{
 				{ Name = "Invalid", Type = "SlotRegion", EnumValue = 0 },
 				{ Name = "PlayerEquip", Type = "SlotRegion", EnumValue = 1 },
 				{ Name = "PlayerBags", Type = "SlotRegion", EnumValue = 2 },
 				{ Name = "PlayerInv", Type = "SlotRegion", EnumValue = 3 },
-				{ Name = "Bank", Type = "SlotRegion", EnumValue = 4 },
-				{ Name = "ReagentBank", Type = "SlotRegion", EnumValue = 5 },
-				{ Name = "AccountBank", Type = "SlotRegion", EnumValue = 6 },
+				{ Name = "CharacterBank", Type = "SlotRegion", EnumValue = 4 },
+				{ Name = "AccountBank", Type = "SlotRegion", EnumValue = 5 },
 			},
 		},
 		{
 			Name = "SlotRegionMask",
 			Type = "Enumeration",
-			NumValues = 7,
+			NumValues = 6,
 			MinValue = 1,
 			MaxValue = 64,
 			Fields =
@@ -540,17 +572,16 @@ local ItemConstants =
 				{ Name = "PlayerEquip", Type = "SlotRegionMask", EnumValue = 2 },
 				{ Name = "PlayerBags", Type = "SlotRegionMask", EnumValue = 4 },
 				{ Name = "PlayerInv", Type = "SlotRegionMask", EnumValue = 8 },
-				{ Name = "Bank", Type = "SlotRegionMask", EnumValue = 16 },
-				{ Name = "ReagentBank", Type = "SlotRegionMask", EnumValue = 32 },
+				{ Name = "CharacterBank", Type = "SlotRegionMask", EnumValue = 16 },
 				{ Name = "AccountBank", Type = "SlotRegionMask", EnumValue = 64 },
 			},
 		},
 		{
 			Name = "SubcontainerType",
 			Type = "Enumeration",
-			NumValues = 38,
+			NumValues = 40,
 			MinValue = 0,
-			MaxValue = 37,
+			MaxValue = 39,
 			Fields =
 			{
 				{ Name = "Bag", Type = "SubcontainerType", EnumValue = 0 },
@@ -591,6 +622,8 @@ local ItemConstants =
 				{ Name = "CraftingOrderReagents", Type = "SubcontainerType", EnumValue = 35 },
 				{ Name = "AccountBankTabs", Type = "SubcontainerType", EnumValue = 36 },
 				{ Name = "CurrencyTransfer", Type = "SubcontainerType", EnumValue = 37 },
+				{ Name = "CharacterBankTabs", Type = "SubcontainerType", EnumValue = 38 },
+				{ Name = "HousingDecorConversion", Type = "SubcontainerType", EnumValue = 39 },
 			},
 		},
 		{
@@ -625,17 +658,30 @@ local ItemConstants =
 			},
 		},
 		{
+			Name = "WeaponSlot",
+			Type = "Enumeration",
+			NumValues = 2,
+			MinValue = 0,
+			MaxValue = 1,
+			Fields =
+			{
+				{ Name = "MainHand", Type = "WeaponSlot", EnumValue = 0 },
+				{ Name = "OffHand", Type = "WeaponSlot", EnumValue = 1 },
+			},
+		},
+		{
 			Name = "ItemConsts",
 			Type = "Constants",
 			Values =
 			{
 				{ Name = "NUM_ITEM_ENCHANTMENT_SOCKETS", Type = "number", Value = 3 },
 				{ Name = "MAX_LOOT_OBJECT_ITEMS", Type = "number", Value = 31 },
-				{ Name = "INVALID_TRANSACTION_BANK_TAB_SLOT", Type = "number", Value = 0xFF },
+				{ Name = "INVALID_BANK_TAB_SLOT", Type = "number", Value = 0xFF },
 				{ Name = "DEFAULT_ITEM_SAVE_VERSION", Type = "number", Value = 2 },
 				{ Name = "CURRENT_ITEM_SAVE_VERSION", Type = "number", Value = DEFAULT_ITEM_SAVE_VERSION },
 				{ Name = "DEFAULT_ARTIFACT_POWERS_VERSION", Type = "number", Value = 1 },
 				{ Name = "CURRENT_ARTIFACT_POWERS_VERSION", Type = "number", Value = DEFAULT_ARTIFACT_POWERS_VERSION },
+				{ Name = "DEFAULT_RETENTION", Type = "number", Value = 7 },
 			},
 		},
 		{
@@ -643,9 +689,9 @@ local ItemConstants =
 			Type = "Constants",
 			Values =
 			{
-				{ Name = "ITEM_WEAPON_SUBCLASS_EXOTIC1H", Type = "ItemWeaponSubclass", Value = Bearclaw },
-				{ Name = "ITEM_WEAPON_SUBCLASS_EXOTIC2H", Type = "ItemWeaponSubclass", Value = Catclaw },
-				{ Name = "ITEM_WEAPON_SUBCLASS_SPEAR", Type = "ItemWeaponSubclass", Value = Obsolete3 },
+				{ Name = "ITEM_WEAPON_SUBCLASS_EXOTIC1H", Type = "ItemWeaponSubclass", Value = "Bearclaw" },
+				{ Name = "ITEM_WEAPON_SUBCLASS_EXOTIC2H", Type = "ItemWeaponSubclass", Value = "Catclaw" },
+				{ Name = "ITEM_WEAPON_SUBCLASS_SPEAR", Type = "ItemWeaponSubclass", Value = "Obsolete3" },
 			},
 		},
 		{
@@ -654,8 +700,25 @@ local ItemConstants =
 			Values =
 			{
 				{ Name = "ITEM_WEAPON_SUBCLASS_NONE", Type = "ItemWeaponSubclass", Value = -1 },
+				{ Name = "ITEM_WEAPON_SUBCLASS_MASK", Type = "number", Value = 0 },
+				{ Name = "ITEM_WEAPON_SUBCLASS_IS2HWEAPON_MASK", Type = "number", Value = 0 },
+				{ Name = "ITEM_WEAPON_SUBCLASS_USES2HANDS_MASK", Type = "number", Value = 0 },
+				{ Name = "ITEM_WEAPON_SUBCLASS_ISRANGEDWEAPON_MASK", Type = "number", Value = 0 },
+				{ Name = "ITEM_WEAPON_SUBCLASS_ISTWOHANDEDRANGEDWEAPON_MASK", Type = "number", Value = 0 },
+				{ Name = "ITEM_WEAPON_SUBCLASS_ISMAINHANDWEAPON_NONRANGED_MASK", Type = "number", Value = 0 },
 			},
 		},
+		{
+			Name = "ITEM_WEAPON_SUBCLASSConstants_PostMists",
+			Type = "Constants",
+			Values =
+			{
+				{ Name = "ITEM_WEAPON_SUBCLASS_ISTITANSGRIPWEAPON_MASK", Type = "number", Value = 0 },
+			},
+		},
+	},
+	Predicates =
+	{
 	},
 };
 

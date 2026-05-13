@@ -68,7 +68,7 @@ function SettingsPanelMixin:OnLoad()
 	local settingsList = self:GetSettingsList();
 	settingsList.Header.DefaultsButton.Text:SetText(SETTINGS_DEFAULTS);
 	settingsList.Header.DefaultsButton:SetScript("OnClick", function(button, buttonName, down)
-		ShowAppropriateDialog("GAME_SETTINGS_APPLY_DEFAULTS");
+		StaticPopup_Show("GAME_SETTINGS_APPLY_DEFAULTS");
 	end);
 
 	self.SearchBox:HookScript("OnTextChanged", GenerateClosure(self.OnSearchTextChanged, self));
@@ -89,8 +89,9 @@ function SettingsPanelMixin:OnLoad()
 	EventRegistry:RegisterCallback("KeybindListener.RebindFailed", self.OnKeybindRebindFailed, self);
 	EventRegistry:RegisterCallback("KeybindListener.RebindSuccess", self.OnKeybindRebindSuccess, self);
 
-	CVarCallbackRegistry:RegisterCVarChangedCallback(self.OnCVarChanged, self);
+	CVarCallbackRegistry:RegisterCallbackForAllCVarUpdates(self.OnCVarChanged, self);
 
+	self:RegisterEvent("SETTINGS_PANEL_OPEN");
 	self:RegisterEvent("UPDATE_BINDINGS");
 end
 
@@ -112,7 +113,7 @@ function SettingsPanelMixin:OnCVarChanged(cvar, cvarValue)
 	if setting:GetValue() == nil then
 		return;
 	end
-	
+
 	-- The value is forced because the setting will always evaluate the current state of this
 	-- cvar as unchanged due to the source of the value being the cvar that was just modified.
 	-- This won't produce a recursive overflow because when setting the value legimately through
@@ -127,7 +128,15 @@ function SettingsPanelMixin:OnCVarChanged(cvar, cvarValue)
 end
 
 function SettingsPanelMixin:OnEvent(event, ...)
-	if event == "UPDATE_BINDINGS" then
+	if event == "SETTINGS_PANEL_OPEN" then
+		local openToCategoryID, scrollToElementName = ...;
+
+		if openToCategoryID ~= nil then
+			self:OpenToCategory(openToCategoryID, scrollToElementName);
+		else
+			self:Open();
+		end
+	elseif event == "UPDATE_BINDINGS" then
 		self:RenewKeybinds();
 	end
 end
@@ -138,7 +147,7 @@ function SettingsPanelMixin:OnShow()
 	local force = true;
 	self:SelectFirstCategory(force);
 
-	-- Checks for if there are any categories to show on the AddOnsTab 
+	-- Checks for if there are any categories to show on the AddOnsTab
 	local categories = self:GetCategoryList();
 	local showTabs = false;
 	for _, category in ipairs(categories.allCategories) do
@@ -167,7 +176,7 @@ function SettingsPanelMixin:OnShow()
 	self:CheckApplyButton();
 
 	self:CallRefreshOnCanvases();
-	self:CheckTutorials(); 
+	self:CheckTutorials();
 
 	categories:RefreshNewFeatures();
 end
@@ -192,7 +201,7 @@ function SettingsPanelMixin:OnHide()
 		GlueParent_RemoveModalFrame(self);
 		GlueParent_CloseSecondaryScreen();
 		return;
-	else 
+	else
 		UpdateMicroButtons();
 	end
 
@@ -212,7 +221,7 @@ end
 
 function SettingsPanelMixin:Close(skipTransitionBackToOpeningPanel)
 	if self:HasUnappliedSettings() then
-		ShowAppropriateDialog("GAME_SETTINGS_CONFIRM_DISCARD");
+		StaticPopup_Show("GAME_SETTINGS_CONFIRM_DISCARD");
 	else
 		self:ExitWithCommit(skipTransitionBackToOpeningPanel);
 	end
@@ -253,9 +262,7 @@ function SettingsPanelMixin:TransitionBackOpeningPanel()
 	HideUIPanel(self);
 
 	if not C_Glue.IsOnGlueScreen() then
-		if EditModeManagerFrame:IsEditModeActive() then
-			ShowUIPanel(EditModeManagerFrame);
-		else
+		if not EditModeManagerFrame:ShowIfActive() then
 			ToggleGameMenu();
 		end
 	end
@@ -275,7 +282,7 @@ function SettingsPanelMixin:OpenToCategory(categoryID, scrollToElementName)
 	local categoryTbl = self:GetCategoryList():GetCategory(categoryID);
 	if categoryTbl then
 		categoryTbl:SetExpanded(true);
-		 
+
 		self:SelectCategory(categoryTbl);
 
 		if scrollToElementName then
@@ -323,14 +330,14 @@ function SettingsPanelMixin:CommitSettings(unrevertable)
 			saveBindings = saveBindings or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.SaveBindings);
 			gxRestart = gxRestart or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.GxRestart);
 			windowUpdate = windowUpdate or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.UpdateWindow);
-			
+
 			if not unrevertable then
 				if securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.Revertable) then
 					local originalValue = securecallfunction(setting.GetValueDerived, setting);
 					table.insert(self.revertableSettings, {setting = setting, originalValue = originalValue});
 				end
 			end
-			
+
 			securecallfunction(setting.Commit, setting);
 		end
 
@@ -341,10 +348,10 @@ function SettingsPanelMixin:CommitSettings(unrevertable)
 
 	if #self.revertableSettings > 0 then
 		local duration = 8.0;
-		ShowAppropriateDialog("GAME_SETTINGS_TIMED_CONFIRMATION", nil, nil, duration);
+		StaticPopup_Show("GAME_SETTINGS_TIMED_CONFIRMATION", nil, nil, duration);
 		local function Timer()
 			self:RevertSettings();
-			HideAppropriateDialog("GAME_SETTINGS_TIMED_CONFIRMATION");
+			StaticPopup_Hide("GAME_SETTINGS_TIMED_CONFIRMATION");
 		end
 		self.Timer = C_Timer.NewTimer(duration, Timer);
 	end
@@ -359,7 +366,7 @@ function SettingsPanelMixin:FinalizeCommit(saveBindings, gxRestart, windowUpdate
 	if gxRestart then
 		RestartGx();
 	end
-	
+
 	if windowUpdate then
 		UpdateWindow();
 	end
@@ -399,25 +406,39 @@ function SettingsPanelMixin:CancelPendingRevertTimer()
 	end
 end
 
+function SettingsPanelMixin:SetIsSettingDefaults(isSettingDefaults)
+	self.isSettingDefaults = isSettingDefaults;
+end
+
+function SettingsPanelMixin:CheckIsSettingDefaults()
+	return self.isSettingDefaults;
+end
+
 function SettingsPanelMixin:SetAllSettingsToDefaults()
+	self:SetIsSettingDefaults(true);
+
 	local keys = {GetCVarDefault("VoicePushToTalkKeybind")}
 	C_VoiceChat.SetPushToTalkBinding(keys);
 
 	local saveBindings = false;
 	local gxRestart = false;
 	local windowUpdate = false;
-
 	local settings = {};
+
 	for setting, category in pairs(self.settings) do
 		table.insert(settings, setting);
 	end
+
 	SortTableByCommitOrder(settings);
 
+	local isKioskEnabled = Kiosk.IsEnabled();
 	for index, setting in ipairs(settings) do
-		if securecallfunction(setting.SetValueToDefault, setting) then
-			saveBindings = saveBindings or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.SaveBindings);
-			gxRestart = gxRestart or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.GxRestart);
-			windowUpdate = windowUpdate or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.UpdateWindow);
+		if not isKioskEnabled or not setting:HasCommitFlag(Settings.CommitFlag.KioskProtected) then
+			if securecallfunction(setting.SetValueToDefault, setting) then
+				saveBindings = saveBindings or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.SaveBindings);
+				gxRestart = gxRestart or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.GxRestart);
+				windowUpdate = windowUpdate or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.UpdateWindow);
+			end
 		end
 	end
 
@@ -429,29 +450,36 @@ function SettingsPanelMixin:SetAllSettingsToDefaults()
 	Settings.SafeLoadBindings(Enum.BindingSet.Default);
 
 	EventRegistry:TriggerEvent("Settings.Defaulted");
+	self:SetIsSettingDefaults(false);
 end
 
 function SettingsPanelMixin:SetCurrentCategorySettingsToDefaults()
+	self:SetIsSettingDefaults(true);
 	local saveBindings = false;
 	local gxRestart = false;
 	local windowUpdate = false;
 
 	local settings = {};
 	local currentCategory = self:GetCurrentCategory();
+
 	for setting, category in pairs(self.settings) do
 		if category == currentCategory then
 			table.insert(settings, setting);
 		end
 	end
+	
 	SortTableByCommitOrder(settings);
 
+	local isKioskEnabled = Kiosk.IsEnabled();
 	for index, setting in ipairs(settings) do
-		if securecallfunction(setting.SetValueToDefault, setting) then
-			saveBindings = saveBindings or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.SaveBindings);
-			gxRestart = gxRestart or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.GxRestart);
-			windowUpdate = windowUpdate or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.UpdateWindow);
+		if not isKioskEnabled or not setting:HasCommitFlag(Settings.CommitFlag.KioskProtected) then
+			if securecallfunction(setting.SetValueToDefault, setting) then
+				saveBindings = saveBindings or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.SaveBindings);
+				gxRestart = gxRestart or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.GxRestart);
+				windowUpdate = windowUpdate or securecallfunction(setting.HasCommitFlag, setting, Settings.CommitFlag.UpdateWindow);
+			end
+			self.modified[setting] = nil;
 		end
-		self.modified[setting] = nil;
 	end
 
 	for _, category in ipairs(self:GetAllCategories()) do
@@ -474,6 +502,7 @@ function SettingsPanelMixin:SetCurrentCategorySettingsToDefaults()
 	end
 
 	EventRegistry:TriggerEvent("Settings.CategoryDefaulted", currentCategory);
+	self:SetIsSettingDefaults(false);
 end
 
 function SettingsPanelMixin:HasUnappliedSettings()
@@ -542,7 +571,7 @@ function SettingsPanelMixin:FindInitializersMatchingSearchText(searchText)
 		table.insert(words, word);
 	end
 
-	-- Score is the number of matching characters. 
+	-- Score is the number of matching characters.
 	local scoredInitializers = {};
 	local function ParseCategory(category, parentCategory)
 		local layout = self:GetLayout(category);
@@ -573,7 +602,7 @@ function SettingsPanelMixin:FindInitializersMatchingSearchText(searchText)
 
 	local matchScores = GetKeysArray(scoredInitializers);
 	table.sort(matchScores, function(a, b) return a > b end);
-	
+
 	-- Shuffle all of the initializers that are now ordered by match score into their respective category.
 	local scoredInitializersList = {};
 	local initializerLists = {};
@@ -924,9 +953,9 @@ function SettingsPanelMixin:OnKeybindStartedListening(action, slotIndex)
 
 	local settingsList = self:GetSettingsList();
 	settingsList:SetInputBlockerShown(true);
-	
+
 	self:SetOutputText(SETTINGS_BIND_KEY_TO_COMMAND_OR_CANCEL:format(GetBindingName(action), GetBindingText("ESCAPE")));
-	
+
 	EventRegistry:TriggerEvent("Settings.ReparentBindingsToInputBlocker", settingsList:GetInputBlocker());
 end
 

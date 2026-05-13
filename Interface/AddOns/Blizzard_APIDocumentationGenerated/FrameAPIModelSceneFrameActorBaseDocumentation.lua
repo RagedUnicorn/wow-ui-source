@@ -2,6 +2,7 @@ local FrameAPIModelSceneFrameActorBase =
 {
 	Name = "FrameAPIModelSceneFrameActorBase",
 	Type = "ScriptObject",
+	Environment = "All",
 
 	Functions =
 	{
@@ -23,8 +24,8 @@ local FrameAPIModelSceneFrameActorBase =
 
 			Returns =
 			{
-				{ Name = "boxBottom", Type = "vector3", Mixin = "Vector3DMixin", Nilable = false },
-				{ Name = "boxTop", Type = "vector3", Mixin = "Vector3DMixin", Nilable = false },
+				{ Name = "boxBottom", Type = "vector3", Nilable = false },
+				{ Name = "boxTop", Type = "vector3", Nilable = false },
 			},
 		},
 		{
@@ -102,8 +103,8 @@ local FrameAPIModelSceneFrameActorBase =
 
 			Returns =
 			{
-				{ Name = "boxBottom", Type = "vector3", Mixin = "Vector3DMixin", Nilable = false },
-				{ Name = "boxTop", Type = "vector3", Mixin = "Vector3DMixin", Nilable = false },
+				{ Name = "boxBottom", Type = "vector3", Nilable = false },
+				{ Name = "boxTop", Type = "vector3", Nilable = false },
 			},
 		},
 		{
@@ -260,6 +261,19 @@ local FrameAPIModelSceneFrameActorBase =
 			},
 		},
 		{
+			Name = "IsPreferringModelCollisionBounds",
+			Type = "Function",
+
+			Arguments =
+			{
+			},
+
+			Returns =
+			{
+				{ Name = "preferringCollisionBounds", Type = "bool", Nilable = false },
+			},
+		},
+		{
 			Name = "IsShown",
 			Type = "Function",
 
@@ -350,6 +364,29 @@ local FrameAPIModelSceneFrameActorBase =
 			},
 		},
 		{
+			Name = "SetGradientMask",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "gradientIndex0", Type = "number", Nilable = false },
+				{ Name = "gradientIndex1", Type = "number", Nilable = false },
+				{ Name = "gradientIndex2", Type = "number", Nilable = false },
+				{ Name = "gradientIndex3", Type = "number", Nilable = false },
+			},
+		},
+		{
+			Name = "SetGradientMaskWithDyes",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "grad0DyeColorID", Type = "number", Nilable = true },
+				{ Name = "grad1DyeColorID", Type = "number", Nilable = true },
+				{ Name = "grad2DyeColorID", Type = "number", Nilable = true },
+			},
+		},
+		{
 			Name = "SetModelByCreatureDisplayID",
 			Type = "Function",
 
@@ -397,6 +434,7 @@ local FrameAPIModelSceneFrameActorBase =
 		{
 			Name = "SetModelByUnit",
 			Type = "Function",
+			RequiresDeclassifiedUnitIdentity = true,
 
 			Arguments =
 			{
@@ -406,6 +444,7 @@ local FrameAPIModelSceneFrameActorBase =
 				{ Name = "hideWeapons", Type = "bool", Nilable = false, Default = false },
 				{ Name = "usePlayerNativeForm", Type = "bool", Nilable = false, Default = true },
 				{ Name = "holdBowString", Type = "bool", Nilable = false, Default = false },
+				{ Name = "customRaceID", Type = "number", Nilable = true },
 			},
 
 			Returns =
@@ -442,6 +481,7 @@ local FrameAPIModelSceneFrameActorBase =
 				{ Name = "autoDress", Type = "bool", Nilable = false, Default = true },
 				{ Name = "hideWeapons", Type = "bool", Nilable = false, Default = false },
 				{ Name = "usePlayerNativeForm", Type = "bool", Nilable = false, Default = true },
+				{ Name = "customRaceID", Type = "number", Nilable = true },
 			},
 
 			Returns =
@@ -458,6 +498,16 @@ local FrameAPIModelSceneFrameActorBase =
 				{ Name = "positionX", Type = "number", Nilable = false },
 				{ Name = "positionY", Type = "number", Nilable = false },
 				{ Name = "positionZ", Type = "number", Nilable = false },
+			},
+		},
+		{
+			Name = "SetPreferModelCollisionBounds",
+			Type = "Function",
+			Documentation = { "If true, will try to use the collision bounds of models for sizing and centering. Will fall back to default model bounds if set to False, or if collision bounds are unavailable." },
+
+			Arguments =
+			{
+				{ Name = "preferCollisionBounds", Type = "bool", Nilable = false },
 			},
 		},
 		{
@@ -556,6 +606,9 @@ local FrameAPIModelSceneFrameActorBase =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

@@ -1,7 +1,7 @@
 UnitPopupLootMethodButtonMixin = CreateFromMixins(UnitPopupButtonBaseMixin);
 
 function UnitPopupLootMethodButtonMixin:GetSelectedLootMixin()
-	local lootMethod = GetLootMethod();
+	local lootMethod = C_PartyInfo.GetLootMethod();
 	for index, buttonMixin in ipairs(self:GetEntries()) do
 		if buttonMixin and buttonMixin:GetLootMethod() == lootMethod then
 			return buttonMixin;
@@ -70,11 +70,11 @@ function UnitPopupLootFreeForAllButtonMixin:GetTooltipText(contextData)
 end 
 
 function UnitPopupLootFreeForAllButtonMixin:GetLootMethod()
-	return "freeforall";
+	return Enum.LootMethod.Freeforall;
 end	
 
 function UnitPopupLootFreeForAllButtonMixin:IsChecked(contextData)
-	return GetLootMethod() == self:GetLootMethod();
+	return C_PartyInfo.GetLootMethod() == self:GetLootMethod();
 end
 
 function UnitPopupLootFreeForAllButtonMixin:CanShow(contextData)
@@ -90,7 +90,7 @@ function UnitPopupLootFreeForAllButtonMixin:CanShow(contextData)
 end
 
 function UnitPopupLootFreeForAllButtonMixin:OnClick(contextData)
-	SetLootMethod(self:GetLootMethod());
+	C_PartyInfo.SetLootMethod(self:GetLootMethod());
 end
 
 UnitPopupLootRoundRobinButtonMixin = CreateFromMixins(UnitPopupLootFreeForAllButtonMixin);
@@ -104,7 +104,7 @@ function UnitPopupLootRoundRobinButtonMixin:GetTooltipText(contextData)
 end 
 
 function UnitPopupLootRoundRobinButtonMixin:GetLootMethod()
-	return "roundrobin";
+	return Enum.LootMethod.Roundrobin;
 end		
 
 UnitPopupMasterLooterButtonMixin = CreateFromMixins(UnitPopupLootFreeForAllButtonMixin);
@@ -118,11 +118,11 @@ function UnitPopupMasterLooterButtonMixin:GetTooltipText(contextData)
 end 
 
 function UnitPopupMasterLooterButtonMixin:GetLootMethod()
-	return "master";
+	return Enum.LootMethod.Masterlooter;
 end		
 
 function UnitPopupMasterLooterButtonMixin:OnClick(contextData)
-	SetLootMethod(self:GetLootMethod(), UnitPopupSharedUtil.GetFullPlayerName(contextData), 2);
+	C_PartyInfo.SetLootMethod(self:GetLootMethod(), UnitPopupSharedUtil.GetFullPlayerName(contextData), 2);
 end
 
 UnitPopupGroupLootButtonMixin = CreateFromMixins(UnitPopupLootFreeForAllButtonMixin);
@@ -136,7 +136,7 @@ function UnitPopupGroupLootButtonMixin:GetTooltipText(contextData)
 end 
 
 function UnitPopupGroupLootButtonMixin:GetLootMethod()
-	return "group";
+	return Enum.LootMethod.Group;
 end		
 
 UnitPopupNeedBeforeGreedButtonMixin = CreateFromMixins(UnitPopupLootFreeForAllButtonMixin);
@@ -146,7 +146,7 @@ function UnitPopupNeedBeforeGreedButtonMixin:GetText(contextData)
 end
 
 function UnitPopupNeedBeforeGreedButtonMixin:GetLootMethod()
-	return "needbeforegreed";
+	return Enum.LootMethod.Needbeforegreed;
 end		
 
 function UnitPopupNeedBeforeGreedButtonMixin:GetTooltipText(contextData)
@@ -188,8 +188,8 @@ function UnitPopupLootPromoteButtonMixin:CanShow(contextData)
 		return false;
 	end
 
-	local lootMethod, partyIndex, raidIndex = GetLootMethod();
-	if lootMethod ~= "master" then
+	local lootMethod, partyIndex, raidIndex = C_PartyInfo.GetLootMethod();
+	if lootMethod ~= Enum.LootMethod.Masterlooter then
 		return false;
 	end
 
@@ -213,36 +213,36 @@ end
 
 function UnitPopupLootPromoteButtonMixin:IsEnabled(contextData)
 	if not IsInGroup() then
-		return false; 
+		return false;
 	end
 
 	if not UnitIsGroupLeader("player") then
 		return false;
-end 
-
-	local lootMethod, partyIndex, raidIndex = GetLootMethod();
-	if lootMethod ~= "master" then
-		return false; 
 	end
 
-		local masterName = 0;
-	if partyMaster and (partyMaster == 0) then
-			masterName = "player";
-	elseif partyMaster then
-			masterName = "party"..partyMaster;
-	elseif raidMaster then
-			masterName = "raid"..raidMaster;
-		end
+	local lootMethod, partyIndex, raidIndex = C_PartyInfo.GetLootMethod();
+	if lootMethod ~= Enum.LootMethod.Masterlooter then
+		return false;
+	end
 
-	if contextData.unit and UnitIsUnit(contextData.unit, masterName) then
-			return false; 
-		end
+	local masterLooterUnit;
+	if partyIndex and (partyIndex == 0) then
+		masterLooterUnit = "player";
+	elseif partyIndex then
+		masterLooterUnit = "party"..partyIndex;
+	elseif raidIndex then
+		masterLooterUnit = "raid"..raidIndex;
+	end
 
-	return true; 
+	if contextData.unit and masterLooterUnit and UnitIsUnit(contextData.unit, masterLooterUnit) then
+		return false;
+	end
+
+	return true;
 end
 
 function UnitPopupLootPromoteButtonMixin:OnClick(contextData)
-	SetLootMethod("master", UnitPopupSharedUtil.GetFullPlayerName(contextData), 2);
+	C_PartyInfo.SetLootMethod(Enum.LootMethod.Masterlooter, UnitPopupSharedUtil.GetFullPlayerName(contextData), 2);
 end
 
 -- Overrides
@@ -471,11 +471,20 @@ function UnitPopupVoteToKickButtonMixin:IsEnabled(contextData)
 end
 
 function UnitPopupDungeonDifficultyButtonMixin:GetEntries()
-	return { 
+	local difficultyEntries = { 
 		UnitPopupDungeonDifficulty1ButtonMixin, 
 		UnitPopupDungeonDifficulty2ButtonMixin,
 		UnitPopupDungeonDifficulty3ButtonMixin,
-	}
+	};
+
+	local supportedDifficultyEntries = {};
+	for i, buttonMixin in ipairs(difficultyEntries) do
+		if buttonMixin:IsSupported() then
+			table.insert(supportedDifficultyEntries, buttonMixin);
+		end
+	end
+
+	return supportedDifficultyEntries;
 end 
 
 function UnitPopupPartyInstanceLeaveButtonMixin:CanShow(contextData)

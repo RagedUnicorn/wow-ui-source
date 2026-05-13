@@ -273,7 +273,7 @@ function WorldStateScoreFrame_Update()
 
 		if ( index <= numScores ) then
 			scoreButton.index = index;
-			name, killingBlows, honorableKills, deaths, honorGained, faction, rank, race, class, classToken, damageDone, healingDone = GetBattlefieldScore(index);
+			name, killingBlows, honorableKills, deaths, honorGained, faction, rank, race, class, classToken, damageDone, healingDone, ratingChange = GetBattlefieldScore(index);
 
 			if GetClassicExpansionLevel() >= LE_EXPANSION_CATACLYSM then
 				honorGained = honorGained / 100;
@@ -314,14 +314,17 @@ function WorldStateScoreFrame_Update()
 						scoreButton.team:SetText(teamName);
 						scoreButton.name.teamName = teamName;
 						scoreButton.team:Show();
+
+						if ( teamDataFailed == 1 ) then
+							scoreButton.honorGained:SetText("-------");
+						else
+							local delta = newTeamRating - teamRating;
+							scoreButton.honorGained:SetText(TEAM_RATING_CHANGE:format(delta, newTeamRating));
+						end
+					else
+						scoreButton.honorGained:SetText(ratingChange);
 					end
 
-					if ( teamDataFailed == 1 ) then
-						scoreButton.honorGained:SetText("-------");
-					else
-						local delta = newTeamRating - teamRating;
-						scoreButton.honorGained:SetText(TEAM_RATING_CHANGE:format(delta, newTeamRating));
-					end
 					scoreButton.honorGained:Show();
 				else
 					scoreButton.honorGained:Hide();
@@ -420,7 +423,7 @@ function WorldStateScoreFrame_Update()
 
 	-- Show average matchmaking rating at the bottom
 	if WorldStateScoreFrame.teamAverageRating ~= nil then
-		if isRatedBG or (isArena and isRegistered) then
+		if isRanked then
 			local _, ourAverageMMR, theirAverageMMR;
 			local myFaction = GetBattlefieldArenaFaction();
 			_, _, _, ourAverageMMR = GetBattlefieldTeamInfo(myFaction);
@@ -599,8 +602,8 @@ function ScorePlayer_OnMouseUp(self, mouseButton)
 
 			UnitPopup_OpenMenu("WORLD_STATE_SCORE", contextData);
 		end
-	elseif ( mouseButton == "LeftButton" and IsModifiedClick("CHATLINK") and ChatEdit_GetActiveWindow() ) then
-		ChatEdit_InsertLink(self.text:GetText());
+	elseif ( mouseButton == "LeftButton" and IsModifiedClick("CHATLINK") and ChatFrameUtil.GetActiveWindow() ) then
+		ChatFrameUtil.InsertLink(self.text:GetText());
 	end
 end
 
@@ -654,7 +657,7 @@ function WorldStateChallengeMode_CheckTimers(...)
 	for i = 1, select("#", ...) do
 		local timerID = select(i, ...);
 		local _, elapsedTime, type = GetWorldElapsedTime(timerID);
-		if ( type == LE_WORLD_ELAPSED_TIMER_TYPE_CHALLENGE_MODE) then
+		if ( type == Enum.WorldElapsedTimerTypes.ChallengeMode) then
 			local _, _, _, _, _, _, _, mapID = GetInstanceInfo();
 			if ( mapID ) then
 				WorldStateChallengeMode_ShowTimer(timerID, elapsedTime, C_ChallengeMode.GetChallengeModeMapTimes(mapID));
@@ -823,7 +826,7 @@ function WorldStateProvingGrounds_CheckTimers(...)
 	for i = 1, select("#", ...) do
 		local timerID = select(i, ...);
 		local _, elapsedTime, type = GetWorldElapsedTime(timerID);
-		if ( type == LE_WORLD_ELAPSED_TIMER_TYPE_PROVING_GROUND) then
+		if ( type == Enum.WorldElapsedTimerTypes.ProvingGround) then
 			local diffID, currWave, maxWave, duration = C_Scenario.GetProvingGroundsInfo()
 			if (duration > 0) then
 				WorldStateProvingGrounds_ShowTimer(timerID, elapsedTime, duration, diffID, currWave, maxWave);

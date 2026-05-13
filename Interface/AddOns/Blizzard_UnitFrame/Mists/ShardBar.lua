@@ -27,7 +27,7 @@ end
 function WarlockPowerFrameMixin:OnEvent(event, arg1, arg2)
 	-- update events
 	if ( self.activeBar ) then
-		if ( (event == "UNIT_POWER_FREQUENT") and (arg1 == WarlockPowerFrame:GetParent().unit) ) then
+		if ( (event == "UNIT_POWER_FREQUENT") and (arg1 == PlayerFrame.unit) ) then
 			self.activeBar:OnEvent(arg2);
 			return;
 		elseif ( event == "UNIT_DISPLAYPOWER" or event == "PLAYER_ENTERING_WORLD" ) then
@@ -36,11 +36,11 @@ function WarlockPowerFrameMixin:OnEvent(event, arg1, arg2)
 		end
 	end
 	-- power specific events
-	if ( event == "UNIT_AURA" and (arg1 == WarlockPowerFrame:GetParent().unit) ) then
+	if ( event == "UNIT_AURA" and (arg1 == PlayerFrame.unit) ) then
 		DemonicFuryBarFrame:CheckAndSetState();
 	elseif ( event == "SPELLS_CHANGED" ) then
 		if ( self.reqSpellID ) then
-			if ( IsPlayerSpell(self.reqSpellID) ) then
+			if ( C_SpellBook.IsSpellKnown(self.reqSpellID) ) then
 				self:UnregisterEvent("SPELLS_CHANGED");
 				self.reqSpellID = nil;
 				-- clear spec to force reevaluation
@@ -77,7 +77,7 @@ function WarlockPowerFrameMixin:SetUpCurrentPower(shouldAnim)
 			self:SetScript("OnUpdate", nil);
 			-- set up Affliction
 			-- only show shard bar if soulburn is known
-			if ( IsPlayerSpell(WARLOCK_SOULBURN) ) then
+			if ( C_SpellBook.IsSpellKnown(WARLOCK_SOULBURN) ) then
 				self.activeBar = ShardBarFrame;
 				self.activeBar.OnEvent = ShardBarFrame.Update;
 				ShardBarFrame:Show();
@@ -101,7 +101,7 @@ function WarlockPowerFrameMixin:SetUpCurrentPower(shouldAnim)
 			ShardBarFrame:Hide();
 			-- set up Destruction
 			-- only show if burning embers is known
-			if ( IsPlayerSpell(WARLOCK_BURNING_EMBERS) ) then
+			if ( C_SpellBook.IsSpellKnown(WARLOCK_BURNING_EMBERS) ) then
 				self.activeBar = BurningEmbersBarFrame;
 				self.activeBar.OnEvent = BurningEmbersBarFrame.Update;
 				self.activeBar.SetPower = BurningEmbersBarFrame.SetPower;
@@ -226,8 +226,8 @@ function ShardBarMixin:Update(powerType)
 		return;
 	end
 
-	local numShards = UnitPower( WarlockPowerFrame:GetParent().unit, Enum.PowerType.SoulShards );
-	local maxShards = UnitPowerMax( WarlockPowerFrame:GetParent().unit, Enum.PowerType.SoulShards );
+	local numShards = UnitPower( PlayerFrame.unit, Enum.PowerType.SoulShards );
+	local maxShards = UnitPowerMax( PlayerFrame.unit, Enum.PowerType.SoulShards );
 	-- update individual shard display
 	for i = 1, maxShards do
 		local shard = _G["ShardBarFrameShard"..i];
@@ -258,21 +258,26 @@ function DemonicFuryBarMixin:SetPower(power)
 		texData = WARLOCK_POWER_FILLBAR["Demonology"];
 	end
 	WarlockPowerFrame:UpdateFill(self.fill, texData, power, self.maxPower);
-	TextStatusBar_UpdateTextStringWithValues(self, self.powerText, math.floor(power), 1, self.maxPower);
+	self:UpdateTextStringWithValues(self.powerText, math.floor(power), 1, self.maxPower);
+end
+
+function DemonicFuryBarMixin:UpdateTextStringWithValues(textString, value, valueMin, valueMax)
+	if not textString then
+		return;
+	end
+
+	if self.lockShow > 0 then
+		textString:Show();
+		textString:SetText(tostring(value) .. ' / ' .. tostring(valueMax));
+	else
+		textString:Hide();
+		textString:SetText("");
+	end
 end
 
 function DemonicFuryBarMixin:CheckAndSetState()
-	local activated = false;
-	local index = 1;
-	local name, _, _, _, _, _, _, _, _, _, spellId = UnitBuff("player", index);
-	while spellId do
-		if ( spellId == WARLOCK_METAMORPHOSIS ) then
-			activated = true;
-			break;
-		end
-		name, _, _, _, _, _, _, _, _, _, spellId = UnitBuff("player", index);
-		index = index + 1
-	end
+	local activated = C_UnitAuras.GetPlayerAuraBySpellID(WARLOCK_METAMORPHOSIS);
+
 	if ( activated and not self.activated ) then
 		self.activated = true;
 		self.bar:SetTexCoord(0.03906250, 0.69921875, 0.30859375, 0.51171875);
@@ -354,7 +359,7 @@ end
 function BurningEmbersBarMixin:SetColorTextures()
 	local frame = BurningEmbersBarFrame;
 	local textureFile;
-	if ( IsSpellKnown(WARLOCK_GREEN_FIRE) ) then
+	if ( C_SpellBook.IsSpellKnown(WARLOCK_GREEN_FIRE) ) then
 		if ( not frame.hasGreenFire ) then
 			frame.hasGreenFire = true;
 			textureFile = "Interface\\PlayerFrame\\Warlock-DestructionUI-Green";

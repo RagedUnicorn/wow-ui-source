@@ -63,7 +63,7 @@ function TalentFrame_Load(TalentFrame)
 	TalentFrame.TALENT_BRANCH_ARRAY={};
 	for i=1, MAX_NUM_TALENT_TIERS do
 		TalentFrame.TALENT_BRANCH_ARRAY[i] = {};
-		for j=1, NUM_TALENT_COLUMNS do
+		for j=1, Constants.TalentConsts.NumTalentColumns do
 			TalentFrame.TALENT_BRANCH_ARRAY[i][j] = {id=nil, up=0, left=0, right=0, down=0, leftArrow=0, rightArrow=0, topArrow=0};
 		end
 	end
@@ -100,7 +100,7 @@ function TalentFrame_DrawLines(buttonTier, buttonColumn, tier, column, requireme
 			for i=tier + 1, buttonTier - 1 do
 				if ( TalentFrame.TALENT_BRANCH_ARRAY[i][buttonColumn].id ) then
 					-- If there's an id, there's a blocker
-					message("Error this layout is blocked vertically "..TalentFrame.TALENT_BRANCH_ARRAY[buttonTier][i].id);
+					SetBasicMessageDialogText("Error this layout is blocked vertically "..TalentFrame.TALENT_BRANCH_ARRAY[buttonTier][i].id);
 					return;
 				end
 			end
@@ -129,7 +129,7 @@ function TalentFrame_DrawLines(buttonTier, buttonColumn, tier, column, requireme
 			for i=left + 1, right - 1 do
 				if ( TalentFrame.TALENT_BRANCH_ARRAY[tier][i].id ) then
 					-- If there's an id, there's a blocker
-					message("there's a blocker "..tier.." "..i);
+					SetBasicMessageDialogText("there's a blocker "..tier.." "..i);
 					return;
 				end
 			end
@@ -193,7 +193,7 @@ function TalentFrame_DrawLines(buttonTier, buttonColumn, tier, column, requireme
 	for i=left, right do
 		if ( TalentFrame.TALENT_BRANCH_ARRAY[buttonTier][i].id ) then
 			-- If there's an id, then throw an error
-			message("Error, this layout is undrawable "..TalentFrame.TALENT_BRANCH_ARRAY[buttonTier][i].id);
+			SetBasicMessageDialogText("Error, this layout is undrawable "..TalentFrame.TALENT_BRANCH_ARRAY[buttonTier][i].id);
 			return;
 		end
 	end
@@ -218,7 +218,7 @@ end
 
 function TalentFrame_ResetBranches(TalentFrame)
 	for i=1, MAX_NUM_TALENT_TIERS do
-		for j=1, NUM_TALENT_COLUMNS do
+		for j=1, Constants.TalentConsts.NumTalentColumns do
 			TalentFrame.TALENT_BRANCH_ARRAY[i][j].id = nil;
 			TalentFrame.TALENT_BRANCH_ARRAY[i][j].up = 0;
 			TalentFrame.TALENT_BRANCH_ARRAY[i][j].down = 0;

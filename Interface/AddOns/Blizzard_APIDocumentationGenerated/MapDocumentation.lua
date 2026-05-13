@@ -3,6 +3,7 @@ local Map =
 	Name = "MapUI",
 	Type = "System",
 	Namespace = "C_Map",
+	Environment = "All",
 
 	Functions =
 	{
@@ -305,14 +306,14 @@ local Map =
 			Arguments =
 			{
 				{ Name = "continentID", Type = "number", Nilable = false },
-				{ Name = "worldPosition", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
+				{ Name = "worldPosition", Type = "vector2", Nilable = false },
 				{ Name = "overrideUiMapID", Type = "number", Nilable = true },
 			},
 
 			Returns =
 			{
 				{ Name = "uiMapID", Type = "number", Nilable = false },
-				{ Name = "mapPosition", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
+				{ Name = "mapPosition", Type = "vector2", Nilable = false },
 			},
 		},
 		{
@@ -347,7 +348,7 @@ local Map =
 
 			Returns =
 			{
-				{ Name = "position", Type = "vector2", Mixin = "Vector2DMixin", Nilable = true },
+				{ Name = "position", Type = "vector2", Nilable = true },
 			},
 		},
 		{
@@ -358,13 +359,13 @@ local Map =
 			Arguments =
 			{
 				{ Name = "uiMapID", Type = "number", Nilable = false },
-				{ Name = "mapPosition", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
+				{ Name = "mapPosition", Type = "vector2", Nilable = false },
 			},
 
 			Returns =
 			{
 				{ Name = "continentID", Type = "number", Nilable = false },
-				{ Name = "worldPosition", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
+				{ Name = "worldPosition", Type = "vector2", Nilable = false },
 			},
 		},
 		{
@@ -398,21 +399,25 @@ local Map =
 			Name = "NewWmoChunk",
 			Type = "Event",
 			LiteralName = "NEW_WMO_CHUNK",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "ZoneChanged",
 			Type = "Event",
 			LiteralName = "ZONE_CHANGED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "ZoneChangedIndoors",
 			Type = "Event",
 			LiteralName = "ZONE_CHANGED_INDOORS",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "ZoneChangedNewArea",
 			Type = "Event",
 			LiteralName = "ZONE_CHANGED_NEW_AREA",
+			SynchronousEvent = true,
 		},
 	},
 
@@ -434,7 +439,7 @@ local Map =
 			Fields =
 			{
 				{ Name = "areaPoiID", Type = "number", Nilable = false },
-				{ Name = "position", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
+				{ Name = "position", Type = "vector2", Nilable = false },
 				{ Name = "name", Type = "cstring", Nilable = false },
 				{ Name = "atlasName", Type = "string", Nilable = false },
 				{ Name = "linkedUiMapID", Type = "number", Nilable = false },
@@ -490,6 +495,9 @@ local Map =
 				{ Name = "additionalZoomSteps", Type = "number", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

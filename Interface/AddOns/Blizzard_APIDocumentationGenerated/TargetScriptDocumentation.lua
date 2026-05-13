@@ -2,12 +2,14 @@ local TargetScript =
 {
 	Name = "TargetScript",
 	Type = "System",
+	Environment = "All",
 
 	Functions =
 	{
 		{
 			Name = "AssistUnit",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -35,6 +37,7 @@ local TargetScript =
 		{
 			Name = "FocusUnit",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -165,10 +168,12 @@ local TargetScript =
 		{
 			Name = "TargetToggle",
 			Type = "Function",
+			HasRestrictions = true,
 		},
 		{
 			Name = "TargetUnit",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -183,6 +188,9 @@ local TargetScript =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

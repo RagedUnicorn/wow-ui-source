@@ -2,6 +2,7 @@ local FrameAPICooldown =
 {
 	Name = "FrameAPICooldown",
 	Type = "ScriptObject",
+	Environment = "All",
 
 	Functions =
 	{
@@ -53,6 +54,60 @@ local FrameAPICooldown =
 			{
 				{ Name = "start", Type = "number", Nilable = false },
 				{ Name = "duration", Type = "number", Nilable = false },
+			},
+		},
+		{
+			Name = "GetCountdownAbbrevThreshold",
+			Type = "Function",
+			Documentation = { "Returns the threshold below which cooldown numbers are displayed as an abbreviated form without a unit suffix (eg. '1:31')." },
+
+			Arguments =
+			{
+			},
+
+			Returns =
+			{
+				{ Name = "seconds", Type = "DurationSecondsPrimitive", Nilable = false },
+			},
+		},
+		{
+			Name = "GetCountdownFontString",
+			Type = "Function",
+
+			Arguments =
+			{
+			},
+
+			Returns =
+			{
+				{ Name = "countdownString", Type = "SimpleFontString", Nilable = false },
+			},
+		},
+		{
+			Name = "GetCountdownFormatter",
+			Type = "Function",
+
+			Arguments =
+			{
+			},
+
+			Returns =
+			{
+				{ Name = "formatter", Type = "NumericFormatter", Nilable = true },
+			},
+		},
+		{
+			Name = "GetCountdownMillisecondsThreshold",
+			Type = "Function",
+			Documentation = { "Returns the threshold below which cooldown numbers are displayed as a decimal value with one place for milliseconds (eg. '8.7')." },
+
+			Arguments =
+			{
+			},
+
+			Returns =
+			{
+				{ Name = "seconds", Type = "DurationSecondsPrimitive", Nilable = false },
 			},
 		},
 		{
@@ -118,6 +173,19 @@ local FrameAPICooldown =
 			Returns =
 			{
 				{ Name = "hideNumbers", Type = "bool", Nilable = false },
+			},
+		},
+		{
+			Name = "GetMinimumCountdownDuration",
+			Type = "Function",
+
+			Arguments =
+			{
+			},
+
+			Returns =
+			{
+				{ Name = "milliseconds", Type = "DurationMillisecondsPrimitive", Nilable = false },
 			},
 		},
 		{
@@ -207,8 +275,8 @@ local FrameAPICooldown =
 
 			Arguments =
 			{
-				{ Name = "start", Type = "number", Nilable = false },
-				{ Name = "duration", Type = "number", Nilable = false },
+				{ Name = "start", Type = "DurationSeconds", Nilable = false },
+				{ Name = "duration", Type = "DurationSeconds", Nilable = false },
 				{ Name = "modRate", Type = "number", Nilable = false, Default = 1 },
 			},
 		},
@@ -218,7 +286,28 @@ local FrameAPICooldown =
 
 			Arguments =
 			{
-				{ Name = "duration", Type = "number", Nilable = false },
+				{ Name = "duration", Type = "DurationSeconds", Nilable = false },
+				{ Name = "modRate", Type = "number", Nilable = false, Default = 1 },
+			},
+		},
+		{
+			Name = "SetCooldownFromDurationObject",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "duration", Type = "LuaDurationObject", Nilable = false },
+				{ Name = "clearIfZero", Type = "bool", Nilable = false, Default = true },
+			},
+		},
+		{
+			Name = "SetCooldownFromExpirationTime",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "expirationTime", Type = "DurationSeconds", Nilable = false },
+				{ Name = "duration", Type = "DurationSeconds", Nilable = false },
 				{ Name = "modRate", Type = "number", Nilable = false, Default = 1 },
 			},
 		},
@@ -236,10 +325,11 @@ local FrameAPICooldown =
 		{
 			Name = "SetCountdownAbbrevThreshold",
 			Type = "Function",
+			Documentation = { "Sets the threshold below which cooldown numbers are displayed as an abbreviated form without a unit suffix (eg. '1:31')." },
 
 			Arguments =
 			{
-				{ Name = "seconds", Type = "number", Nilable = false },
+				{ Name = "seconds", Type = "DurationSecondsPrimitive", Nilable = false, Documentation = { "Number of seconds below which numbers will be abbreviated. If above one hour or below one minute, no abbreviation will be performed." } },
 			},
 		},
 		{
@@ -249,6 +339,25 @@ local FrameAPICooldown =
 			Arguments =
 			{
 				{ Name = "fontName", Type = "cstring", Nilable = false },
+			},
+		},
+		{
+			Name = "SetCountdownFormatter",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "formatter", Type = "NumericFormatter", Nilable = true },
+			},
+		},
+		{
+			Name = "SetCountdownMillisecondsThreshold",
+			Type = "Function",
+			Documentation = { "Sets the threshold below which cooldown numbers are displayed as a decimal value with one place for milliseconds (eg. '8.7')." },
+
+			Arguments =
+			{
+				{ Name = "seconds", Type = "DurationSecondsPrimitive", Nilable = false, Documentation = { "Number of seconds below which numbers are displayed with milliseconds." } },
 			},
 		},
 		{
@@ -322,6 +431,25 @@ local FrameAPICooldown =
 			},
 		},
 		{
+			Name = "SetMinimumCountdownDuration",
+			Type = "Function",
+			Documentation = { "Controls the minimum duration above which countdown text will be shown. This is applied based upon the total duration of the cooldown, not the remaining duration as it ticks down." },
+
+			Arguments =
+			{
+				{ Name = "milliseconds", Type = "DurationMillisecondsPrimitive", Nilable = false },
+			},
+		},
+		{
+			Name = "SetPaused",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "paused", Type = "bool", Nilable = false },
+			},
+		},
+		{
 			Name = "SetReverse",
 			Type = "Function",
 
@@ -370,8 +498,8 @@ local FrameAPICooldown =
 
 			Arguments =
 			{
-				{ Name = "low", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
-				{ Name = "high", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
+				{ Name = "low", Type = "vector2", Nilable = false },
+				{ Name = "high", Type = "vector2", Nilable = false },
 			},
 		},
 		{
@@ -400,6 +528,9 @@ local FrameAPICooldown =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

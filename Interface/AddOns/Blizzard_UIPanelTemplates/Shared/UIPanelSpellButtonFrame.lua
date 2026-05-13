@@ -7,15 +7,40 @@ function UIPanelSpellButtonFrameMixin:OnLoad()
 	local height = self:GetHeight();
 	button:SetSize(height, height);
 
+	if self.buttonBorderAtlas then
+		self.Button.Border:SetTexCoord(0, 1, 0, 1);
+		local useAtlasSize = true;
+		if self.buttonBorderAtlasSize then
+			self.Button.Border:SetSize(self.buttonBorderAtlasSize, self.buttonBorderAtlasSize);
+			useAtlasSize = false;
+		end
+		self.Button.Border:SetAtlas(self.buttonBorderAtlas, useAtlasSize);
+	end
+
 	button:SetScript("OnClick", GenerateClosure(self.OnIconClick, self));
 	button:SetScript("OnDragStart", GenerateClosure(self.OnIconDragStart, self));
 	button:SetScript("OnEnter", GenerateClosure(self.OnIconEnter, self));
 	button:SetScript("OnLeave", GenerateClosure(self.OnIconLeave, self));
 	button.UpdateTooltip =  GenerateClosure(self.UpdateTooltip, self);
 
-	if not self.resizeToText then
-		self.Label:SetPoint("LEFT", self.textPadLeft, 0);
-		self.Label:SetPoint("RIGHT", self.Button.Border, "LEFT", -self.textPadRight, 0);
+	-- Is the spell anchored on the left or right side of the frame.
+	self.Button:ClearAllPoints();
+	if self.spellButtonJustifyLeft then
+		self.Button:SetPoint("LEFT");
+		self.Label:SetJustifyH("LEFT");
+
+		if not self.resizeToText then
+			self.Label:SetPoint("LEFT", self.Button.Border, "RIGHT", self.textPadLeft, 0);
+			self.Label:SetPoint("RIGHT", -self.textPadRight, 0);
+		end
+	else
+		self.Button:SetPoint("RIGHT");
+		self.Label:SetJustifyH("RIGHT");
+
+		if not self.resizeToText then
+			self.Label:SetPoint("LEFT", self.textPadLeft, 0);
+			self.Label:SetPoint("RIGHT", self.Button.Border, "LEFT", -self.textPadRight, 0);
+		end
 	end
 
 	self:UpdateDisplay();
@@ -68,11 +93,18 @@ function UIPanelSpellButtonFrameMixin:UpdateDisplay()
 
 	if self.resizeToText then
 		self.Label:ClearAllPoints();
-		self.Label:SetPoint("LEFT", self.textPadLeft, 0);
+
+		if self.spellButtonJustifyLeft then
+			self.Label:SetPoint("LEFT", self.Button.Border, "RIGHT", self.textPadLeft, 0);
+			self.Label:SetPoint("RIGHT", -self.textPadRight, 0);
+		else
+			self.Label:SetPoint("LEFT", self.textPadLeft, 0);
+			self.Label:SetPoint("RIGHT", self.Button.Border, "LEFT", -self.textPadRight, 0);
+		end
+
 		local fontStringWidth = self.Label:GetWidth();
 		local buttonWidth = self.Button:GetWidth();
 		self:SetWidth(fontStringWidth + buttonWidth + self.textPadLeft + self.textPadRight + 1);	-- add 1 to account for rounding errors
-		self.Label:SetPoint("RIGHT", self.Button.Border, "LEFT", -self.textPadRight, 0);
 	end
 
 	if self:IsShown() then

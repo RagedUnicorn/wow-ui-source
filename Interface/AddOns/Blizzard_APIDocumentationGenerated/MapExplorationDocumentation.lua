@@ -3,6 +3,7 @@ local MapExploration =
 	Name = "MapExplorationInfo",
 	Type = "System",
 	Namespace = "C_MapExplorationInfo",
+	Environment = "All",
 
 	Functions =
 	{
@@ -13,7 +14,7 @@ local MapExploration =
 			Arguments =
 			{
 				{ Name = "uiMapID", Type = "number", Nilable = false },
-				{ Name = "normalizedPosition", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
+				{ Name = "normalizedPosition", Type = "vector2", Nilable = false },
 			},
 
 			Returns =
@@ -44,6 +45,7 @@ local MapExploration =
 			Name = "MapExplorationUpdated",
 			Type = "Event",
 			LiteralName = "MAP_EXPLORATION_UPDATED",
+			SynchronousEvent = true,
 		},
 	},
 
@@ -75,6 +77,9 @@ local MapExploration =
 				{ Name = "hitRect", Type = "UiMapExplorationHitRect", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

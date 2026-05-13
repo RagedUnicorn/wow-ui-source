@@ -86,6 +86,23 @@ function tContains(tbl, item)
 	return false;
 end
 
+function TableUtil.SafeCountTable(tbl, isIndexTable)
+	if tbl == nil then
+		return 0;
+	end
+
+	if isIndexTable then
+		return #tbl;
+	end
+
+	return CountTable(tbl);
+end
+
+function TableUtil.SafeCountIndexTable(tbl)
+	local isIndexTable = true;
+	return TableUtil.SafeCountTable(tbl, isIndexTable);
+end
+
 function TableUtil.ContainsAllKeys(lhsTable, rhsTable)
 	for key, _ in pairs(lhsTable) do
 		if rhsTable[key] == nil then
@@ -143,6 +160,16 @@ function tInvert(tbl)
 		inverted[v] = k;
 	end
 	return inverted;
+end
+
+function tInvertToArray(tbl)
+	local index = 1;
+	local copy = {};
+	for k in pairs(tbl) do
+		copy[k] = index;
+		index = index + 1;
+	end
+	return tInvert(copy);
 end
 
 function TableUtil.TrySet(tbl, key)
@@ -227,6 +254,14 @@ function CopyTable(settings, shallow)
 	return copy;
 end
 
+function CopyTableSafe(settings, shallow)
+	if not settings then
+		return nil;
+	end
+
+	return CopyTable(settings, shallow);
+end
+
 function MergeTable(destination, source)
 	for k, v in pairs(source) do
 		destination[k] = v;
@@ -289,7 +324,7 @@ function TableUtil.Transform(tbl, op)
 	return result;
 end
 
--- Returns the value in a table deemed smallest by evaluating each value returned by the op function parameter. 
+-- Returns the value in a table deemed smallest by evaluating each value returned by the op function parameter.
 -- The return of the op function must return a number.
 function TableUtil.FindMin(tbl, op)
 	local result = nil;
@@ -304,7 +339,7 @@ function TableUtil.FindMin(tbl, op)
 	return result;
 end
 
--- Returns the value in a table deemed largest by evaluating each value returned by the op function parameter. 
+-- Returns the value in a table deemed largest by evaluating each value returned by the op function parameter.
 -- The return of the op function must return a number.
 function TableUtil.FindMax(tbl, op)
 	local result = nil;
@@ -413,7 +448,7 @@ function CopyTransformedValuesAsKeys(tbl, transformOp)
 end
 
 -- Addresses the problem where nil values within a varargs list are not preserved when constructing
--- a table, resulting a table with a smaller size than expected. Should be paired with a call to 
+-- a table, resulting a table with a smaller size than expected. Should be paired with a call to
 -- SafeUnpack when unpacking the table.
 function SafePack(...)
 	local tbl = { ... };
@@ -462,6 +497,17 @@ function GetOrCreateTableEntryByCallback(table, key, callback)
 	local isNewValue = (currentValue == nil);
 	if isNewValue then
 		currentValue = callback(key);
+		table[key] = currentValue;
+	end
+
+	return currentValue, isNewValue;
+end
+
+function GetOrCreateTableEntryByMethod(table, key, method, owner)
+	local currentValue = table[key];
+	local isNewValue = (currentValue == nil);
+	if isNewValue then
+		currentValue = method(owner, key);
 		table[key] = currentValue;
 	end
 
@@ -521,10 +567,10 @@ end
 function GetKeysArraySortedByValue(tbl)
 	local keysArray = GetKeysArray(tbl);
 
-	table.sort(keysArray, function(a, b) 
+	table.sort(keysArray, function(a, b)
 		return tbl[a] < tbl[b];
 	end);
-	
+
 	return keysArray;
 end
 
@@ -545,6 +591,80 @@ function TableUtil.GetHighestNumericalValueInTable(table)
 		end
 	end
 	return highestValue;
+end
+
+-- Useful for debugging the differences between two tables.
+function CollectTableDifferences(actual, expected, path, differences, depth)
+	path = path or "";
+	differences = differences or {};
+	depth = depth or 10;
+
+	if depth <= 0 then
+		return differences;
+	end
+
+	-- Check if types match
+	local actualType = type(actual);
+	local expectedType = type(expected);
+
+	if actualType ~= expectedType then
+		table.insert(differences, {
+			path = path == "" and "root" or path,
+			actual = actual,
+			expected = expected,
+			reason = "type mismatch"
+		});
+		return differences;
+	end
+
+	-- If not tables, do direct comparison
+	if actualType ~= "table" then
+		if actual ~= expected then
+			table.insert(differences, {
+				path = path == "" and "root" or path,
+				actual = actual,
+				expected = expected,
+				reason = "value mismatch"
+			});
+		end
+		return differences;
+	end
+
+	-- Both are tables, compare recursively
+	local checkedKeys = {};
+
+	-- Check all keys in expected
+	for key, expectedValue in pairs(expected) do
+		checkedKeys[key] = true;
+		local actualValue = actual[key];
+		local keyPath = path == "" and tostring(key) or (path .. "." .. tostring(key));
+
+		if actualValue == nil then
+			table.insert(differences, {
+				path = keyPath,
+				actual = nil,
+				expected = expectedValue,
+				reason = "missing in actual"
+			});
+		else
+			CollectTableDifferences(actualValue, expectedValue, keyPath, differences, depth - 1);
+		end
+	end
+
+	-- Check for extra keys in actual
+	for key, actualValue in pairs(actual) do
+		if not checkedKeys[key] then
+			local keyPath = path == "" and tostring(key) or (path .. "." .. tostring(key));
+			table.insert(differences, {
+				path = keyPath,
+				actual = actualValue,
+				expected = nil,
+				reason = "extra in actual"
+			});
+		end
+	end
+
+	return differences;
 end
 
 --[[
@@ -616,9 +736,16 @@ function TableUtil.CreatePriorityTable(comparator, isAssociative)
 
 	local t = {};
 
+	local function GetKey(k)
+		if isAssociative then
+			return keyToPosMap[k];
+		end
+		return k;
+	end
+
 	function t:Get(k)
-		local key = isAssociative and keyToPosMap[k] or k;
-		return sortedArray[key];
+		local key = GetKey(k);
+		return key and sortedArray[key] or nil;
 	end
 
 	if not isAssociative then
@@ -628,12 +755,14 @@ function TableUtil.CreatePriorityTable(comparator, isAssociative)
 	end
 
 	function t:Remove(k)
-		local key = isAssociative and keyToPosMap[k] or k;
-		tRemove(sortedArray, key);
-		if isAssociative then
-			keyToPosMap[k] = nil;
-			local shiftUp = false;
-			ShiftPositionMap(key, shiftUp);
+		local key = GetKey(k);
+		if key then
+			tRemove(sortedArray, key);
+			if isAssociative then
+				keyToPosMap[k] = nil;
+				local shiftUp = false;
+				ShiftPositionMap(key, shiftUp);
+			end
 		end
 	end
 

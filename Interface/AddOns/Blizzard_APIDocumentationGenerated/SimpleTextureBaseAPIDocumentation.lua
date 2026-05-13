@@ -2,6 +2,7 @@ local SimpleTextureBaseAPI =
 {
 	Name = "SimpleTextureBaseAPI",
 	Type = "ScriptObject",
+	Environment = "All",
 
 	Functions =
 	{
@@ -9,6 +10,14 @@ local SimpleTextureBaseAPI =
 			Name = "ClearTextureSlice",
 			Type = "Function",
 			Documentation = { "Disable shader based nineslice texture rendering. Since SetAtlas will automatically load slice data for the atlas from the DB, can be useful if you want to disable nineslice after setting an atlas." },
+
+			Arguments =
+			{
+			},
+		},
+		{
+			Name = "ClearVertexOffsets",
+			Type = "Function",
 
 			Arguments =
 			{
@@ -77,7 +86,7 @@ local SimpleTextureBaseAPI =
 			Returns =
 			{
 				{ Name = "radians", Type = "number", Nilable = false },
-				{ Name = "normalizedRotationPoint", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
+				{ Name = "normalizedRotationPoint", Type = "vector2", Nilable = false },
 			},
 		},
 		{
@@ -90,8 +99,14 @@ local SimpleTextureBaseAPI =
 
 			Returns =
 			{
-				{ Name = "x", Type = "number", Nilable = false, StrideIndex = 1 },
-				{ Name = "y", Type = "number", Nilable = false, StrideIndex = 2 },
+				{ Name = "ulX", Type = "number", Nilable = false },
+				{ Name = "ulY", Type = "number", Nilable = false },
+				{ Name = "llX", Type = "number", Nilable = false },
+				{ Name = "llY", Type = "number", Nilable = false },
+				{ Name = "urX", Type = "number", Nilable = false },
+				{ Name = "urY", Type = "number", Nilable = false },
+				{ Name = "lrX", Type = "number", Nilable = false },
+				{ Name = "lrY", Type = "number", Nilable = false },
 			},
 		},
 		{
@@ -221,6 +236,7 @@ local SimpleTextureBaseAPI =
 		{
 			Name = "IsDesaturated",
 			Type = "Function",
+			RequiresScriptObjectDesaturationAccess = true,
 
 			Arguments =
 			{
@@ -245,6 +261,14 @@ local SimpleTextureBaseAPI =
 			},
 		},
 		{
+			Name = "ResetTexCoord",
+			Type = "Function",
+
+			Arguments =
+			{
+			},
+		},
+		{
 			Name = "SetAtlas",
 			Type = "Function",
 
@@ -254,6 +278,8 @@ local SimpleTextureBaseAPI =
 				{ Name = "useAtlasSize", Type = "bool", Nilable = false, Default = false },
 				{ Name = "filterMode", Type = "FilterMode", Nilable = true },
 				{ Name = "resetTexCoords", Type = "bool", Nilable = true },
+				{ Name = "wrapModeHorizontal", Type = "cstring", Nilable = true },
+				{ Name = "wrapModeVertical", Type = "cstring", Nilable = true },
 			},
 		},
 		{
@@ -311,8 +337,8 @@ local SimpleTextureBaseAPI =
 			Arguments =
 			{
 				{ Name = "orientation", Type = "Orientation", Nilable = false },
-				{ Name = "minColor", Type = "colorRGBA", Mixin = "ColorMixin", Nilable = false },
-				{ Name = "maxColor", Type = "colorRGBA", Mixin = "ColorMixin", Nilable = false },
+				{ Name = "minColor", Type = "colorRGBA", Nilable = false },
+				{ Name = "maxColor", Type = "colorRGBA", Nilable = false },
 			},
 		},
 		{
@@ -340,7 +366,7 @@ local SimpleTextureBaseAPI =
 			Arguments =
 			{
 				{ Name = "radians", Type = "number", Nilable = false },
-				{ Name = "normalizedRotationPoint", Type = "vector2", Mixin = "Vector2DMixin", Nilable = true },
+				{ Name = "normalizedRotationPoint", Type = "vector2", Nilable = true },
 			},
 		},
 		{
@@ -350,6 +376,19 @@ local SimpleTextureBaseAPI =
 			Arguments =
 			{
 				{ Name = "snap", Type = "bool", Nilable = false, Default = false },
+			},
+		},
+		{
+			Name = "SetSpriteSheetCell",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "cell", Type = "luaIndex", Nilable = false },
+				{ Name = "numRows", Type = "number", Nilable = false },
+				{ Name = "numColumns", Type = "number", Nilable = false },
+				{ Name = "cellWidth", Type = "number", Nilable = true },
+				{ Name = "cellHeight", Type = "number", Nilable = true },
 			},
 		},
 		{
@@ -440,6 +479,9 @@ local SimpleTextureBaseAPI =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

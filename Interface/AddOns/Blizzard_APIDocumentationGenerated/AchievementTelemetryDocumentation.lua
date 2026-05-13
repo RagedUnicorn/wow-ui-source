@@ -3,12 +3,14 @@ local AchievementTelemetry =
 	Name = "AchievementTelemetry",
 	Type = "System",
 	Namespace = "C_AchievementTelemetry",
+	Environment = "All",
 
 	Functions =
 	{
 		{
 			Name = "LinkAchievementInClub",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -18,6 +20,7 @@ local AchievementTelemetry =
 		{
 			Name = "LinkAchievementInWhisper",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -35,6 +38,9 @@ local AchievementTelemetry =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

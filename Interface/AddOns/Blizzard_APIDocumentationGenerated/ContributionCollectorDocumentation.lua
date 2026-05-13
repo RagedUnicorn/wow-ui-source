@@ -3,6 +3,7 @@ local ContributionCollector =
 	Name = "ContributionCollector",
 	Type = "System",
 	Namespace = "C_ContributionCollector",
+	Environment = "All",
 
 	Functions =
 	{
@@ -14,17 +15,6 @@ local ContributionCollector =
 
 	Tables =
 	{
-		{
-			Name = "ContributionAppearanceFlags",
-			Type = "Enumeration",
-			NumValues = 1,
-			MinValue = 0,
-			MaxValue = 0,
-			Fields =
-			{
-				{ Name = "TooltipUseTimeRemaining", Type = "ContributionAppearanceFlags", EnumValue = 0 },
-			},
-		},
 		{
 			Name = "ContributionResult",
 			Type = "Enumeration",
@@ -49,7 +39,7 @@ local ContributionCollector =
 			Fields =
 			{
 				{ Name = "stateName", Type = "cstring", Nilable = false },
-				{ Name = "stateColor", Type = "colorRGB", Mixin = "ColorMixin", Nilable = false },
+				{ Name = "stateColor", Type = "colorRGB", Nilable = false },
 				{ Name = "tooltipLine", Type = "cstring", Nilable = false },
 				{ Name = "tooltipUseTimeRemaining", Type = "bool", Nilable = false },
 				{ Name = "statusBarAtlas", Type = "textureAtlas", Nilable = false },
@@ -63,12 +53,15 @@ local ContributionCollector =
 			Fields =
 			{
 				{ Name = "areaPoiID", Type = "number", Nilable = false },
-				{ Name = "position", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
+				{ Name = "position", Type = "vector2", Nilable = false },
 				{ Name = "name", Type = "cstring", Nilable = false },
 				{ Name = "atlasName", Type = "string", Nilable = false },
 				{ Name = "collectorCreatureID", Type = "number", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

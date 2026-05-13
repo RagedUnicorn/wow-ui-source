@@ -2,6 +2,7 @@ local SimpleButtonAPI =
 {
 	Name = "SimpleButtonAPI",
 	Type = "ScriptObject",
+	Environment = "All",
 
 	Functions =
 	{
@@ -50,6 +51,7 @@ local SimpleButtonAPI =
 		{
 			Name = "Disable",
 			Type = "Function",
+			IsProtectedFunction = true,
 
 			Arguments =
 			{
@@ -58,6 +60,7 @@ local SimpleButtonAPI =
 		{
 			Name = "Enable",
 			Type = "Function",
+			IsProtectedFunction = true,
 
 			Arguments =
 			{
@@ -262,19 +265,21 @@ local SimpleButtonAPI =
 		{
 			Name = "RegisterForClicks",
 			Type = "Function",
+			IsProtectedFunction = true,
 
 			Arguments =
 			{
-				{ Name = "unpackedPrimitiveType", Type = "number", Nilable = false, StrideIndex = 1 },
+				{ Name = "buttons", Type = "ClickButton", Nilable = false, StrideIndex = 1 },
 			},
 		},
 		{
 			Name = "RegisterForMouse",
 			Type = "Function",
+			IsProtectedFunction = true,
 
 			Arguments =
 			{
-				{ Name = "unpackedPrimitiveType", Type = "number", Nilable = false, StrideIndex = 1 },
+				{ Name = "buttons", Type = "ClickButton", Nilable = false, StrideIndex = 1 },
 			},
 		},
 		{
@@ -317,6 +322,7 @@ local SimpleButtonAPI =
 		{
 			Name = "SetEnabled",
 			Type = "Function",
+			IsProtectedFunction = true,
 
 			Arguments =
 			{
@@ -450,6 +456,9 @@ local SimpleButtonAPI =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

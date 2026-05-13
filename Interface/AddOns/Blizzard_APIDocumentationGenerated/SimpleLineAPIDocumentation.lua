@@ -2,12 +2,14 @@ local SimpleLineAPI =
 {
 	Name = "SimpleLineAPI",
 	Type = "ScriptObject",
+	Environment = "All",
 
 	Functions =
 	{
 		{
 			Name = "ClearAllPoints",
 			Type = "Function",
+			IsProtectedFunction = true,
 
 			Arguments =
 			{
@@ -120,6 +122,9 @@ local SimpleLineAPI =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

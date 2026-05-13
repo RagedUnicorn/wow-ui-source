@@ -3,9 +3,19 @@ local Container =
 	Name = "Container",
 	Type = "System",
 	Namespace = "C_Container",
+	Environment = "All",
 
 	Functions =
 	{
+		{
+			Name = "CalculateTotalNumberOfFreeBagSlots",
+			Type = "Function",
+
+			Returns =
+			{
+				{ Name = "totalFreeSlots", Type = "number", Nilable = false },
+			},
+		},
 		{
 			Name = "ContainerIDToInventoryID",
 			Type = "Function",
@@ -296,6 +306,21 @@ local Container =
 			},
 		},
 		{
+			Name = "HasContainerItem",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "containerIndex", Type = "BagIndex", Nilable = false },
+				{ Name = "slotIndex", Type = "luaIndex", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "hasItem", Type = "bool", Nilable = false },
+			},
+		},
+		{
 			Name = "IsBagSlotFlagEnabledOnOtherBankBags",
 			Type = "Function",
 
@@ -430,6 +455,7 @@ local Container =
 			Name = "BagClosed",
 			Type = "Event",
 			LiteralName = "BAG_CLOSED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "bagID", Type = "BagIndex", Nilable = false },
@@ -439,16 +465,19 @@ local Container =
 			Name = "BagContainerUpdate",
 			Type = "Event",
 			LiteralName = "BAG_CONTAINER_UPDATE",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "BagNewItemsUpdated",
 			Type = "Event",
 			LiteralName = "BAG_NEW_ITEMS_UPDATED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "BagOpen",
 			Type = "Event",
 			LiteralName = "BAG_OPEN",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "bagID", Type = "number", Nilable = false },
@@ -458,11 +487,13 @@ local Container =
 			Name = "BagOverflowWithFullInventory",
 			Type = "Event",
 			LiteralName = "BAG_OVERFLOW_WITH_FULL_INVENTORY",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "BagSlotFlagsUpdated",
 			Type = "Event",
 			LiteralName = "BAG_SLOT_FLAGS_UPDATED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "slot", Type = "number", Nilable = false },
@@ -472,6 +503,7 @@ local Container =
 			Name = "BagUpdate",
 			Type = "Event",
 			LiteralName = "BAG_UPDATE",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "bagID", Type = "BagIndex", Nilable = false },
@@ -481,16 +513,19 @@ local Container =
 			Name = "BagUpdateCooldown",
 			Type = "Event",
 			LiteralName = "BAG_UPDATE_COOLDOWN",
+			UniqueEvent = true,
 		},
 		{
 			Name = "BagUpdateDelayed",
 			Type = "Event",
 			LiteralName = "BAG_UPDATE_DELAYED",
+			UniqueEvent = true,
 		},
 		{
 			Name = "EquipBindRefundableConfirm",
 			Type = "Event",
 			LiteralName = "EQUIP_BIND_REFUNDABLE_CONFIRM",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "slot", Type = "number", Nilable = false },
@@ -500,6 +535,7 @@ local Container =
 			Name = "EquipBindTradeableConfirm",
 			Type = "Event",
 			LiteralName = "EQUIP_BIND_TRADEABLE_CONFIRM",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "slot", Type = "number", Nilable = false },
@@ -509,6 +545,7 @@ local Container =
 			Name = "ExpandBagBarChanged",
 			Type = "Event",
 			LiteralName = "EXPAND_BAG_BAR_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "expandBagBar", Type = "bool", Nilable = false },
@@ -518,11 +555,13 @@ local Container =
 			Name = "InventorySearchUpdate",
 			Type = "Event",
 			LiteralName = "INVENTORY_SEARCH_UPDATE",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "ItemLockChanged",
 			Type = "Event",
 			LiteralName = "ITEM_LOCK_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "bagOrSlotIndex", Type = "BagIndex", Nilable = false },
@@ -533,6 +572,7 @@ local Container =
 			Name = "ItemLocked",
 			Type = "Event",
 			LiteralName = "ITEM_LOCKED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "bagOrSlotIndex", Type = "BagIndex", Nilable = false },
@@ -543,6 +583,7 @@ local Container =
 			Name = "ItemUnlocked",
 			Type = "Event",
 			LiteralName = "ITEM_UNLOCKED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "bagOrSlotIndex", Type = "BagIndex", Nilable = false },
@@ -553,6 +594,7 @@ local Container =
 			Name = "UseCombinedBagsChanged",
 			Type = "Event",
 			LiteralName = "USE_COMBINED_BAGS_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "useCombinedBags", Type = "bool", Nilable = false },
@@ -623,6 +665,9 @@ local Container =
 				{ Name = "isActive", Type = "bool", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

@@ -3,6 +3,7 @@ local GossipInfo =
 	Name = "GossipInfo",
 	Type = "System",
 	Namespace = "C_GossipInfo",
+	Environment = "All",
 
 	Functions =
 	{
@@ -197,11 +198,13 @@ local GossipInfo =
 			Name = "DynamicGossipPoiUpdated",
 			Type = "Event",
 			LiteralName = "DYNAMIC_GOSSIP_POI_UPDATED",
+			UniqueEvent = true,
 		},
 		{
 			Name = "GossipClosed",
 			Type = "Event",
 			LiteralName = "GOSSIP_CLOSED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "interactionIsContinuing", Type = "bool", Nilable = false },
@@ -211,6 +214,7 @@ local GossipInfo =
 			Name = "GossipConfirm",
 			Type = "Event",
 			LiteralName = "GOSSIP_CONFIRM",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "gossipID", Type = "number", Nilable = false },
@@ -222,11 +226,13 @@ local GossipInfo =
 			Name = "GossipConfirmCancel",
 			Type = "Event",
 			LiteralName = "GOSSIP_CONFIRM_CANCEL",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "GossipEnterCode",
 			Type = "Event",
 			LiteralName = "GOSSIP_ENTER_CODE",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "gossipID", Type = "number", Nilable = false },
@@ -236,6 +242,7 @@ local GossipInfo =
 			Name = "GossipShow",
 			Type = "Event",
 			LiteralName = "GOSSIP_SHOW",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "uiTextureKit", Type = "textureKit", Nilable = true },
@@ -308,7 +315,7 @@ local GossipInfo =
 			{
 				{ Name = "name", Type = "string", Nilable = false },
 				{ Name = "textureIndex", Type = "number", Nilable = false },
-				{ Name = "position", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
+				{ Name = "position", Type = "vector2", Nilable = false },
 				{ Name = "inBattleMap", Type = "bool", Nilable = false },
 			},
 		},
@@ -328,8 +335,12 @@ local GossipInfo =
 				{ Name = "questID", Type = "number", Nilable = false },
 				{ Name = "isImportant", Type = "bool", Nilable = false },
 				{ Name = "isMeta", Type = "bool", Nilable = false },
+				{ Name = "questInfoID", Type = "number", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

@@ -44,7 +44,7 @@ function PVPFramePopup_SetupPopUp(event, challengerName, bgName, timeout, tourna
 	PVPFramePopup.title:SetFormattedText(WARGAME_CHALLENGED, challengerName, bgName);
 	PVPFramePopup.type = event;
 	PVPFramePopup.timeout = timeout  - 3;  -- add a 3 second buffer
-	SetPortraitToTexture(PVPFramePopup.ringIcon,"Interface\\BattlefieldFrame\\UI-Battlefield-Icon");
+	PVPFramePopup.ringIcon:SetTexture("Interface\\BattlefieldFrame\\UI-Battlefield-Icon");
 	StaticPopupSpecial_Show(PVPFramePopup);
 	PlaySound(SOUNDKIT.READY_CHECK);
 	FlashClientIcon();
@@ -99,6 +99,10 @@ function PVPReadyDialog_Display(self, index, displayName, isRated, queueType, ga
 	PVPReadyDialog.activeIndex = index;
 	
 	PVPReadyDialog.text:SetFormattedText(CONFIRM_BATTLEFIELD_ENTRY, displayName, nil);
+
+	-- Classic doesnt currently use SubText, but if ever we do, account for it.
+	local dynamicDialogHeight = self.windowHeightOffset + PVPReadyDialog.text:GetHeight() + PVPReadyDialog.SubText:GetHeight();
+	self:SetSize(self:GetWidth(), dynamicDialogHeight);
 
 	PlaySound(SOUNDKIT.PVP_THROUGH_QUEUE);
 	StaticPopupSpecial_Show(PVPReadyDialog);

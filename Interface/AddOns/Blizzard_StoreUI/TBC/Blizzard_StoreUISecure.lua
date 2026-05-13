@@ -987,40 +987,14 @@ end
 function StoreFrame_UpdateCategories(self)
 	local categories = GetStoreProductGroups();
 
-	for i = 1, #categories do
-		local frame = self.CategoryFrames[i];
-		local groupID = categories[i];
-		if ( not frame ) then
-			frame = CreateForbiddenFrame("Button", nil, self, "StoreCategoryTemplate");
-
-			--[[
-							WARNING: ScopeModifiers don't work for templates!
-				These functions will fail to load properly if this template is instantiated outside
-				of the initial C_AddOns.LoadAddon call because we'll have lost the scoped modifiers and the
-				reference to the addon environment if we instantiate them later.
-
-				We have to manually set these scripts (below) for them to work properly.
-			--]]
-
-			frame:SetScript("OnEnter", StoreCategory_OnEnter);
-			frame:SetScript("OnLeave", StoreCategory_OnLeave);
-			frame:SetScript("OnClick", StoreCategory_OnClick);
-			frame:SetPoint("TOPLEFT", self.CategoryFrames[i - 1], "BOTTOMLEFT", 0, 0);
-
-			self.CategoryFrames[i] = frame;
-		end
-
-		StoreCategoryFrame_SetGroupID(frame, groupID);
-
-		frame:Show();
+	local newDataProvider = CreateDataProvider();
+	for index = 1, #categories do
+		newDataProvider:Insert({index = index, groupID = categories[index]});
 	end
+	self.CategoryScrollBox:SetDataProvider(newDataProvider, ScrollBoxConstants.RetainScrollPosition);
 
 	self.BrowseNotice:ClearAllPoints();
-	self.BrowseNotice:SetPoint("TOP", self.CategoryFrames[#categories], "BOTTOM", 0, -15);
-
-	for i = #categories + 1, #self.CategoryFrames do
-		self.CategoryFrames[i]:Hide();
-	end
+	self.BrowseNotice:SetPoint("TOP", self.CategoryScrollBox, "BOTTOM", 0, -15);
 end
 
 function StoreFrame_OnLoad(self)
@@ -1053,8 +1027,7 @@ function StoreFrame_OnLoad(self)
 
 	self.TitleText:SetText(BLIZZARD_STORE);
 
-	--SetPortraitToTexture(self.portrait, "Interface\\Icons\\WoW_Store");
-	SetPortraitToTexture(self.portrait, "Interface\\Icons\\Inv_Misc_Note_02");
+	self.portrait:SetTexture("Interface\\Icons\\Inv_Misc_Note_02");
 	StoreFrame_UpdateBuyButton();
 
 	if ( C_Glue.IsOnGlueScreen() ) then
@@ -1097,6 +1070,21 @@ function StoreFrame_OnLoad(self)
 
 	self.variablesLoaded = false;
 	self.distributionsUpdated = false;
+
+	-- Setup categories
+	local view = CreateScrollBoxListLinearView();
+	view:SetElementInitializer("StoreCategoryTemplate", function(button, elementData)
+		StoreFrame_InitCategoryButton(button, elementData);
+	end);
+	ScrollUtil.InitScrollBoxListWithScrollBar(self.CategoryScrollBox, self.CategoryScrollBar, view);
+end
+
+function StoreFrame_InitCategoryButton(frame, elementData)
+	StoreCategoryFrame_SetGroupID(frame, elementData.groupID);
+
+	frame:SetScript("OnEnter", StoreCategory_OnEnter);
+	frame:SetScript("OnLeave", StoreCategory_OnLeave);
+	frame:SetScript("OnClick", StoreCategory_OnClick);
 end
 
 local JustFinishedOrdering = false;
@@ -1207,7 +1195,7 @@ function StoreFrame_OnEvent(self, event, ...)
 	elseif (event == "SUBSCRIPTION_CHANGED_KICK_IMMINENT") then
 		if not SimpleCheckout:IsShown() then
 			self:Hide();
-			GlueDialog_Show("SUBSCRIPTION_CHANGED_KICK_WARNING");
+			StaticPopup_Show("SUBSCRIPTION_CHANGED_KICK_WARNING");
 		end
 	elseif (event == "LOGIN_STATE_CHANGED") then
 		if (C_Glue.IsOnGlueScreen()) then
@@ -1304,7 +1292,7 @@ end
 function StoreFrame_OnLegionDelivered(self)
 	self:Hide();
 	if (C_Glue.IsOnGlueScreen()) then
-		GlueDialog_Show("LEGION_PURCHASE_READY");
+		StaticPopup_Show("LEGION_PURCHASE_READY");
 	else
 		ServicesLogoutPopup_SetShowReason(ServicesLogoutPopup, "forLegion");
 	end
@@ -1865,7 +1853,7 @@ end
 function StoreConfirmationFrame_SetNotice(self, icon, name, dollars, cents, walletName, productDecorator)
 	local currency = C_StoreSecure.GetCurrencyID();
 
-	SetPortraitToTexture(self.Icon, icon);
+	self.Icon:SetTexture(icon);
 
 	name = name:gsub("|n", " ");
 	self.ProductName:SetText(name);
@@ -2106,7 +2094,7 @@ function StoreVASValidationFrame_SetVASStart(self)
 	if ( not finalIcon ) then
 		finalIcon = "Interface\\Icons\\INV_Misc_Note_02";
 	end
-	SetPortraitToTexture(self.Icon, finalIcon);
+	self.Icon:SetTexture(finalIcon);
 	self.ProductName:SetText(productInfo.sharedData.name);
 	self.ProductDescription:SetText(productInfo.sharedData.description);
 
@@ -2306,9 +2294,9 @@ function StoreVASValidationFrame_OnEvent(self, event, ...)
 	elseif ( event == "VAS_QUEUE_STATUS_UPDATE" ) then
 		local transfer, factionTransfer = C_StoreGlue.GetVasTransferQueues();
 		local queueTime = Enum.VasQueueStatus.UnderAnHour;
-		if (VASServiceType == Enum.VasServiceType.CharacterTransfer) then
+		if (VASServiceType == Enum.VasServiceType.CharacterTransfer and transfer) then
 			queueTime = transfer;
-		elseif (VASServiceType == Enum.VasServiceType.FactionChange) then
+		elseif (VASServiceType == Enum.VasServiceType.FactionChange and factionTransfer) then
 			queueTime = factionTransfer;
 		end
 		if (queueTime > Enum.VasQueueStatus.UnderAnHour) then
@@ -2476,7 +2464,7 @@ function StoreProductCard_UpdateState(card)
 		local entryInfo = C_StoreSecure.GetEntryInfo(entryID);
 		local enableHighlight = card:GetID() ~= selectedEntryID and not isRotating and (entryInfo.sharedData.productDecorator ~= Enum.BattlepayProductDecorator.VasService or C_Glue.IsOnGlueScreen());
 		card.HighlightTexture:SetAlpha(enableHighlight and 1 or 0);
-		if (not card.Description and (card:IsMouseMotionFocus() or card.BuyButton:IsMouseMotionFocus())) then
+		if (not card.Description and (card:IsMouseMotionFocus() or (card.BuyButton and card.BuyButton:IsMouseMotionFocus()))) then
 			if (isRotating) then
 				StoreTooltip:Hide()
 			else
@@ -2855,7 +2843,7 @@ function StoreProductCard_ShowIcon(self, displayData)
 			self.Icon:SetPoint("TOPLEFT", 88, -99);
 		end
 		self.Icon:SetSize(64, 64);
-		SetPortraitToTexture(self.Icon, icon);
+		self.Icon:SetTexture(icon);
 		self.IconBorder:Show();
 	else
 		self.Icon:SetAtlas(overrideTexture, true);
@@ -3551,7 +3539,7 @@ function VASCharacterSelectionCharacterSelector_Callback(value)
 				frame.ValidationDescription:SetPoint("TOPLEFT", frame.SelectedCharacterFrame, "BOTTOMLEFT", 8, -8);
 				frame.ValidationDescription:SetFontObject("GameFontBlackSmall2");
 				frame.ValidationDescription:SetTextColor(1.0, 0.1, 0.1);
-				frame.ValidationDescription:SetText(StoreVASValidationFrame_AppendError(BLIZZARD_STORE_VAS_ERROR_LABEL, Enum.VasError.RaceClassComboIneligible, character, true));
+				frame.ValidationDescription:SetText(StoreVASValidationFrame_AppendError(BLIZZARD_STORE_VAS_ERROR_LABEL, Enum.VasTransactionPurchaseResult.DbRaceClassComboIneligible, character, true));
 				frame.ValidationDescription:Show();
 				frame.ContinueButton:Disable();
 				return;
@@ -3956,6 +3944,11 @@ function VASCharacterSelectionContinueButton_OnClick(self)
 	local characters = C_StoreSecure.GetCharactersForRealm(SelectedRealm);
 
 	if (not characters[SelectedCharacter]) then
+		-- This should not happen
+		return;
+	end
+
+	if (not selectedEntryID) then
 		-- This should not happen
 		return;
 	end

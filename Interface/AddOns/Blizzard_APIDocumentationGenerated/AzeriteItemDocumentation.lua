@@ -3,6 +3,7 @@ local AzeriteItem =
 	Name = "AzeriteItem",
 	Type = "System",
 	Namespace = "C_AzeriteItem",
+	Environment = "All",
 
 	Functions =
 	{
@@ -13,7 +14,7 @@ local AzeriteItem =
 
 			Returns =
 			{
-				{ Name = "activeAzeriteItemLocation", Type = "AzeriteItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "activeAzeriteItemLocation", Type = "AzeriteItemLocation", Nilable = false },
 			},
 		},
 		{
@@ -23,7 +24,7 @@ local AzeriteItem =
 
 			Arguments =
 			{
-				{ Name = "azeriteItemLocation", Type = "AzeriteItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "azeriteItemLocation", Type = "AzeriteItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -38,7 +39,7 @@ local AzeriteItem =
 
 			Arguments =
 			{
-				{ Name = "azeriteItemLocation", Type = "AzeriteItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "azeriteItemLocation", Type = "AzeriteItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -52,7 +53,7 @@ local AzeriteItem =
 
 			Arguments =
 			{
-				{ Name = "azeriteItemLocation", Type = "AzeriteItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "azeriteItemLocation", Type = "AzeriteItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -75,7 +76,7 @@ local AzeriteItem =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -112,7 +113,7 @@ local AzeriteItem =
 
 			Arguments =
 			{
-				{ Name = "azeriteItemLocation", Type = "AzeriteItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "azeriteItemLocation", Type = "AzeriteItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -137,6 +138,7 @@ local AzeriteItem =
 			Name = "AzeriteItemEnabledStateChanged",
 			Type = "Event",
 			LiteralName = "AZERITE_ITEM_ENABLED_STATE_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "enabled", Type = "bool", Nilable = false },
@@ -146,9 +148,10 @@ local AzeriteItem =
 			Name = "AzeriteItemExperienceChanged",
 			Type = "Event",
 			LiteralName = "AZERITE_ITEM_EXPERIENCE_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
-				{ Name = "azeriteItemLocation", Type = "AzeriteItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "azeriteItemLocation", Type = "AzeriteItemLocation", Nilable = false },
 				{ Name = "oldExperienceAmount", Type = "number", Nilable = false },
 				{ Name = "newExperienceAmount", Type = "number", Nilable = false },
 			},
@@ -157,9 +160,10 @@ local AzeriteItem =
 			Name = "AzeriteItemPowerLevelChanged",
 			Type = "Event",
 			LiteralName = "AZERITE_ITEM_POWER_LEVEL_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
-				{ Name = "azeriteItemLocation", Type = "AzeriteItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "azeriteItemLocation", Type = "AzeriteItemLocation", Nilable = false },
 				{ Name = "oldPowerLevel", Type = "number", Nilable = false },
 				{ Name = "newPowerLevel", Type = "number", Nilable = false },
 				{ Name = "unlockedEmpoweredItemsInfo", Type = "table", InnerType = "UnlockedAzeriteEmpoweredItems", Nilable = false },
@@ -175,10 +179,13 @@ local AzeriteItem =
 			Type = "Structure",
 			Fields =
 			{
-				{ Name = "unlockedItem", Type = "AzeriteEmpoweredItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "unlockedItem", Type = "AzeriteEmpoweredItemLocation", Nilable = false },
 				{ Name = "tierIndex", Type = "luaIndex", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

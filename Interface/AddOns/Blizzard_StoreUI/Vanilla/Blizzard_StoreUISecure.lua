@@ -924,8 +924,7 @@ function StoreFrame_OnLoad(self)
 
 	self.TitleText:SetText(BLIZZARD_STORE);
 
-	--SetPortraitToTexture(self.portrait, "Interface\\Icons\\WoW_Store");
-	SetPortraitToTexture(self.portrait, "Interface\\Icons\\Inv_Misc_Note_02");
+	self.portrait:SetTexture("Interface\\Icons\\Inv_Misc_Note_02");
 	StoreFrame_UpdateBuyButton();
 
 	if ( C_Glue.IsOnGlueScreen() ) then
@@ -1078,7 +1077,7 @@ function StoreFrame_OnEvent(self, event, ...)
 	elseif (event == "SUBSCRIPTION_CHANGED_KICK_IMMINENT") then
 		if not SimpleCheckout:IsShown() then
 			self:Hide();
-			GlueDialog_Show("SUBSCRIPTION_CHANGED_KICK_WARNING");
+			StaticPopup_Show("SUBSCRIPTION_CHANGED_KICK_WARNING");
 		end
 	elseif (event == "LOGIN_STATE_CHANGED") then
 		if (C_Glue.IsOnGlueScreen()) then
@@ -1175,7 +1174,7 @@ end
 function StoreFrame_OnLegionDelivered(self)
 	self:Hide();
 	if (C_Glue.IsOnGlueScreen()) then
-		GlueDialog_Show("LEGION_PURCHASE_READY");
+		StaticPopup_Show("LEGION_PURCHASE_READY");
 	else
 		ServicesLogoutPopup_SetShowReason(ServicesLogoutPopup, "forLegion");
 	end
@@ -1736,7 +1735,7 @@ end
 function StoreConfirmationFrame_SetNotice(self, icon, name, dollars, cents, walletName, productDecorator)
 	local currency = C_StoreSecure.GetCurrencyID();
 
-	SetPortraitToTexture(self.Icon, icon);
+	self.Icon:SetTexture(icon);
 
 	name = name:gsub("|n", " ");
 	self.ProductName:SetText(name);
@@ -1977,7 +1976,7 @@ function StoreVASValidationFrame_SetVASStart(self)
 	if ( not finalIcon ) then
 		finalIcon = "Interface\\Icons\\INV_Misc_Note_02";
 	end
-	SetPortraitToTexture(self.Icon, finalIcon);
+	self.Icon:SetTexture(finalIcon);
 	self.ProductName:SetText(productInfo.sharedData.name);
 	self.ProductDescription:SetText(productInfo.sharedData.description);
 
@@ -2697,7 +2696,7 @@ function StoreProductCard_ShowIcon(self, displayData)
 			self.Icon:SetPoint("TOPLEFT", 88, -99);
 		end
 		self.Icon:SetSize(64, 64);
-		SetPortraitToTexture(self.Icon, icon);
+		self.Icon:SetTexture(icon);
 		self.IconBorder:Show();
 	else
 		self.Icon:SetAtlas(overrideTexture, true);
@@ -3396,7 +3395,7 @@ function VASCharacterSelectionCharacterSelector_Callback(value)
 				frame.ValidationDescription:SetPoint("TOPLEFT", frame.SelectedCharacterFrame, "BOTTOMLEFT", 8, -8);
 				frame.ValidationDescription:SetFontObject("GameFontBlackSmall2");
 				frame.ValidationDescription:SetTextColor(1.0, 0.1, 0.1);
-				frame.ValidationDescription:SetText(StoreVASValidationFrame_AppendError(BLIZZARD_STORE_VAS_ERROR_LABEL, Enum.VasError.RaceClassComboIneligible, character, true));
+				frame.ValidationDescription:SetText(StoreVASValidationFrame_AppendError(BLIZZARD_STORE_VAS_ERROR_LABEL, Enum.VasTransactionPurchaseResult.DbRaceClassComboIneligible, character, true));
 				frame.ValidationDescription:Show();
 				frame.ContinueButton:Disable();
 				return;

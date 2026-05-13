@@ -3,6 +3,7 @@ local LFGListInfo =
 	Name = "LFGList",
 	Type = "System",
 	Namespace = "C_LFGList",
+	Environment = "All",
 
 	Functions =
 	{
@@ -48,6 +49,7 @@ local LFGListInfo =
 		{
 			Name = "CreateListing",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -68,6 +70,7 @@ local LFGListInfo =
 				{ Name = "activityID", Type = "number", Nilable = false },
 				{ Name = "groupID", Type = "number", Nilable = false },
 				{ Name = "playstyle", Type = "LFGEntryPlaystyle", Nilable = true },
+				{ Name = "generalPlaystyle", Type = "LFGEntryGeneralPlaystyle", Nilable = true },
 			},
 
 			Returns =
@@ -209,6 +212,17 @@ local LFGListInfo =
 			},
 		},
 		{
+			Name = "GetGroupLeaverCountsByRole",
+			Type = "Function",
+
+			Returns =
+			{
+				{ Name = "tankLeavers", Type = "number", Nilable = false },
+				{ Name = "healerLeavers", Type = "number", Nilable = false },
+				{ Name = "damageLeavers", Type = "number", Nilable = false },
+			},
+		},
+		{
 			Name = "GetKeystoneForActivity",
 			Type = "Function",
 			MayReturnNothing = true,
@@ -262,6 +276,7 @@ local LFGListInfo =
 			Arguments =
 			{
 				{ Name = "playstyle", Type = "LFGEntryPlaystyle", Nilable = false },
+				{ Name = "generalPlaystyle", Type = "LFGEntryGeneralPlaystyle", Nilable = false },
 				{ Name = "activityInfo", Type = "GroupFinderActivityInfo", Nilable = false },
 			},
 
@@ -373,6 +388,15 @@ local LFGListInfo =
 			},
 		},
 		{
+			Name = "IsPlayerValidForEndgameFieldEdits",
+			Type = "Function",
+
+			Returns =
+			{
+				{ Name = "isValid", Type = "bool", Nilable = false },
+			},
+		},
+		{
 			Name = "IsPremadeGroupFinderEnabled",
 			Type = "Function",
 
@@ -382,8 +406,33 @@ local LFGListInfo =
 			},
 		},
 		{
+			Name = "ListingUsesEndgameEditRestrictions",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "activityID", Type = "number", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "isEndgameListing", Type = "bool", Nilable = false },
+			},
+		},
+		{
+			Name = "ReportGroupAsAdvertisement",
+			Type = "Function",
+			HasRestrictions = true,
+
+			Arguments =
+			{
+				{ Name = "searchResultID", Type = "number", Nilable = false },
+			},
+		},
+		{
 			Name = "Search",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -399,12 +448,14 @@ local LFGListInfo =
 		{
 			Name = "SetEntryTitle",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
 				{ Name = "activityID", Type = "number", Nilable = false },
 				{ Name = "groupID", Type = "number", Nilable = false },
 				{ Name = "playstyle", Type = "LFGEntryPlaystyle", Nilable = true },
+				{ Name = "generalPlaystyle", Type = "LFGEntryGeneralPlaystyle", Nilable = true },
 			},
 		},
 		{
@@ -428,6 +479,7 @@ local LFGListInfo =
 		{
 			Name = "UpdateListing",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -476,6 +528,7 @@ local LFGListInfo =
 			Name = "LfgGroupDelistedLeadershipChange",
 			Type = "Event",
 			LiteralName = "LFG_GROUP_DELISTED_LEADERSHIP_CHANGE",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "listingName", Type = "string", Nilable = false },
@@ -486,6 +539,7 @@ local LFGListInfo =
 			Name = "LfgListActiveEntryUpdate",
 			Type = "Event",
 			LiteralName = "LFG_LIST_ACTIVE_ENTRY_UPDATE",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "created", Type = "bool", Nilable = true },
@@ -495,6 +549,7 @@ local LFGListInfo =
 			Name = "LfgListApplicantListUpdated",
 			Type = "Event",
 			LiteralName = "LFG_LIST_APPLICANT_LIST_UPDATED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "newPendingEntry", Type = "bool", Nilable = true },
@@ -505,6 +560,7 @@ local LFGListInfo =
 			Name = "LfgListApplicantUpdated",
 			Type = "Event",
 			LiteralName = "LFG_LIST_APPLICANT_UPDATED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "applicantID", Type = "number", Nilable = false },
@@ -514,6 +570,7 @@ local LFGListInfo =
 			Name = "LfgListApplicationStatusUpdated",
 			Type = "Event",
 			LiteralName = "LFG_LIST_APPLICATION_STATUS_UPDATED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "searchResultID", Type = "number", Nilable = false },
@@ -526,26 +583,31 @@ local LFGListInfo =
 			Name = "LfgListAvailabilityUpdate",
 			Type = "Event",
 			LiteralName = "LFG_LIST_AVAILABILITY_UPDATE",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "LfgListEntryCreationFailed",
 			Type = "Event",
 			LiteralName = "LFG_LIST_ENTRY_CREATION_FAILED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "LfgListEntryExpiredTimeout",
 			Type = "Event",
 			LiteralName = "LFG_LIST_ENTRY_EXPIRED_TIMEOUT",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "LfgListEntryExpiredTooManyPlayers",
 			Type = "Event",
 			LiteralName = "LFG_LIST_ENTRY_EXPIRED_TOO_MANY_PLAYERS",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "LfgListJoinedGroup",
 			Type = "Event",
 			LiteralName = "LFG_LIST_JOINED_GROUP",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "searchResultID", Type = "number", Nilable = false },
@@ -556,6 +618,7 @@ local LFGListInfo =
 			Name = "LfgListSearchFailed",
 			Type = "Event",
 			LiteralName = "LFG_LIST_SEARCH_FAILED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "reason", Type = "cstring", Nilable = true },
@@ -565,6 +628,7 @@ local LFGListInfo =
 			Name = "LfgListSearchResultUpdated",
 			Type = "Event",
 			LiteralName = "LFG_LIST_SEARCH_RESULT_UPDATED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "searchResultID", Type = "number", Nilable = false },
@@ -574,27 +638,18 @@ local LFGListInfo =
 			Name = "LfgListSearchResultsReceived",
 			Type = "Event",
 			LiteralName = "LFG_LIST_SEARCH_RESULTS_RECEIVED",
+			SynchronousEvent = true,
+		},
+		{
+			Name = "LfgListUpdateSearchResults",
+			Type = "Event",
+			LiteralName = "LFG_LIST_UPDATE_SEARCH_RESULTS",
+			SynchronousEvent = true,
 		},
 	},
 
 	Tables =
 	{
-		{
-			Name = "LFGListDisplayType",
-			Type = "Enumeration",
-			NumValues = 6,
-			MinValue = 0,
-			MaxValue = 5,
-			Fields =
-			{
-				{ Name = "RoleCount", Type = "LFGListDisplayType", EnumValue = 0 },
-				{ Name = "RoleEnumerate", Type = "LFGListDisplayType", EnumValue = 1 },
-				{ Name = "ClassEnumerate", Type = "LFGListDisplayType", EnumValue = 2 },
-				{ Name = "HideAll", Type = "LFGListDisplayType", EnumValue = 3 },
-				{ Name = "PlayerCount", Type = "LFGListDisplayType", EnumValue = 4 },
-				{ Name = "Comment", Type = "LFGListDisplayType", EnumValue = 5 },
-			},
-		},
 		{
 			Name = "AdvancedFilterOptions",
 			Type = "Structure",
@@ -612,6 +667,10 @@ local LFGListInfo =
 				{ Name = "difficultyHeroic", Type = "bool", Nilable = false, Default = false },
 				{ Name = "difficultyMythic", Type = "bool", Nilable = false, Default = false },
 				{ Name = "difficultyMythicPlus", Type = "bool", Nilable = false, Default = false },
+				{ Name = "generalPlaystyle1", Type = "bool", Nilable = false, Default = false },
+				{ Name = "generalPlaystyle2", Type = "bool", Nilable = false, Default = false },
+				{ Name = "generalPlaystyle3", Type = "bool", Nilable = false, Default = false },
+				{ Name = "generalPlaystyle4", Type = "bool", Nilable = false, Default = false },
 			},
 		},
 		{
@@ -706,6 +765,7 @@ local LFGListInfo =
 				{ Name = "requiredDungeonScore", Type = "number", Nilable = true },
 				{ Name = "requiredPvpRating", Type = "number", Nilable = true },
 				{ Name = "playstyle", Type = "LFGEntryPlaystyle", Nilable = true },
+				{ Name = "generalPlaystyle", Type = "LFGEntryGeneralPlaystyle", Nilable = true },
 				{ Name = "isCrossFactionListing", Type = "bool", Nilable = false },
 				{ Name = "newPlayerFriendly", Type = "bool", Nilable = false },
 			},
@@ -722,6 +782,7 @@ local LFGListInfo =
 				{ Name = "isPrivateGroup", Type = "bool", Nilable = false, Default = false },
 				{ Name = "newPlayerFriendly", Type = "bool", Nilable = false, Default = false },
 				{ Name = "playstyle", Type = "LFGEntryPlaystyle", Nilable = false, Default = "None" },
+				{ Name = "generalPlaystyle", Type = "LFGEntryGeneralPlaystyle", Nilable = false, Default = "None" },
 				{ Name = "requiredDungeonScore", Type = "number", Nilable = false, Default = 0 },
 				{ Name = "requiredItemLevel", Type = "number", Nilable = false, Default = 0 },
 				{ Name = "requiredPvpRating", Type = "number", Nilable = false, Default = 0 },
@@ -757,6 +818,7 @@ local LFGListInfo =
 				{ Name = "requiredDungeonScore", Type = "number", Nilable = true },
 				{ Name = "requiredPvpRating", Type = "number", Nilable = true },
 				{ Name = "playstyle", Type = "LFGEntryPlaystyle", Nilable = true },
+				{ Name = "generalPlaystyle", Type = "LFGEntryGeneralPlaystyle", Nilable = true },
 				{ Name = "crossFactionListing", Type = "bool", Nilable = true },
 				{ Name = "leaderFactionGroup", Type = "number", Nilable = false },
 				{ Name = "newPlayerFriendly", Type = "bool", Nilable = true },
@@ -777,6 +839,7 @@ local LFGListInfo =
 				{ Name = "assignedRole", Type = "cstring", Nilable = false },
 				{ Name = "lfgRoles", Type = "LFGRoles", Nilable = false },
 				{ Name = "isLeader", Type = "bool", Nilable = false },
+				{ Name = "isLeaver", Type = "bool", Nilable = false, Default = false },
 			},
 		},
 		{
@@ -808,6 +871,9 @@ local LFGListInfo =
 				{ Name = "itIT", Type = "bool", Nilable = false, Default = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

@@ -3,9 +3,24 @@ local SpellActivationOverlay =
 	Name = "SpellActivationOverlay",
 	Type = "System",
 	Namespace = "C_SpellActivationOverlay",
+	Environment = "All",
 
 	Functions =
 	{
+		{
+			Name = "IsSpellOverlayed",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "spellID", Type = "number", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "isSpellOverlayed", Type = "bool", Nilable = false },
+			},
+		},
 	},
 
 	Events =
@@ -14,6 +29,7 @@ local SpellActivationOverlay =
 			Name = "SpellActivationOverlayGlowHide",
 			Type = "Event",
 			LiteralName = "SPELL_ACTIVATION_OVERLAY_GLOW_HIDE",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "spellID", Type = "number", Nilable = false },
@@ -23,6 +39,7 @@ local SpellActivationOverlay =
 			Name = "SpellActivationOverlayGlowShow",
 			Type = "Event",
 			LiteralName = "SPELL_ACTIVATION_OVERLAY_GLOW_SHOW",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "spellID", Type = "number", Nilable = false },
@@ -32,6 +49,7 @@ local SpellActivationOverlay =
 			Name = "SpellActivationOverlayHide",
 			Type = "Event",
 			LiteralName = "SPELL_ACTIVATION_OVERLAY_HIDE",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "spellID", Type = "number", Nilable = true },
@@ -41,6 +59,7 @@ local SpellActivationOverlay =
 			Name = "SpellActivationOverlayShow",
 			Type = "Event",
 			LiteralName = "SPELL_ACTIVATION_OVERLAY_SHOW",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "spellID", Type = "number", Nilable = false },
@@ -55,6 +74,9 @@ local SpellActivationOverlay =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

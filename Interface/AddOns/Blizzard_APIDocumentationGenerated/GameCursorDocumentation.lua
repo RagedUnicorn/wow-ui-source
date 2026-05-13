@@ -2,6 +2,7 @@ local GameCursor =
 {
 	Name = "GameCursor",
 	Type = "System",
+	Environment = "All",
 
 	Functions =
 	{
@@ -48,10 +49,12 @@ local GameCursor =
 		{
 			Name = "DeleteCursorItem",
 			Type = "Function",
+			HasRestrictions = true,
 		},
 		{
 			Name = "DropCursorMoney",
 			Type = "Function",
+			HasRestrictions = true,
 		},
 		{
 			Name = "EquipCursorItem",
@@ -78,6 +81,7 @@ local GameCursor =
 		{
 			Name = "PickupPlayerMoney",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -106,6 +110,20 @@ local GameCursor =
 				{ Name = "result", Type = "bool", Nilable = false },
 			},
 		},
+		{
+			Name = "SetCursorByMode",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "mode", Type = "Cursormode", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "result", Type = "bool", Nilable = false },
+			},
+		},
 	},
 
 	Events =
@@ -113,6 +131,9 @@ local GameCursor =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

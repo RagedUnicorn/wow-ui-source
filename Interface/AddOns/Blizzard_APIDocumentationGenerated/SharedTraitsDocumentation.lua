@@ -3,6 +3,7 @@ local SharedTraits =
 	Name = "SharedTraits",
 	Type = "System",
 	Namespace = "C_Traits",
+	Environment = "All",
 
 	Functions =
 	{
@@ -200,6 +201,21 @@ local SharedTraits =
 			},
 		},
 		{
+			Name = "GetConfigVariationID",
+			Type = "Function",
+			MayReturnNothing = true,
+
+			Arguments =
+			{
+				{ Name = "systemID", Type = "number", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "variationID", Type = "number", Nilable = false },
+			},
+		},
+		{
 			Name = "GetConfigsByType",
 			Type = "Function",
 
@@ -242,6 +258,22 @@ local SharedTraits =
 			Returns =
 			{
 				{ Name = "entryInfo", Type = "TraitEntryInfo", Nilable = false },
+			},
+		},
+		{
+			Name = "GetIncreasedTraitData",
+			Type = "Function",
+			MayReturnNothing = true,
+
+			Arguments =
+			{
+				{ Name = "nodeID", Type = "number", Nilable = false },
+				{ Name = "entryID", Type = "number", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "itemName", Type = "table", InnerType = "IncreasedTraitData", Nilable = false },
 			},
 		},
 		{
@@ -491,6 +523,22 @@ local SharedTraits =
 			},
 		},
 		{
+			Name = "PurchaseAllRanks",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "configID", Type = "number", Nilable = false },
+				{ Name = "nodeID", Type = "number", Nilable = false },
+				{ Name = "ignoreCost", Type = "bool", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "success", Type = "bool", Nilable = false },
+			},
+		},
+		{
 			Name = "PurchaseRank",
 			Type = "Function",
 
@@ -616,6 +664,52 @@ local SharedTraits =
 			Name = "TalentTestUnlearnSpells",
 			Type = "Function",
 		},
+		{
+			Name = "TryPurchaseAllRanks",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "configID", Type = "number", Nilable = false },
+				{ Name = "nodeID", Type = "number", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "success", Type = "bool", Nilable = false },
+			},
+		},
+		{
+			Name = "TryPurchaseToNode",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "configID", Type = "number", Nilable = false },
+				{ Name = "nodeID", Type = "number", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "success", Type = "bool", Nilable = false },
+			},
+		},
+		{
+			Name = "TryRefundToNode",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "configID", Type = "number", Nilable = false },
+				{ Name = "nodeID", Type = "number", Nilable = false },
+				{ Name = "entryID", Type = "number", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "success", Type = "bool", Nilable = false },
+			},
+		},
 	},
 
 	Events =
@@ -624,6 +718,7 @@ local SharedTraits =
 			Name = "ConfigCommitFailed",
 			Type = "Event",
 			LiteralName = "CONFIG_COMMIT_FAILED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "configID", Type = "number", Nilable = false },
@@ -633,6 +728,7 @@ local SharedTraits =
 			Name = "TraitCondInfoChanged",
 			Type = "Event",
 			LiteralName = "TRAIT_COND_INFO_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "condID", Type = "number", Nilable = false },
@@ -642,6 +738,7 @@ local SharedTraits =
 			Name = "TraitConfigCreated",
 			Type = "Event",
 			LiteralName = "TRAIT_CONFIG_CREATED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "configInfo", Type = "TraitConfigInfo", Nilable = false },
@@ -651,6 +748,7 @@ local SharedTraits =
 			Name = "TraitConfigDeleted",
 			Type = "Event",
 			LiteralName = "TRAIT_CONFIG_DELETED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "configID", Type = "number", Nilable = false },
@@ -660,11 +758,13 @@ local SharedTraits =
 			Name = "TraitConfigListUpdated",
 			Type = "Event",
 			LiteralName = "TRAIT_CONFIG_LIST_UPDATED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "TraitConfigUpdated",
 			Type = "Event",
 			LiteralName = "TRAIT_CONFIG_UPDATED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "configID", Type = "number", Nilable = false },
@@ -674,6 +774,7 @@ local SharedTraits =
 			Name = "TraitNodeChanged",
 			Type = "Event",
 			LiteralName = "TRAIT_NODE_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "nodeID", Type = "number", Nilable = false },
@@ -683,6 +784,7 @@ local SharedTraits =
 			Name = "TraitNodeChangedPartial",
 			Type = "Event",
 			LiteralName = "TRAIT_NODE_CHANGED_PARTIAL",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "ID", Type = "number", Nilable = false },
@@ -693,6 +795,7 @@ local SharedTraits =
 			Name = "TraitNodeEntryUpdated",
 			Type = "Event",
 			LiteralName = "TRAIT_NODE_ENTRY_UPDATED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "nodeEntryID", Type = "number", Nilable = false },
@@ -702,6 +805,7 @@ local SharedTraits =
 			Name = "TraitSubTreeChanged",
 			Type = "Event",
 			LiteralName = "TRAIT_SUB_TREE_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "subTreeID", Type = "number", Nilable = false },
@@ -711,6 +815,7 @@ local SharedTraits =
 			Name = "TraitSystemInteractionStarted",
 			Type = "Event",
 			LiteralName = "TRAIT_SYSTEM_INTERACTION_STARTED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "treeID", Type = "number", Nilable = false },
@@ -720,11 +825,13 @@ local SharedTraits =
 			Name = "TraitSystemNpcClosed",
 			Type = "Event",
 			LiteralName = "TRAIT_SYSTEM_NPC_CLOSED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "TraitTreeChanged",
 			Type = "Event",
 			LiteralName = "TRAIT_TREE_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "treeID", Type = "number", Nilable = false },
@@ -734,15 +841,36 @@ local SharedTraits =
 			Name = "TraitTreeCurrencyInfoUpdated",
 			Type = "Event",
 			LiteralName = "TRAIT_TREE_CURRENCY_INFO_UPDATED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "treeID", Type = "number", Nilable = false },
+			},
+		},
+		{
+			Name = "TryPurchaseToNodePartialSuccess",
+			Type = "Event",
+			LiteralName = "TRY_PURCHASE_TO_NODE_PARTIAL_SUCCESS",
+			SynchronousEvent = true,
+			Payload =
+			{
+				{ Name = "nodeFinishedOn", Type = "number", Nilable = false },
 			},
 		},
 	},
 
 	Tables =
 	{
+		{
+			Name = "IncreasedTraitData",
+			Type = "Structure",
+			Fields =
+			{
+				{ Name = "itemNameIncreasing", Type = "string", Nilable = false },
+				{ Name = "itemQualityIncreasing", Type = "ItemQuality", Nilable = false },
+				{ Name = "numPointsIncreased", Type = "number", Nilable = false },
+			},
+		},
 		{
 			Name = "TraitCondInfo",
 			Type = "Structure",
@@ -849,11 +977,14 @@ local SharedTraits =
 				{ Name = "isVisible", Type = "bool", Nilable = false },
 				{ Name = "isDisplayError", Type = "bool", Nilable = false, Documentation = { "True if this node fails the TRAIT_CONDITION_TYPE_DISPLAY_ERROR condition check. Used to communicate a problem with the node to the player (e.g. A prerequisite node has not been purchased.) but will not prevent the player from spending points on the node." } },
 				{ Name = "ranksPurchased", Type = "number", Nilable = false },
+				{ Name = "ranksIncreased", Type = "number", Nilable = false },
+				{ Name = "entryIDToRanksIncreased", Type = "LuaValueVariant", Nilable = false, Documentation = { "A map of the entry IDs on this node to the number of ranks increased. This covers all entries on the node, which is important in the case of selection nodes where we have more than one option that could be increased." } },
 				{ Name = "activeRank", Type = "number", Nilable = false },
 				{ Name = "currentRank", Type = "number", Nilable = false },
 				{ Name = "activeEntry", Type = "TraitEntryRankInfo", Nilable = true },
 				{ Name = "nextEntry", Type = "TraitEntryRankInfo", Nilable = true },
 				{ Name = "maxRanks", Type = "number", Nilable = false },
+				{ Name = "totalMaxRanks", Type = "number", Nilable = false },
 				{ Name = "type", Type = "TraitNodeType", Nilable = false },
 				{ Name = "visibleEdges", Type = "table", InnerType = "TraitOutEdgeInfo", Nilable = false },
 				{ Name = "meetsEdgeRequirements", Type = "bool", Nilable = false },
@@ -918,6 +1049,9 @@ local SharedTraits =
 				{ Name = "ID", Type = "number", Nilable = false },
 				{ Name = "gates", Type = "table", InnerType = "TraitGateInfo", Nilable = false },
 				{ Name = "hideSingleRankNumbers", Type = "bool", Nilable = false },
+				{ Name = "rootNodeID", Type = "number", Nilable = true },
+				{ Name = "uiTextureKit", Type = "textureKit", Nilable = false },
+				{ Name = "titleText", Type = "string", Nilable = true },
 			},
 		},
 		{
@@ -931,6 +1065,9 @@ local SharedTraits =
 				{ Name = "spent", Type = "number", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

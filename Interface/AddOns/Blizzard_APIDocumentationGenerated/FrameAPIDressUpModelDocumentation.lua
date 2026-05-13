@@ -2,6 +2,7 @@ local FrameAPIDressUpModel =
 {
 	Name = "FrameAPIDressUpModel",
 	Type = "ScriptObject",
+	Environment = "All",
 
 	Functions =
 	{
@@ -52,7 +53,7 @@ local FrameAPIDressUpModel =
 
 			Returns =
 			{
-				{ Name = "itemTransmogInfo", Type = "ItemTransmogInfo", Mixin = "ItemTransmogInfoMixin", Nilable = false },
+				{ Name = "itemTransmogInfo", Type = "ItemTransmogInfo", Nilable = false },
 			},
 		},
 		{
@@ -185,6 +186,22 @@ local FrameAPIDressUpModel =
 			},
 		},
 		{
+			Name = "SetItemTransmogInfo",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "itemTransmogInfo", Type = "ItemTransmogInfo", Nilable = false },
+				{ Name = "inventorySlot", Type = "luaIndex", Nilable = true },
+				{ Name = "ignoreChildItems", Type = "bool", Nilable = false, Default = false },
+			},
+
+			Returns =
+			{
+				{ Name = "result", Type = "ItemTryOnReason", Nilable = false },
+			},
+		},
+		{
 			Name = "SetObeyHideInTransmogFlag",
 			Type = "Function",
 
@@ -255,6 +272,9 @@ local FrameAPIDressUpModel =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

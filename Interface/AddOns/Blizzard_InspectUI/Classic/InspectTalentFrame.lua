@@ -7,7 +7,7 @@ function InspectTalentFrameTalent_OnClick(self, button)
 		local link = GetTalentLink(PanelTemplates_GetSelectedTab(InspectTalentFrame), self:GetID(),
 			InspectTalentFrame.inspect, InspectTalentFrame.pet, InspectTalentFrame.talentGroup);
 		if ( link ) then
-			ChatEdit_InsertLink(link);
+			ChatFrameUtil.InsertLink(link);
 		end
 	end
 end
@@ -96,15 +96,19 @@ function InspectTalentFrame_Update()
 	TalentFrame_Update(InspectTalentFrame);
 
 	-- Update unspent talent point text
-	local unspentTalentPoints = TalentFrame_GetUnspentTalentPoints(InspectTalentFrame);
+	local unspentTalentPoints = InspectTalentFrame.GetUnspentTalentNumFunc(InspectTalentFrame);
 	InspectTalentFrameTalentPointsText:SetFormattedText(UNSPENT_TALENT_POINTS, HIGHLIGHT_FONT_COLOR_CODE..unspentTalentPoints..FONT_COLOR_CODE_CLOSE);
 end
 
 function InspectTalentFrame_OnLoad(self)
-	self.updateFunction = InspectTalentFrame_Update;
 	self.inspect = true;
 	self.pet = false;
 	self.talentGroup = 1;
+	if(TalentFrame_UpdateTalentPoints) then
+		self.GetUnspentTalentNumFunc = TalentFrame_UpdateTalentPoints;
+	else
+		self.GetUnspentTalentNumFunc = TalentFrame_GetUnspentTalentPoints;
+	end
 
 	TalentFrame_Load(self);
 
@@ -137,6 +141,15 @@ function InspectTalentFrame_OnEvent(self, event, ...)
 	if ( event == "INSPECT_READY" ) then
 		InspectTalentFrame_Update();
 	end
+end
+
+InspectTalentFrameTabMixin = {};
+
+function InspectTalentFrameTabMixin:OnClick()
+	PanelTemplates_Tab_OnClick(self, InspectTalentFrame);
+	InspectTalentFrame_Update(self);
+	TalentFrame_Update(InspectTalentFrame);
+	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 end
 
 function InspectTalentFrameDownArrow_OnClick(self)

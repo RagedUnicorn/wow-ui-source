@@ -281,7 +281,7 @@ function GuildRenameFrameMixin:BeginInteraction()
 	if C_GuildInfo.RequestRenameStatus() then
 		self:BeginInteractionMode(); -- there won't be a mode yet, but the UI needs to show immediately and enter the waiting state
 	else
-		ChatFrame_DisplaySystemMessageInPrimary(GUILD_RENAME_ERROR_MUST_BE_IN_A_GUILD);
+		ChatFrameUtil.DisplaySystemMessageInPrimary(GUILD_RENAME_ERROR_MUST_BE_IN_A_GUILD);
 		HideUIPanel(self);
 	end
 end
@@ -467,7 +467,8 @@ function GuildRenameTitleFlowMixin:OnLoad()
 			local refundAmount = GetMoneyString(manager:GetRefundAmount(), MoneyStringConstants.SeparateThousands, MoneyStringConstants.CheckGoldThreshold);
 			local guildRefundDialogText = GUILD_RENAME_REFUND_DIALOG_TEXT:format(currentGuildName, oldGuildName, refundAmount);
 
-			StaticPopup_Show("CONFIRM_GUILD_RENAME_REFUND", guildRefundDialogText, nil, { timeLeft = manager:GetRefundTimeRemaining() });
+			local dialog = StaticPopup_Show("CONFIRM_GUILD_RENAME_REFUND", guildRefundDialogText);
+			StaticPopup_SetTimeLeft(dialog, manager:GetRefundTimeRemaining());
 		end
 	end);
 end
@@ -570,8 +571,8 @@ StaticPopupDialogs["CONFIRM_PURCHASE_GUILD_RENAME"] = {
 	text = GUILD_RENAME_DIALOG_TEXT,
 	button1 = GUILD_RENAME_DIALOG_CONFIRM_BUTTON,
 	button2 = GUILD_RENAME_DIALOG_CANCEL_BUTTON,
-	OnAccept = function(self)
-		C_GuildInfo.RequestGuildRename(self.data.desiredName);
+	OnAccept = function(dialog, data)
+		C_GuildInfo.RequestGuildRename(data.desiredName);
 	end,
 	OnCancel = nop,
 	timeout = 0,
@@ -582,12 +583,11 @@ StaticPopupDialogs["CONFIRM_GUILD_RENAME_REFUND"] = {
 	text = "%s", -- Custom text
 	subText = GUILD_RENAME_REFUND_DIALOG_SUBTEXT,
 	subtextIsTimer = true,
-	autoSetTimeRemainingDataKey = "timeLeft",
 	normalSizedSubText = true,
 	timeFormatter = timeFormatter,
 	button1 = GUILD_RENAME_DIALOG_CONFIRM_BUTTON,
 	button2 = GUILD_RENAME_DIALOG_CANCEL_BUTTON,
-	OnAccept = function(self)
+	OnAccept = function(dialog, data)
 		C_GuildInfo.RequestGuildRenameRefund();
 	end,
 	OnCancel = nop,

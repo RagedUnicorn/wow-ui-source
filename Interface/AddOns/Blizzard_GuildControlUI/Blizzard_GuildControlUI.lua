@@ -1,7 +1,7 @@
 
 BANK_TAB_OFFSET = 4;
 BANK_TAB_HEIGHT = BANK_TAB_OFFSET + 73;
-NUM_RANK_FLAGS = 20;
+NUM_RANK_FLAGS = 21;
 MAX_GUILDRANKS = 10;
 
 function GuildControlUI_OnLoad(self)
@@ -410,7 +410,6 @@ function GuildControlUI_CheckClicked(self)
 	end
 	GuildControlUI.numSkipUpdates = GuildControlUI.numSkipUpdates + 1;
 	GuildControlSetRankFlag(self:GetID(), self:GetChecked());
-	--WithdrawGoldEditBox_Update();
 end
 
 

@@ -3,6 +3,7 @@ local EncounterJournal =
 	Name = "EncounterJournal",
 	Type = "System",
 	Namespace = "C_EncounterJournal",
+	Environment = "All",
 
 	Functions =
 	{
@@ -179,6 +180,7 @@ local EncounterJournal =
 		{
 			Name = "SetTab",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -193,6 +195,7 @@ local EncounterJournal =
 			Name = "EjDifficultyUpdate",
 			Type = "Event",
 			LiteralName = "EJ_DIFFICULTY_UPDATE",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "difficultyID", Type = "number", Nilable = false },
@@ -202,6 +205,8 @@ local EncounterJournal =
 			Name = "EjLootDataRecieved",
 			Type = "Event",
 			LiteralName = "EJ_LOOT_DATA_RECIEVED",
+			SynchronousEvent = true,
+			UniqueEvent = true,
 			Payload =
 			{
 				{ Name = "itemID", Type = "number", Nilable = true },
@@ -243,7 +248,7 @@ local EncounterJournal =
 			Fields =
 			{
 				{ Name = "areaPoiID", Type = "number", Nilable = false },
-				{ Name = "position", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
+				{ Name = "position", Type = "vector2", Nilable = false },
 				{ Name = "name", Type = "cstring", Nilable = false },
 				{ Name = "description", Type = "cstring", Nilable = false },
 				{ Name = "atlasName", Type = "string", Nilable = false },
@@ -301,6 +306,9 @@ local EncounterJournal =
 				{ Name = "startsOpen", Type = "bool", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

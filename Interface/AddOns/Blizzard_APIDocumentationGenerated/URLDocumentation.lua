@@ -2,12 +2,14 @@ local URL =
 {
 	Name = "URL",
 	Type = "System",
+	Environment = "All",
 
 	Functions =
 	{
 		{
 			Name = "LaunchURL",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -21,6 +23,9 @@ local URL =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

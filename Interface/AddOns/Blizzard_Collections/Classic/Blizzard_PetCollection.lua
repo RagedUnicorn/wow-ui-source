@@ -5,6 +5,7 @@ PET_ACHIEVEMENT_CATEGORY = 15117;
 local MAX_PET_LEVEL = 25;
 local HEAL_PET_SPELL = 125439;
 local SUMMON_RANDOM_FAVORITE_PET_SPELL = 243819;
+local BATTLEPETS_SUPPORTED = GetClassicExpansionLevel() >= LE_EXPANSION_MISTS_OF_PANDARIA;
 
 function PetJournalUtil_GetDisplayName(petID)
 	local _, customName, _, _, _, _, _, petName = C_PetJournal.GetPetInfoByPetID(petID);
@@ -107,7 +108,7 @@ function PetJournal_OnShow(self)
 	PetJournal_UpdatePetList();
 	PetJournal_UpdatePetCard(PetJournalPetCard);
 
-	SetPortraitToTexture(self:GetParent().portrait, "Interface\\ICONS\\Spell_Magic_PolymorphChicken");
+	self:GetParent().portrait:SetPortraitToAsset("Interface\\ICONS\\Spell_Magic_PolymorphChicken");
 end
 
 
@@ -435,13 +436,12 @@ function PetJournalListItem_OnClick(self, button)
 		local id = self.petID;
 		if ( id and MacroFrame and MacroFrame:IsShown() ) then
 			-- Macros are not yet supported
-		elseif (id) then
+		elseif (id and BATTLEPETS_SUPPORTED) then
 			local petLink = C_PetJournal.GetBattlePetLink(id);
-			ChatEdit_InsertLink(petLink);
+			ChatFrameUtil.InsertLink(petLink);
 		else
-			local _, species  = C_PetJournal.GetPetInfoByIndex(self.index)
-			local petLink = C_PetJournal.GetBattlePetLinkFromSpecies(species);
-			ChatEdit_InsertLink(petLink);
+			local petLink = C_PetJournal.GetNonBattlePetLinkByIndex(self.index);
+			ChatFrameUtil.InsertLink(petLink);
 		end
 	elseif button == "RightButton" then
 		if self.owned then
@@ -472,13 +472,12 @@ function PetJournalDragButton_OnClick(self, button)
 		local id = self:GetParent().petID;
 		if ( id and MacroFrame and MacroFrame:IsShown() ) then
 			-- Macros are not yet supported
-		elseif (id) then
+		elseif (id and BATTLEPETS_SUPPORTED) then
 			local petLink = C_PetJournal.GetBattlePetLink(id);
-			ChatEdit_InsertLink(petLink);
+			ChatFrameUtil.InsertLink(petLink);
 		else
-			local _, species  = C_PetJournal.GetPetInfoByIndex(self.index)
-			local petLink = C_PetJournal.GetBattlePetLinkFromSpecies(species);
-			ChatEdit_InsertLink(petLink);
+			local petLink = C_PetJournal.GetNonBattlePetLinkByIndex(self:GetParent().index);
+			ChatFrameUtil.InsertLink(petLink);
 		end
 	elseif ( button == "RightButton" ) then
 		local parent = self:GetParent();
@@ -596,13 +595,12 @@ function PetJournalPetCard_OnClick(self, button)
 		local id = PetJournalPetCard.petID;
 		if ( id and MacroFrame and MacroFrame:IsShown() ) then
 			-- Macros are not yet supported
-		elseif (id) then
+		elseif (id and BATTLEPETS_SUPPORTED) then
 			local petLink = C_PetJournal.GetBattlePetLink(id);
-			ChatEdit_InsertLink(petLink);
+			ChatFrameUtil.InsertLink(petLink);
 		else
-			local _, species  = C_PetJournal.GetPetInfoByIndex(self.index)
-			local petLink = C_PetJournal.GetBattlePetLinkFromSpecies(species);
-			ChatEdit_InsertLink(petLink);
+			local petLink = C_PetJournal.GetNonBattlePetLinkByIndex(self.index);
+			ChatFrameUtil.InsertLink(petLink);
 		end
 	elseif button == "RightButton" then
 		if ( PetJournalPetCard.petID ) then

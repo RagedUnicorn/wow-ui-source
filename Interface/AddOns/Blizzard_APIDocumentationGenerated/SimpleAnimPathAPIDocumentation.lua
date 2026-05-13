@@ -2,6 +2,7 @@ local SimpleAnimPathAPI =
 {
 	Name = "SimpleAnimPathAPI",
 	Type = "ScriptObject",
+	Environment = "All",
 
 	Functions =
 	{
@@ -31,7 +32,7 @@ local SimpleAnimPathAPI =
 
 			Returns =
 			{
-				{ Name = "scriptObject", Type = "ScriptObject", Nilable = false, StrideIndex = 1 },
+				{ Name = "points", Type = "SimpleControlPoint", Nilable = false, StrideIndex = 1 },
 			},
 		},
 		{
@@ -76,6 +77,9 @@ local SimpleAnimPathAPI =
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

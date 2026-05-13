@@ -3,6 +3,7 @@ local ReportSystem =
 	Name = "ReportSystem",
 	Type = "System",
 	Namespace = "C_ReportSystem",
+	Environment = "All",
 
 	Functions =
 	{
@@ -12,7 +13,7 @@ local ReportSystem =
 
 			Arguments =
 			{
-				{ Name = "playerLocation", Type = "PlayerLocation", Mixin = "PlayerLocationMixin", Nilable = false },
+				{ Name = "playerLocation", Type = "PlayerLocation", Nilable = false },
 			},
 
 			Returns =
@@ -26,7 +27,7 @@ local ReportSystem =
 
 			Arguments =
 			{
-				{ Name = "playerLocation", Type = "PlayerLocation", Mixin = "PlayerLocationMixin", Nilable = false },
+				{ Name = "playerLocation", Type = "PlayerLocation", Nilable = false },
 			},
 
 			Returns =
@@ -100,15 +101,44 @@ local ReportSystem =
 			Type = "Function",
 		},
 		{
+			Name = "RequiresScreenshotForReportType",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "reportType", Type = "ReportType", Nilable = false },
+				{ Name = "majorCategory", Type = "ReportMajorCategory", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "requiresScreenshot", Type = "bool", Nilable = false },
+			},
+		},
+		{
 			Name = "SendReport",
 			Type = "Function",
+			HasRestrictions = true,
 			Documentation = { "Not allowed to be called by addons" },
 
 			Arguments =
 			{
-				{ Name = "reportInfo", Type = "ReportInfo", Mixin = "ReportInfoMixin", Nilable = false },
-				{ Name = "playerLocation", Type = "PlayerLocation", Mixin = "PlayerLocationMixin", Nilable = true },
+				{ Name = "reportInfo", Type = "ReportInfo", Nilable = false },
+				{ Name = "playerLocation", Type = "PlayerLocation", Nilable = true },
 			},
+		},
+		{
+			Name = "SetScreenshotPreviewTexture",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "textureObject", Type = "SimpleTexture", Nilable = false },
+			},
+		},
+		{
+			Name = "TakeReportScreenshot",
+			Type = "Function",
 		},
 	},
 
@@ -118,15 +148,25 @@ local ReportSystem =
 			Name = "ReportPlayerResult",
 			Type = "Event",
 			LiteralName = "REPORT_PLAYER_RESULT",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "result", Type = "SendReportResult", Nilable = false },
 				{ Name = "reportType", Type = "ReportType", Nilable = false },
 			},
 		},
+		{
+			Name = "ReportScreenshotReady",
+			Type = "Event",
+			LiteralName = "REPORT_SCREENSHOT_READY",
+			SynchronousEvent = true,
+		},
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

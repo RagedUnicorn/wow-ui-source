@@ -3,22 +3,44 @@ local TradeInfo =
 	Name = "TradeInfo",
 	Type = "System",
 	Namespace = "C_TradeInfo",
+	Environment = "All",
 
 	Functions =
 	{
 		{
 			Name = "AddTradeMoney",
 			Type = "Function",
+			HasRestrictions = true,
 			Documentation = { "Adds any cursor-held money to the current trade offer." },
+		},
+		{
+			Name = "PickupTradeMoney",
+			Type = "Function",
+			HasRestrictions = true,
+
+			Arguments =
+			{
+				{ Name = "amount", Type = "WOWMONEY", Nilable = false },
+			},
 		},
 		{
 			Name = "SetTradeMoney",
 			Type = "Function",
+			HasRestrictions = true,
 			Documentation = { "Sets the amount of money in the current trade offer." },
 
 			Arguments =
 			{
 				{ Name = "amount", Type = "WOWMONEY", Nilable = false },
+			},
+		},
+		{
+			Name = "ShouldShowTradeOfferWarning",
+			Type = "Function",
+
+			Returns =
+			{
+				{ Name = "shouldShow", Type = "bool", Nilable = false },
 			},
 		},
 	},
@@ -29,11 +51,13 @@ local TradeInfo =
 			Name = "PlayerTradeMoney",
 			Type = "Event",
 			LiteralName = "PLAYER_TRADE_MONEY",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "TradeAcceptUpdate",
 			Type = "Event",
 			LiteralName = "TRADE_ACCEPT_UPDATE",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "playerAccepted", Type = "number", Nilable = false },
@@ -44,16 +68,19 @@ local TradeInfo =
 			Name = "TradeClosed",
 			Type = "Event",
 			LiteralName = "TRADE_CLOSED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "TradeMoneyChanged",
 			Type = "Event",
 			LiteralName = "TRADE_MONEY_CHANGED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "TradePlayerItemChanged",
 			Type = "Event",
 			LiteralName = "TRADE_PLAYER_ITEM_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "tradeSlotIndex", Type = "number", Nilable = false },
@@ -63,6 +90,7 @@ local TradeInfo =
 			Name = "TradePotentialBindEnchant",
 			Type = "Event",
 			LiteralName = "TRADE_POTENTIAL_BIND_ENCHANT",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "canBecomeBoundForTrade", Type = "bool", Nilable = false },
@@ -72,6 +100,7 @@ local TradeInfo =
 			Name = "TradeRequest",
 			Type = "Event",
 			LiteralName = "TRADE_REQUEST",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "name", Type = "cstring", Nilable = false },
@@ -81,16 +110,19 @@ local TradeInfo =
 			Name = "TradeRequestCancel",
 			Type = "Event",
 			LiteralName = "TRADE_REQUEST_CANCEL",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "TradeShow",
 			Type = "Event",
 			LiteralName = "TRADE_SHOW",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "TradeTargetItemChanged",
 			Type = "Event",
 			LiteralName = "TRADE_TARGET_ITEM_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "tradeSlotIndex", Type = "number", Nilable = false },
@@ -100,10 +132,20 @@ local TradeInfo =
 			Name = "TradeUpdate",
 			Type = "Event",
 			LiteralName = "TRADE_UPDATE",
+			SynchronousEvent = true,
+		},
+		{
+			Name = "TradeUpdateWarnings",
+			Type = "Event",
+			LiteralName = "TRADE_UPDATE_WARNINGS",
+			SynchronousEvent = true,
 		},
 	},
 
 	Tables =
+	{
+	},
+	Predicates =
 	{
 	},
 };

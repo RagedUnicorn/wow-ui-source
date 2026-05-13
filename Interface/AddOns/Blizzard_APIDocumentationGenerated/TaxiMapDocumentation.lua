@@ -3,6 +3,7 @@ local TaxiMap =
 	Name = "TaxiMap",
 	Type = "System",
 	Namespace = "C_TaxiMap",
+	Environment = "All",
 
 	Functions =
 	{
@@ -44,16 +45,19 @@ local TaxiMap =
 			Name = "TaxiNodeStatusChanged",
 			Type = "Event",
 			LiteralName = "TAXI_NODE_STATUS_CHANGED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "TaximapClosed",
 			Type = "Event",
 			LiteralName = "TAXIMAP_CLOSED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "TaximapOpened",
 			Type = "Event",
 			LiteralName = "TAXIMAP_OPENED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "system", Type = "number", Nilable = false },
@@ -95,7 +99,7 @@ local TaxiMap =
 			Fields =
 			{
 				{ Name = "nodeID", Type = "number", Nilable = false },
-				{ Name = "position", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
+				{ Name = "position", Type = "vector2", Nilable = false },
 				{ Name = "name", Type = "cstring", Nilable = false },
 				{ Name = "atlasName", Type = "cstring", Nilable = false },
 				{ Name = "faction", Type = "FlightPathFaction", Nilable = false },
@@ -109,13 +113,16 @@ local TaxiMap =
 			Fields =
 			{
 				{ Name = "nodeID", Type = "number", Nilable = false },
-				{ Name = "position", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
+				{ Name = "position", Type = "vector2", Nilable = false },
 				{ Name = "name", Type = "cstring", Nilable = false },
 				{ Name = "state", Type = "FlightPathState", Nilable = false },
 				{ Name = "slotIndex", Type = "luaIndex", Nilable = false },
 				{ Name = "textureKitPrefix", Type = "string", Nilable = true },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

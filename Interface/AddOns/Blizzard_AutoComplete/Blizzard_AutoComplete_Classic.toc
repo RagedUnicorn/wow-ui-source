@@ -1,8 +1,0 @@
-## Title: Blizzard_AutoComplete
-## Author: Blizzard Entertainment
-## DefaultState: enabled
-## Dependencies: Blizzard_UIParent
-## AllowLoad: Game
-## AllowLoadGameType: classic
-Classic\AutoComplete.lua
-Classic\AutoComplete.xml

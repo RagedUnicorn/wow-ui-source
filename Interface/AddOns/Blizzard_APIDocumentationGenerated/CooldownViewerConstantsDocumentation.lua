@@ -3,6 +3,17 @@ local CooldownViewerConstants =
 	Tables =
 	{
 		{
+			Name = "CooldownSetLinkedSpellFlags",
+			Type = "Enumeration",
+			NumValues = 1,
+			MinValue = 1,
+			MaxValue = 1,
+			Fields =
+			{
+				{ Name = "UseAsTooltip", Type = "CooldownSetLinkedSpellFlags", EnumValue = 1 },
+			},
+		},
+		{
 			Name = "CooldownSetSpellFlags",
 			Type = "Enumeration",
 			NumValues = 2,
@@ -11,7 +22,49 @@ local CooldownViewerConstants =
 			Fields =
 			{
 				{ Name = "HideAura", Type = "CooldownSetSpellFlags", EnumValue = 1 },
-				{ Name = "PlaceHolder1", Type = "CooldownSetSpellFlags", EnumValue = 2 },
+				{ Name = "HideByDefault", Type = "CooldownSetSpellFlags", EnumValue = 2 },
+			},
+		},
+		{
+			Name = "CooldownViewerAddAlertStatus",
+			Type = "Enumeration",
+			NumValues = 4,
+			MinValue = 0,
+			MaxValue = 3,
+			Fields =
+			{
+				{ Name = "Success", Type = "CooldownViewerAddAlertStatus", EnumValue = 0 },
+				{ Name = "InvalidAlertType", Type = "CooldownViewerAddAlertStatus", EnumValue = 1 },
+				{ Name = "InvalidEventType", Type = "CooldownViewerAddAlertStatus", EnumValue = 2 },
+				{ Name = "DuplicateAlert", Type = "CooldownViewerAddAlertStatus", EnumValue = 3 },
+			},
+		},
+		{
+			Name = "CooldownViewerAlertEventType",
+			Type = "Enumeration",
+			NumValues = 6,
+			MinValue = 1,
+			MaxValue = 6,
+			Fields =
+			{
+				{ Name = "Available", Type = "CooldownViewerAlertEventType", EnumValue = 1 },
+				{ Name = "PandemicTime", Type = "CooldownViewerAlertEventType", EnumValue = 2 },
+				{ Name = "OnCooldown", Type = "CooldownViewerAlertEventType", EnumValue = 3 },
+				{ Name = "ChargeGained", Type = "CooldownViewerAlertEventType", EnumValue = 4 },
+				{ Name = "OnAuraApplied", Type = "CooldownViewerAlertEventType", EnumValue = 5 },
+				{ Name = "OnAuraRemoved", Type = "CooldownViewerAlertEventType", EnumValue = 6 },
+			},
+		},
+		{
+			Name = "CooldownViewerAlertType",
+			Type = "Enumeration",
+			NumValues = 2,
+			MinValue = 1,
+			MaxValue = 2,
+			Fields =
+			{
+				{ Name = "Sound", Type = "CooldownViewerAlertType", EnumValue = 1 },
+				{ Name = "Visual", Type = "CooldownViewerAlertType", EnumValue = 2 },
 			},
 		},
 		{
@@ -37,6 +90,9 @@ local CooldownViewerConstants =
 				{ Name = "COOLDOWN_VIEWER_CATEGORY_SET_SIZE", Type = "number", Value = 16 },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

@@ -1008,13 +1008,23 @@ function PaperDollFrame_SetDamage(statFrame, unit)
 	local displayMaxLarge = BreakUpLargeNumbers(displayMax);
 
 	-- calculate base damage
-	minDamage = (minDamage / percent) - physicalBonusPos - physicalBonusNeg;
-	maxDamage = (maxDamage / percent) - physicalBonusPos - physicalBonusNeg;
+	if (percent == 0) then
+		minDamage = 0;
+		maxDamage = 0;
+	else
+		minDamage = (minDamage / percent) - physicalBonusPos - physicalBonusNeg;
+		maxDamage = (maxDamage / percent) - physicalBonusPos - physicalBonusNeg;
+	end
 
 	local baseDamage = (minDamage + maxDamage) * 0.5;
 	local fullDamage = (baseDamage + physicalBonusPos + physicalBonusNeg) * percent;
 	local totalBonus = (fullDamage - baseDamage);
-	local damagePerSecond = (max(fullDamage,1) / speed);
+	local damagePerSecond;
+	if speed == 0 then
+		damagePerSecond = 0;
+	else
+		damagePerSecond = (max(fullDamage,1) / speed);
+	end
 	-- set tooltip text with base damage
 	local damageTooltip;
 	if ClassicExpansionAtLeast(LE_EXPANSION_MISTS_OF_PANDARIA) then
@@ -1079,7 +1089,12 @@ function PaperDollFrame_SetDamage(statFrame, unit)
 
 		local offhandBaseDamage = (minOffHandDamage + maxOffHandDamage) * 0.5;
 		local offhandFullDamage = (offhandBaseDamage + physicalBonusPos + physicalBonusNeg) * percent;
-		local offhandDamagePerSecond = (max(offhandFullDamage,1) / offhandSpeed);
+		local offhandDamagePerSecond;
+		if offhandSpeed == 0 then
+			offhandDamagePerSecond = 0;
+		else
+			offhandDamagePerSecond = (max(offhandFullDamage,1) / offhandSpeed);
+		end
 		local offhandDamageTooltip = BreakUpLargeNumbers(max(floor(minOffHandDamage),1)).." - "..BreakUpLargeNumbers(max(ceil(maxOffHandDamage),1));
 		if ( physicalBonusPos > 0 ) then
 			offhandDamageTooltip = offhandDamageTooltip..colorPos.." +"..physicalBonusPos.."|r";
@@ -2146,7 +2161,9 @@ function Mastery_OnEnter(statFrame)
 	GameTooltip:SetText(title);
 
 	-- Class mastery spells are not used in MoP.
-	local isClassMasteryKnownOrUnused = ClassicExpansionAtLeast(LE_EXPANSION_MISTS_OF_PANDARIA) or IsSpellKnown(CLASS_MASTERY_SPELLS[class]);
+	local spellBank = Enum.SpellBookSpellBank.Player;
+	local includeOverrides = false;
+	local isClassMasteryKnownOrUnused = ClassicExpansionAtLeast(LE_EXPANSION_MISTS_OF_PANDARIA) or C_SpellBook.IsSpellInSpellBook(CLASS_MASTERY_SPELLS[class], spellBank, includeOverrides);
 
 	local primaryTalentTree = C_SpecializationInfo.GetSpecialization();
 	if (isClassMasteryKnownOrUnused and primaryTalentTree) then
@@ -2698,7 +2715,7 @@ function PaperDollItemSlotButton_OnEnter(self)
 	end
 	if ( InRepairMode() and repairCost and (repairCost > 0) ) then
 		GameTooltip:AddLine(REPAIR_COST, "", 1, 1, 1);
-		SetTooltipMoney(GameTooltip, repairCost);
+		GameTooltip_AddMoneyLine(GameTooltip, repairCost);
 		GameTooltip:Show();
 	else
 		CursorUpdate(self);
@@ -3492,9 +3509,8 @@ function GearManagerPopupFrameMixin:OkayButton_OnClick()
 			UIErrorsFrame:AddMessage(EQUIPMENT_SETS_CANT_RENAME, 1.0, 0.1, 0.1, 1.0);
 			return;
 		elseif ( self.mode == IconSelectorPopupFrameModes.New ) then
-			local dialog = StaticPopup_Show("CONFIRM_OVERWRITE_EQUIPMENT_SET", text);
+			local dialog = StaticPopup_Show("CONFIRM_OVERWRITE_EQUIPMENT_SET", text, nil, setID);
 			if ( dialog ) then
-				dialog.data = setID;
 				dialog.selectedIcon = iconTexture;
 			else
 				UIErrorsFrame:AddMessage(ERR_CLIENT_LOCKED_OUT, 1.0, 0.1, 0.1, 1.0);
@@ -3735,10 +3751,8 @@ function PaperDollEquipmentManagerPaneSaveSet_OnClick (self)
 	local selectedSetID = PaperDollFrame.EquipmentManagerPane.selectedSetID
 	if (selectedSetID) then
 		local selectedSetName = C_EquipmentSet.GetEquipmentSetInfo(selectedSetID);
-		local dialog = StaticPopup_Show("CONFIRM_SAVE_EQUIPMENT_SET", selectedSetName);
-		if ( dialog ) then
-			dialog.data = selectedSetID;
-		else
+		local dialog = StaticPopup_Show("CONFIRM_SAVE_EQUIPMENT_SET", selectedSetName, nil, selectedSetID);
+		if ( not dialog ) then
 			UIErrorsFrame:AddMessage(ERR_CLIENT_LOCKED_OUT, 1.0, 0.1, 0.1, 1.0);
 		end
 	end

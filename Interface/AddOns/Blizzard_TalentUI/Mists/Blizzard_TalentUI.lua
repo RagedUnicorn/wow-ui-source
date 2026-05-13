@@ -13,12 +13,13 @@ StaticPopupDialogs["CONFIRM_REMOVE_TALENT"] = {
 		local _, name = GetTalentInfoByID(self.data.id, talentGroup);
 		local resourceName, count, _, _, cost = GetTalentClearInfo();
 		if cost == 0 then
-			self.text:SetFormattedText(CONFIRM_REMOVE_GLYPH_NO_COST, name);
+			self.Text:SetFormattedText(CONFIRM_REMOVE_GLYPH_NO_COST, name);
 		elseif count >= cost then
-			self.text:SetFormattedText(CONFIRM_REMOVE_GLYPH, name, GREEN_FONT_COLOR_CODE, cost, resourceName);
+			self.Text:SetFormattedText(CONFIRM_REMOVE_GLYPH, name, GREEN_FONT_COLOR_CODE, cost, resourceName);
 		else
-			self.text:SetFormattedText(CONFIRM_REMOVE_GLYPH, name, RED_FONT_COLOR_CODE, cost, resourceName);
-			self.button1:Disable();
+			self.Text:SetFormattedText(CONFIRM_REMOVE_GLYPH, name, RED_FONT_COLOR_CODE, cost, resourceName);
+			local button = self:GetButton1();
+			button:Disable();
 		end
 	end,
 	OnCancel = function (self)
@@ -45,12 +46,13 @@ StaticPopupDialogs["CONFIRM_UNLEARN_AND_SWITCH_TALENT"] = {
 		local _, oldName = GetTalentInfoByID(self.data.oldID, talentGroup);
 		local resourceName, count, _, _, cost = GetTalentClearInfo();
 		if cost == 0 then
-			self.text:SetFormattedText(CONFIRM_UNLEARN_AND_SWITCH_TALENT_NO_COST, name, oldName);
+			self.Text:SetFormattedText(CONFIRM_UNLEARN_AND_SWITCH_TALENT_NO_COST, name, oldName);
 		elseif count >= cost then
-			self.text:SetFormattedText(CONFIRM_UNLEARN_AND_SWITCH_TALENT, name, oldName, GREEN_FONT_COLOR_CODE, cost, resourceName);
+			self.Text:SetFormattedText(CONFIRM_UNLEARN_AND_SWITCH_TALENT, name, oldName, GREEN_FONT_COLOR_CODE, cost, resourceName);
 		else
-			self.text:SetFormattedText(CONFIRM_UNLEARN_AND_SWITCH_TALENT, name, oldName, RED_FONT_COLOR_CODE, cost, resourceName);
-			self.button1:Disable();
+			self.Text:SetFormattedText(CONFIRM_UNLEARN_AND_SWITCH_TALENT, name, oldName, RED_FONT_COLOR_CODE, cost, resourceName);
+			local button = self:GetButton1();
+			button:Disable();
 		end
 	end,
 	OnCancel = function (self)
@@ -248,7 +250,7 @@ function PlayerTalentFrame_OnLoad(self)
 	self:RegisterEvent("PREVIEW_TALENT_POINTS_CHANGED");
 	self:RegisterEvent("UNIT_MODEL_CHANGED");
 	self:RegisterEvent("UNIT_LEVEL");
-	self:RegisterEvent("LEARNED_SPELL_IN_TAB");
+	self:RegisterEvent("LEARNED_SPELL_IN_SKILL_LINE");
 	self:RegisterEvent("PLAYER_TALENT_UPDATE");
 	self:RegisterEvent("PET_SPECIALIZATION_CHANGED");
 	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED");
@@ -302,7 +304,7 @@ function PlayerTalentFrameSpec_OnLoad(self)
 	for i = 1, numSpecs do
 		local button = self["specButton"..i];
 		local _, name, description, icon = C_SpecializationInfo.GetSpecializationInfo(i, false, self.isPet);
-		SetPortraitToTexture(button.specIcon, icon);
+		button.specIcon:SetTexture(icon);
 		button.specName:SetText(name);
 		button.tooltip = description;
 		local role = GetSpecializationRole(i, false, self.isPet);
@@ -396,7 +398,7 @@ function PlayerTalentFrame_OnEvent(self, event, ...)
 					PlayerTalentFrame_Update();
 				end
 			end
-		elseif (event == "LEARNED_SPELL_IN_TAB") then
+		elseif (event == "LEARNED_SPELL_IN_SKILL_LINE") then
 			-- Must update the Mastery bonus if you just learned Mastery
 		elseif (event == "BAG_UPDATE_DELAYED") then
 			PlayerTalentFrame_RefreshClearInfo();
@@ -669,15 +671,15 @@ function PlayerTalentFrameTalent_OnClick(self, button)
 			local spellName, subSpellName = GetSpellInfo(talentName);
 			if ( spellName and not IsPassiveSpell(spellName) ) then
 				if ( subSpellName and (strlen(subSpellName) > 0) ) then
-					ChatEdit_InsertLink(spellName.."("..subSpellName..")");
+					ChatFrameUtil.InsertLink(spellName.."("..subSpellName..")");
 				else
-					ChatEdit_InsertLink(spellName);
+					ChatFrameUtil.InsertLink(spellName);
 				end
 			end
 		else
 			local link = GetTalentLink(self:GetID(), PlayerTalentFrame.inspect, PlayerTalentFrame.talentGroup);
 			if ( link ) then
-				ChatEdit_InsertLink(link);
+				ChatFrameUtil.InsertLink(link);
 			end
 		end
 	elseif ( TalentUIUtil.IsActiveSpecSelected() ) then
@@ -1128,7 +1130,7 @@ function SpecButton_OnEnter(self)
 end
 
 function SpecButton_OnLeave(self)
-	GameTooltip:SetMinimumWidth(0, 0);
+	GameTooltip:SetMinimumWidth(0, false);
 	GameTooltip:Hide();
 end
 
@@ -1140,12 +1142,19 @@ function SpecButton_OnClick(self)
 end
 
 function PlayerTalentFrame_UpdateSpecFrame(self, spec)
-	local playerTalentSpec = nil;
+	local activeSpecializationIndex = nil;
 	local selectedSpec = TalentUIUtil.GetSelectedSpec();
-	if not IsPlayerInitialSpec() then
-		playerTalentSpec = C_SpecializationInfo.GetSpecialization(nil, self.isPet, selectedSpec.talentGroup);
+	local isActiveSpecSelected = TalentUIUtil.IsActiveSpecSelected();
+	if not self.isPet or IsPetActive() then
+		activeSpecializationIndex = C_SpecializationInfo.GetSpecialization(nil, self.isPet, selectedSpec.talentGroup);
 	end
-	local shownSpec = spec or playerTalentSpec or 1;
+
+	-- Initial spec should be treated as "no spec" in the UI.
+	if IsInitialSpec(activeSpecializationIndex) then
+		activeSpecializationIndex = nil;
+	end
+
+	local shownSpec = spec or activeSpecializationIndex or 1;
 	local numSpecs = GetNumSpecializations(nil, self.isPet);
 	local petNotActive = self.isPet and not IsPetActive();
 	
@@ -1160,12 +1169,12 @@ function PlayerTalentFrame_UpdateSpecFrame(self, spec)
 			button.selected = false;
 			button.selectedTex:Hide();
 		end
-		if ( i == playerTalentSpec ) then
+		if ( i == activeSpecializationIndex and (not self.isPet or isActiveSpecSelected) ) then
 			button.learnedTex:Show();
 		else
 			button.learnedTex:Hide();
 		end
-		if ( TalentUIUtil.IsActiveSpecSelected() and ( not playerTalentSpec or i == playerTalentSpec ) ) then
+		if ( isActiveSpecSelected and ( not activeSpecializationIndex or i == activeSpecializationIndex ) ) then
 			button.bg:SetTexCoord(0.00390625, 0.87890625, 0.75195313, 0.83007813);
 		else
 			button.bg:SetTexCoord(0.00390625, 0.87890625, 0.67187500, 0.75000000);
@@ -1191,11 +1200,7 @@ function PlayerTalentFrame_UpdateSpecFrame(self, spec)
 		end
 		
 		if ( button.disabled ) then
-			if ( petNotActive) then
-				button.displayTrainerTooltip = false;
-			else
-				button.displayTrainerTooltip = true;
-			end
+			button.displayTrainerTooltip = not petNotActive;
 		else
 			button.displayTrainerTooltip = false;
 		end
@@ -1212,14 +1217,14 @@ function PlayerTalentFrame_UpdateSpecFrame(self, spec)
 		-- that case, just return, and we'll update things later.
 		return;
 	end
-	SetPortraitToTexture(scrollChild.specIcon, icon);
+	scrollChild.specIcon:SetTexture(icon);
 	scrollChild.specName:SetText(name);
 	scrollChild.description:SetText(description);
 	local role1 = GetSpecializationRole(shownSpec, nil, self.isPet);
 	scrollChild.roleName:SetText(_G[role1]);
 	scrollChild.roleIcon:SetTexCoord(GetTexCoordsForRole(role1));
 	-- disable stuff if not in active spec or have picked a specialization and not looking at it
-	local disable = (not TalentUIUtil.IsActiveSpecSelected()) or ( playerTalentSpec and shownSpec ~= playerTalentSpec ) or petNotActive;
+	local disable = (not isActiveSpecSelected) or ( activeSpecializationIndex and shownSpec ~= activeSpecializationIndex ) or petNotActive;
 	if ( disable and not self.disabled ) then
 		self.disabled = true;
 		self.bg:SetDesaturated(true);
@@ -1250,11 +1255,11 @@ function PlayerTalentFrame_UpdateSpecFrame(self, spec)
 		scrollChild.scrollwork_bottomright:SetDesaturated(false);
 	end
 	-- disable Learn button
-	if ( self.isPet and disable ) then
+	if ( self.isPet and isActiveSpecSelected and (not petNotActive) and disable ) then
 		self.learnButton:Enable();
 		self.learnButton.Flash:Show();
 		self.learnButton.FlashAnim:Play();
-	elseif ( playerTalentSpec or disable or not C_SpecializationInfo.CanPlayerUseTalentSpecUI() ) then
+	elseif ( activeSpecializationIndex or disable or not C_SpecializationInfo.CanPlayerUseTalentSpecUI() ) then
 		self.learnButton:Disable();
 		self.learnButton.Flash:Hide();
 		self.learnButton.FlashAnim:Stop();
@@ -1297,7 +1302,7 @@ function PlayerTalentFrame_UpdateSpecFrame(self, spec)
 
 			local spellName, subname = GetSpellInfo(bonuses[i]);
 			local _, spellIcon = GetSpellTexture(bonuses[i]);
-			SetPortraitToTexture(frame.icon, spellIcon);
+			frame.icon:SetTexture(spellIcon);
 			frame.name:SetText(spellName);
 			frame.spellID = bonuses[i];
 			frame.extraTooltip = nil;

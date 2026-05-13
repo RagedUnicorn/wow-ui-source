@@ -442,6 +442,7 @@ function GroupLootContainer_Update(self)
 	if ( lastIdx ) then
 		self:SetHeight(self.reservedSize * lastIdx);
 		self:Show();
+		self.layoutParent:Layout();
 	else
 		self:Hide();
 	end
@@ -567,6 +568,7 @@ function MasterLooterFrame_Show(selectedLootButton)
 
 	MasterLooterFrame:Show();
 	MasterLooterFrame_UpdatePlayers();
+	MasterLooterFrame:ClearAllPoints();
 	MasterLooterFrame:SetPoint("TOPLEFT", selectedLootButton, "BOTTOMLEFT", 0, 0);
 end
 

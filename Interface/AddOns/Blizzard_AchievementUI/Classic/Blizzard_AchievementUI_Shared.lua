@@ -226,7 +226,7 @@ end
 
 function AchievementFrameCategory_StatusBarTooltip(self)
 	GameTooltip_SetDefaultAnchor(GameTooltip, self);
-	GameTooltip:SetMinimumWidth(128, 1);
+	GameTooltip:SetMinimumWidth(128, true);
 	GameTooltip:SetText(self.name, 1, 1, 1, nil, 1);
 	GameTooltip_ShowStatusBar(GameTooltip, 0, self.numAchievements, self.numCompleted, self.numCompletedText);
 	GameTooltip:Show();
@@ -603,7 +603,7 @@ function AchievementFrameStats_SetStat(button, category, index, colorIndex, isSu
 	
 	if ( not colorIndex ) then
 		if ( not index ) then
-			message("Error, need a color index or index");
+			SetBasicMessageDialogText("Error, need a color index or index");
 		end
 		colorIndex = index;
 	end
@@ -1001,7 +1001,7 @@ function AchievementFrameComparisonStats_SetStat (button, category, index, color
 	
 	if ( not colorIndex ) then
 		if ( not index ) then
-			message("Error, need a color index or index");
+			SetBasicMessageDialogText("Error, need a color index or index");
 		end
 		colorIndex = index;
 	end

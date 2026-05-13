@@ -2,10 +2,10 @@ StaticPopupDialogs["CONFIRM_LEARN_PREVIEW_TALENTS"] = {
 	text = CONFIRM_LEARN_PREVIEW_TALENTS,
 	button1 = YES,
 	button2 = NO,
-	OnAccept = function (self)
+	OnAccept = function(dialog, data)
 		LearnPreviewTalents(PlayerTalentFrame.pet);
 	end,
-	OnCancel = function (self)
+	OnCancel = function(dialog, data)
 	end,
 	hideOnEscape = 1,
 	timeout = 0,
@@ -330,7 +330,7 @@ function PlayerTalentFrame_OnLoad(self)
 	self:RegisterEvent("UNIT_PET");
 	self:RegisterEvent("UNIT_MODEL_CHANGED");
 	self:RegisterEvent("UNIT_LEVEL");
-	self:RegisterEvent("LEARNED_SPELL_IN_TAB");
+	self:RegisterEvent("LEARNED_SPELL_IN_SKILL_LINE");
 	self:RegisterEvent("PLAYER_TALENT_UPDATE");
 	self:RegisterEvent("PET_TALENT_UPDATE");
 	self:RegisterEvent("PREVIEW_TALENT_PRIMARY_TREE_CHANGED");
@@ -344,7 +344,7 @@ function PlayerTalentFrame_OnLoad(self)
 	PanelTemplates_SetNumTabs(self, NUM_TALENT_FRAME_TABS);
 	
 	-- setup portrait texture
-	SetPortraitToTexture(PlayerTalentFramePortrait, "Interface\\Icons\\Ability_Marksmanship");
+	PlayerTalentFramePortrait:SetTexture("Interface\\Icons\\Ability_Marksmanship");
 	
 	-- initialize active spec
 	PlayerTalentFrame_UpdateActiveSpec(C_SpecializationInfo.GetActiveSpecGroup(false, false));
@@ -446,7 +446,7 @@ function PlayerTalentFrame_OnEvent(self, event, ...)
 					PlayerTalentFramePanel_UpdateSummary(PlayerTalentFramePanel3);
 				end
 			end
-		elseif (event == "LEARNED_SPELL_IN_TAB") then
+		elseif (event == "LEARNED_SPELL_IN_SKILL_LINE") then
 			-- Must update the Mastery bonus if you just learned Mastery
 			if (PlayerTalentFramePanel1Summary:IsVisible()) then
 				PlayerTalentFramePanel_UpdateSummary(PlayerTalentFramePanel1);
@@ -702,7 +702,7 @@ function PlayerTalentFramePanel_UpdateSummary(self)
 	
 	if (self.Summary and icon) then
 		local summary = self.Summary;
-		SetPortraitToTexture(self.Summary.Icon, icon);
+		self.Summary.Icon:SetTexture(icon);
 		if (PlayerTalentFrame.primaryTree or GetNumTalentPoints() == 0) then
 			self.Summary.TitleText:SetText(name);
 			self.Summary.TitleText:Show();
@@ -830,7 +830,7 @@ function PlayerTalentFramePanel_UpdateSummary(self)
 		local masterySpells = C_SpecializationInfo.GetSpecializationMasterySpells(self.talentTree);
 		if (UnitLevel("player") >= SHOW_MASTERY_LEVEL and masterySpells[1]) then
 			local _, class = UnitClass("player");
-			local masteryKnown = IsSpellKnown(CLASS_MASTERY_SPELLS[class]);
+			local masteryKnown = C_SpellBook.IsSpellInSpellBook(CLASS_MASTERY_SPELLS[class]);
 			numSmallBonuses = numSmallBonuses+1;
 			local bonusFrame = _G[self.Summary:GetName().."Bonus"..numSmallBonuses];
 			if (bonusFrame) then
@@ -1091,7 +1091,7 @@ function PlayerTalentFrameTalent_OnClick(self, button)
 		local link = GetTalentLink(self:GetParent().talentTree, self:GetID(),
 			PlayerTalentFrame.inspect, PlayerTalentFrame.pet, PlayerTalentFrame.talentGroup, GetCVarBool("previewTalentsOption"));
 		if ( link ) then
-			ChatEdit_InsertLink(link);
+			ChatFrameUtil.InsertLink(link);
 		end
 	elseif ( TalentUIUtil.IsActiveSpecSelected() ) then
 		-- only allow functionality if an active spec is selected

@@ -3,6 +3,7 @@ local TextureUtils =
 	Name = "TextureUtils",
 	Type = "System",
 	Namespace = "C_Texture",
+	Environment = "All",
 
 	Functions =
 	{
@@ -36,6 +37,20 @@ local TextureUtils =
 			Returns =
 			{
 				{ Name = "atlases", Type = "table", InnerType = "textureAtlas", Nilable = false },
+			},
+		},
+		{
+			Name = "GetAtlasExists",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "atlas", Type = "textureAtlas", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "atlasExists", Type = "bool", Nilable = false },
 			},
 		},
 		{
@@ -118,10 +133,32 @@ local TextureUtils =
 				{ Name = "version", Type = "TitleIconVersion", Nilable = false },
 			},
 		},
+		{
+			Name = "SetURLTexture",
+			Type = "Function",
+			HasRestrictions = true,
+
+			Arguments =
+			{
+				{ Name = "texture", Type = "SimpleTexture", Nilable = false },
+				{ Name = "url", Type = "cstring", Nilable = false },
+			},
+		},
 	},
 
 	Events =
 	{
+		{
+			Name = "UrlTextureRequestResult",
+			Type = "Event",
+			LiteralName = "URL_TEXTURE_REQUEST_RESULT",
+			SynchronousEvent = true,
+			Payload =
+			{
+				{ Name = "texture", Type = "SimpleTexture", Nilable = false },
+				{ Name = "result", Type = "UrlTextureResult", Nilable = false },
+			},
+		},
 	},
 
 	Tables =
@@ -140,6 +177,20 @@ local TextureUtils =
 			},
 		},
 		{
+			Name = "UrlTextureResult",
+			Type = "Enumeration",
+			NumValues = 4,
+			MinValue = 1,
+			MaxValue = 4,
+			Fields =
+			{
+				{ Name = "Found", Type = "UrlTextureResult", EnumValue = 1 },
+				{ Name = "NotFound", Type = "UrlTextureResult", EnumValue = 2 },
+				{ Name = "Requested", Type = "UrlTextureResult", EnumValue = 3 },
+				{ Name = "NotAllowed", Type = "UrlTextureResult", EnumValue = 4 },
+			},
+		},
+		{
 			Name = "AtlasInfo",
 			Type = "Structure",
 			Fields =
@@ -147,7 +198,7 @@ local TextureUtils =
 				{ Name = "elementName", Type = "cstring", Nilable = false },
 				{ Name = "width", Type = "number", Nilable = false },
 				{ Name = "height", Type = "number", Nilable = false },
-				{ Name = "rawSize", Type = "vector2", Mixin = "Vector2DMixin", Nilable = false },
+				{ Name = "rawSize", Type = "vector2", Nilable = false },
 				{ Name = "leftTexCoord", Type = "number", Nilable = false },
 				{ Name = "rightTexCoord", Type = "number", Nilable = false },
 				{ Name = "topTexCoord", Type = "number", Nilable = false },
@@ -169,6 +220,9 @@ local TextureUtils =
 				{ Name = "texture", Type = "fileID", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

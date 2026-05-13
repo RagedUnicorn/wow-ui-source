@@ -3,6 +3,7 @@ local Item =
 	Name = "Item",
 	Type = "System",
 	Namespace = "C_Item",
+	Environment = "All",
 
 	Functions =
 	{
@@ -20,7 +21,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -34,13 +35,13 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLoc", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLoc", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
 			{
 				{ Name = "canTransmog", Type = "bool", Nilable = false },
-				{ Name = "errorCode", Type = "number", Nilable = false },
+				{ Name = "errorCode", Type = "TransmogOutfitSlotError", Nilable = false },
 			},
 		},
 		{
@@ -77,7 +78,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "emptiableItemLocation", Type = "EmptiableItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "emptiableItemLocation", Type = "EmptiableItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -142,12 +143,12 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLoc", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLoc", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
 			{
-				{ Name = "info", Type = "ItemTransmogInfo", Mixin = "ItemTransmogInfoMixin", Nilable = true },
+				{ Name = "info", Type = "ItemTransmogInfo", Nilable = true },
 			},
 		},
 		{
@@ -156,12 +157,12 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLoc", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLoc", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
 			{
-				{ Name = "info", Type = "ItemTransmogInfo", Mixin = "ItemTransmogInfoMixin", Nilable = true },
+				{ Name = "info", Type = "ItemTransmogInfo", Nilable = true },
 			},
 		},
 		{
@@ -170,7 +171,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -184,12 +185,12 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLoc", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLoc", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
 			{
-				{ Name = "info", Type = "ItemTransmogInfo", Mixin = "ItemTransmogInfoMixin", Nilable = true },
+				{ Name = "info", Type = "ItemTransmogInfo", Nilable = true },
 			},
 		},
 		{
@@ -291,7 +292,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -338,7 +339,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -366,7 +367,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -417,6 +418,7 @@ local Item =
 				{ Name = "expansionID", Type = "number", Nilable = false },
 				{ Name = "setID", Type = "number", Nilable = true },
 				{ Name = "isCraftingReagent", Type = "bool", Nilable = false },
+				{ Name = "itemDescription", Type = "cstring", Nilable = false },
 			},
 		},
 		{
@@ -474,7 +476,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -502,7 +504,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -516,7 +518,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -544,7 +546,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -600,7 +602,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -741,7 +743,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -769,7 +771,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -895,7 +897,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -938,7 +940,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -981,7 +983,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 		},
 		{
@@ -1016,7 +1018,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 		},
 		{
@@ -1034,7 +1036,7 @@ local Item =
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 		},
 		{
@@ -1064,16 +1066,19 @@ local Item =
 			Name = "ActionWillBindItem",
 			Type = "Event",
 			LiteralName = "ACTION_WILL_BIND_ITEM",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "BindEnchant",
 			Type = "Event",
 			LiteralName = "BIND_ENCHANT",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "CharacterItemFixupNotification",
 			Type = "Event",
 			LiteralName = "CHARACTER_ITEM_FIXUP_NOTIFICATION",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "fixupVersion", Type = "number", Nilable = false },
@@ -1083,11 +1088,13 @@ local Item =
 			Name = "ConfirmBeforeUse",
 			Type = "Event",
 			LiteralName = "CONFIRM_BEFORE_USE",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "DeleteItemConfirm",
 			Type = "Event",
 			LiteralName = "DELETE_ITEM_CONFIRM",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "itemName", Type = "cstring", Nilable = false },
@@ -1100,6 +1107,7 @@ local Item =
 			Name = "EndBoundTradeable",
 			Type = "Event",
 			LiteralName = "END_BOUND_TRADEABLE",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "reason", Type = "cstring", Nilable = false },
@@ -1109,6 +1117,7 @@ local Item =
 			Name = "GetItemInfoReceived",
 			Type = "Event",
 			LiteralName = "GET_ITEM_INFO_RECEIVED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "itemID", Type = "number", Nilable = false },
@@ -1119,6 +1128,7 @@ local Item =
 			Name = "ItemDataLoadResult",
 			Type = "Event",
 			LiteralName = "ITEM_DATA_LOAD_RESULT",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "itemID", Type = "number", Nilable = false },
@@ -1129,6 +1139,7 @@ local Item =
 			Name = "MerchantConfirmTradeTimerRemoval",
 			Type = "Event",
 			LiteralName = "MERCHANT_CONFIRM_TRADE_TIMER_REMOVAL",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "itemLink", Type = "cstring", Nilable = false },
@@ -1138,6 +1149,7 @@ local Item =
 			Name = "ReplaceEnchant",
 			Type = "Event",
 			LiteralName = "REPLACE_ENCHANT",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "existingStr", Type = "cstring", Nilable = false },
@@ -1148,6 +1160,7 @@ local Item =
 			Name = "ReplaceTradeskillEnchant",
 			Type = "Event",
 			LiteralName = "REPLACE_TRADESKILL_ENCHANT",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "existing", Type = "cstring", Nilable = false },
@@ -1158,6 +1171,7 @@ local Item =
 			Name = "TradeReplaceEnchant",
 			Type = "Event",
 			LiteralName = "TRADE_REPLACE_ENCHANT",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "existing", Type = "cstring", Nilable = false },
@@ -1168,11 +1182,19 @@ local Item =
 			Name = "UseBindConfirm",
 			Type = "Event",
 			LiteralName = "USE_BIND_CONFIRM",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "UseNoRefundConfirm",
 			Type = "Event",
 			LiteralName = "USE_NO_REFUND_CONFIRM",
+			SynchronousEvent = true,
+		},
+		{
+			Name = "WeaponEnchantChanged",
+			Type = "Event",
+			LiteralName = "WEAPON_ENCHANT_CHANGED",
+			UniqueEvent = true,
 		},
 	},
 
@@ -1200,6 +1222,7 @@ local Item =
 				{ Name = "expansionID", Type = "number", Nilable = false },
 				{ Name = "setID", Type = "number", Nilable = true },
 				{ Name = "isCraftingReagent", Type = "bool", Nilable = false },
+				{ Name = "itemDescription", Type = "cstring", Nilable = false },
 			},
 		},
 		{
@@ -1214,6 +1237,9 @@ local Item =
 				{ Name = "trackStringID", Type = "number", Nilable = true },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

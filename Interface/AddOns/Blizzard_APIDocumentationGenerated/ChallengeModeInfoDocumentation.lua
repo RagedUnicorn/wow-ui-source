@@ -3,6 +3,7 @@ local ChallengeModeInfo =
 	Name = "ChallengeModeInfo",
 	Type = "System",
 	Namespace = "C_ChallengeMode",
+	Environment = "All",
 
 	Functions =
 	{
@@ -169,6 +170,35 @@ local ChallengeModeInfo =
 			},
 		},
 		{
+			Name = "GetNumMedals",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "mapID", Type = "number", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "numMedals", Type = "number", Nilable = false },
+			},
+		},
+		{
+			Name = "GetSpecificDungeonOverallScoreRarityColor",
+			Type = "Function",
+			Documentation = { "Returns a color value from the passed in mythic+ rating from the combined affix scores for a specific dungeon" },
+
+			Arguments =
+			{
+				{ Name = "specificDungeonOverallScore", Type = "number", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "specificDungeonOverallScoreColor", Type = "colorRGB", Nilable = false },
+			},
+		},
+		{
 			Name = "IsChallengeModeActive",
 			Type = "Function",
 
@@ -196,6 +226,18 @@ local ChallengeModeInfo =
 			},
 		},
 		{
+			Name = "RequestChallengeModeLeaderboard",
+			Type = "Function",
+			Documentation = { "Request a page of challenge mode leaderboards that will be returned in a 'CHALLENGE_MODE_LEADERBOARD_RESULT' event" },
+
+			Arguments =
+			{
+				{ Name = "mapID", Type = "number", Nilable = false },
+				{ Name = "challengeModeID", Type = "number", Nilable = false },
+				{ Name = "page", Type = "number", Nilable = false },
+			},
+		},
+		{
 			Name = "RequestLeaders",
 			Type = "Function",
 
@@ -216,11 +258,13 @@ local ChallengeModeInfo =
 			Name = "ChallengeModeCompleted",
 			Type = "Event",
 			LiteralName = "CHALLENGE_MODE_COMPLETED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "ChallengeModeCompletedRewards",
 			Type = "Event",
 			LiteralName = "CHALLENGE_MODE_COMPLETED_REWARDS",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "mapID", Type = "number", Nilable = false },
@@ -234,40 +278,72 @@ local ChallengeModeInfo =
 			Name = "ChallengeModeDeathCountUpdated",
 			Type = "Event",
 			LiteralName = "CHALLENGE_MODE_DEATH_COUNT_UPDATED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "ChallengeModeKeystoneReceptableOpen",
 			Type = "Event",
 			LiteralName = "CHALLENGE_MODE_KEYSTONE_RECEPTABLE_OPEN",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "ChallengeModeKeystoneSlotted",
 			Type = "Event",
 			LiteralName = "CHALLENGE_MODE_KEYSTONE_SLOTTED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "keystoneID", Type = "number", Nilable = false },
 			},
 		},
 		{
+			Name = "ChallengeModeLeaderboardResult",
+			Type = "Event",
+			LiteralName = "CHALLENGE_MODE_LEADERBOARD_RESULT",
+			SynchronousEvent = true,
+			Payload =
+			{
+				{ Name = "mapID", Type = "number", Nilable = false },
+				{ Name = "challengeModeID", Type = "number", Nilable = false },
+				{ Name = "page", Type = "number", Nilable = false },
+				{ Name = "results", Type = "table", InnerType = "MythicPlusLeaderboardResult", Nilable = false },
+			},
+		},
+		{
 			Name = "ChallengeModeLeadersUpdate",
 			Type = "Event",
 			LiteralName = "CHALLENGE_MODE_LEADERS_UPDATE",
+			SynchronousEvent = true,
+		},
+		{
+			Name = "ChallengeModeLeaverTimerEnded",
+			Type = "Event",
+			LiteralName = "CHALLENGE_MODE_LEAVER_TIMER_ENDED",
+			SynchronousEvent = true,
+		},
+		{
+			Name = "ChallengeModeLeaverTimerStarted",
+			Type = "Event",
+			LiteralName = "CHALLENGE_MODE_LEAVER_TIMER_STARTED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "ChallengeModeMapsUpdate",
 			Type = "Event",
 			LiteralName = "CHALLENGE_MODE_MAPS_UPDATE",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "ChallengeModeMemberInfoUpdated",
 			Type = "Event",
 			LiteralName = "CHALLENGE_MODE_MEMBER_INFO_UPDATED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "ChallengeModeNewRecord",
 			Type = "Event",
 			LiteralName = "CHALLENGE_MODE_NEW_RECORD",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "mapID", Type = "number", Nilable = false },
@@ -279,6 +355,7 @@ local ChallengeModeInfo =
 			Name = "ChallengeModeReset",
 			Type = "Event",
 			LiteralName = "CHALLENGE_MODE_RESET",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "mapID", Type = "number", Nilable = false },
@@ -288,6 +365,7 @@ local ChallengeModeInfo =
 			Name = "ChallengeModeStart",
 			Type = "Event",
 			LiteralName = "CHALLENGE_MODE_START",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "mapID", Type = "number", Nilable = false },
@@ -379,6 +457,9 @@ local ChallengeModeInfo =
 				{ Name = "isCurrency", Type = "bool", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

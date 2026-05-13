@@ -21,11 +21,11 @@ StaticPopupDialogs["DIALOG_REPLACE_MOUNT_EQUIPMENT"] = {
 	button1 = YES,
 	button2 = NO,
 	
-	OnAccept = function()
+	OnAccept = function(dialog, data)
 		MountJournal_OnDialogApplyEquipmentChoice(MountJournal, true);
 		PlaySound(SOUNDKIT.UI_MOUNT_SLOTEQUIPMENT_APPROVAL);
 	end,
-	OnCancel = function()
+	OnCancel = function(dialog, data)
 		MountJournal_OnDialogApplyEquipmentChoice(MountJournal, false);
 	end,
 	timeout = 0,
@@ -76,7 +76,7 @@ function MountEquipmentButtonMixin:OnClick()
 			local item = itemID and Item:CreateFromItemID(itemID);
 			if item then
 				item:ContinueOnItemLoad(function()
-					ChatEdit_InsertLink(item:GetItemLink())
+					ChatFrameUtil.InsertLink(item:GetItemLink())
 				end);
 			end
 		end
@@ -251,9 +251,7 @@ function MountJournal_InitFilterButton(self)
 		sourceSubmenu:CreateButton(CHECK_ALL, MountJournal_SetAllSourceFilters, true);
 		sourceSubmenu:CreateButton(UNCHECK_ALL, MountJournal_SetAllSourceFilters, false);
 
-		local filterIndexList = CollectionsUtil.GetSortedFilterIndexList("TOYS", mountSourceOrderPriorities);
-		for index = 1, C_PetJournal.GetNumPetSources() do
-			local filterIndex = filterIndexList[i] and filterIndexList[i].index or index;
+		for filterIndex = 1, C_PetJournal.GetNumPetSources() do
 			if C_MountJournal.IsValidSourceFilter(filterIndex) then
 				sourceSubmenu:CreateCheckbox(_G["BATTLE_PET_SOURCE_"..filterIndex], IsSourceChecked, SetSourceChecked, filterIndex);
 			end
@@ -416,13 +414,16 @@ function MountJournal_OnEvent(self, event, ...)
 	if ( event == "MOUNT_JOURNAL_USABILITY_CHANGED" or event == "COMPANION_LEARNED" or event == "COMPANION_UNLEARNED" or event == "COMPANION_UPDATE" or event == "PLAYER_REGEN_ENABLED" ) then
 		local companionType = ...;
 		if ( not companionType or companionType == "MOUNT" ) then
-			MountJournal_FullUpdate(self);
+			local skipMountDisplay = true;
+			MountJournal_FullUpdate(self, skipMountDisplay);
 		end
 	elseif ( event == "MOUNT_JOURNAL_SEARCH_UPDATED" ) then
-		MountJournal_FullUpdate(self);
+		local skipMountDisplay = true;
+		MountJournal_FullUpdate(self, skipMountDisplay);
 	elseif ( event == "UI_MODEL_SCENE_INFO_UPDATED" ) then
 		if (self:IsVisible()) then
-			MountJournal_UpdateMountDisplay(true);
+			local forceSceneChange = true;
+			MountJournal_UpdateMountDisplay(forceSceneChange);
 		end
 	elseif ( event == "PLAYER_LEVEL_CHANGED" ) then
 		MountJournal_UpdateEquipment(self);
@@ -437,7 +438,8 @@ function MountJournal_OnEvent(self, event, ...)
 	elseif ( event == "UNIT_FORM_CHANGED" ) then
 		local showPlayer = GetCVarBool("mountJournalShowPlayer");
 		if(self:IsVisible() and showPlayer) then
-			MountJournal_UpdateMountDisplay(true);
+			local forceSceneChange =  true;
+			MountJournal_UpdateMountDisplay(forceSceneChange);
 		end
 	end
 end
@@ -626,7 +628,7 @@ function MountJournal_UpdateEquipment(self)
 	MountJournal_UpdateEquipmentPalette(self);
 end
 
-function MountJournal_FullUpdate(self)
+function MountJournal_FullUpdate(self, skipMountDisplay)
 	if (self:IsVisible()) then
 		MountJournal_UpdateMountList();
 
@@ -634,7 +636,10 @@ function MountJournal_FullUpdate(self)
 			MountJournal_Select(1);
 		end
 
-		MountJournal_UpdateMountDisplay();
+		if not skipMountDisplay then
+			local forceSceneChange = true;
+			MountJournal_UpdateMountDisplay(forceSceneChange);
+		end
 	end
 end
 
@@ -688,7 +693,8 @@ function MountJournal_UpdateMountList()
 	if ( not showMounts ) then
 		MountJournal.selectedSpellID = nil;
 		MountJournal.selectedMountID = nil;
-		MountJournal_UpdateMountDisplay();
+		local forceSceneChange = true;
+		MountJournal_UpdateMountDisplay(forceSceneChange);
 		MountJournal.MountCount.Count:SetText(0);
 	end
 end
@@ -721,11 +727,11 @@ function MountJournal_OnModelLoaded(mountActor)
 	mountActor:Show();
 end
 
-function MountJournal_UpdateMountDisplay(forceSceneChange)
+function MountJournal_UpdateMountDisplay(forceSceneChange, refreshPlayer)
 	if ( MountJournal.selectedMountID ) then
 		local creatureName, spellID, icon, active, isUsable, sourceType = C_MountJournal.GetMountInfoByID(MountJournal.selectedMountID);
 		local needsFanfare = C_MountJournal.NeedsFanfare(MountJournal.selectedMountID);
-		if ( MountJournal.MountDisplay.lastDisplayed ~= spellID or forceSceneChange or MountJournal_GetPendingMountChanges()) then
+		if ( MountJournal.MountDisplay.lastDisplayed ~= spellID or MountJournal_GetPendingMountChanges()) or forceSceneChange or refreshPlayer then
 			MountJournal_SetPendingMountChanges(false);
 			local creatureDisplayID, descriptionText, sourceText, isSelfMount, _, modelSceneID, animID, spellVisualKitID, disablePlayerMountPreview = C_MountJournal.GetMountInfoExtraByID(MountJournal.selectedMountID);
 			if not creatureDisplayID then
@@ -755,7 +761,9 @@ function MountJournal_UpdateMountDisplay(forceSceneChange)
 
 			MountJournal.MountDisplay.lastDisplayed = spellID;
 
-			MountJournal.MountDisplay.ModelScene:TransitionToModelSceneID(modelSceneID, CAMERA_TRANSITION_TYPE_IMMEDIATE, CAMERA_MODIFICATION_TYPE_DISCARD, forceSceneChange);
+			if forceSceneChange then
+				MountJournal.MountDisplay.ModelScene:TransitionToModelSceneID(modelSceneID, CAMERA_TRANSITION_TYPE_IMMEDIATE, CAMERA_MODIFICATION_TYPE_DISCARD, forceSceneChange);
+			end
 
 			MountJournal.MountDisplay.ModelScene:PrepareForFanfare(needsFanfare);
 
@@ -832,7 +840,8 @@ function MountJournal_SetSelected(selectedMountID, selectedSpellID)
 	local oldSelectedID = MountJournal.selectedMountID;
 	MountJournal.selectedSpellID = selectedSpellID;
 	MountJournal.selectedMountID = selectedMountID;
-	MountJournal_UpdateMountDisplay();
+	local forceSceneChange = true;
+	MountJournal_UpdateMountDisplay(forceSceneChange);
 	
 	if oldSelectedID ~= selectedMountID then
 		local foundFrame = MountJournal.ScrollBox:FindFrameByPredicate(function(frame, elementData)
@@ -864,7 +873,8 @@ function MountJournalMountButton_UseMount(mountID)
 		local function OnFinishedCallback()
 			C_MountJournal.ClearFanfare(mountID);
 			MountJournal_UpdateMountList();
-			MountJournal_UpdateMountDisplay();
+			local forceSceneChange = true;
+			MountJournal_UpdateMountDisplay(forceSceneChange);
 		end
 
 		MountJournal.MountDisplay.ModelScene:StartUnwrapAnimation(OnFinishedCallback);
@@ -912,10 +922,10 @@ function MountListDragButton_OnClick(self, button)
 		local id = parent.spellID;
 		if ( MacroFrame and MacroFrame:IsShown() ) then
 			local spellName = C_Spell.GetSpellName(id);
-			ChatEdit_InsertLink(spellName);
+			ChatFrameUtil.InsertLink(spellName);
 		else
 			local mountLink = C_MountJournal.GetMountLink(id);
-			ChatEdit_InsertLink(mountLink);
+			ChatFrameUtil.InsertLink(mountLink);
 		end
 	else
 		C_MountJournal.Pickup(parent.index);
@@ -932,10 +942,10 @@ function MountListItem_OnClick(self, button)
 		local id = self.spellID;
 		if ( MacroFrame and MacroFrame:IsShown() ) then
 			local spellName = C_Spell.GetSpellName(id);
-			ChatEdit_InsertLink(spellName);
+			ChatFrameUtil.InsertLink(spellName);
 		else
 			local mountLink = C_MountJournal.GetMountLink(id);
-			ChatEdit_InsertLink(mountLink);
+			ChatFrameUtil.InsertLink(mountLink);
 		end
 	elseif ( self.spellID ~= MountJournal.selectedSpellID ) then
 		MountJournal_Select(self.index);
@@ -1066,7 +1076,7 @@ function MountJournalOpenDynamicFlightSkillTreeButtonMixin:OnClick()
 
 	GenericTraitUI_LoadUI();
 
-	GenericTraitFrame:SetSystemID(Constants.MountDynamicFlightConsts.TRAIT_SYSTEM_ID);
+	GenericTraitFrame:SetConfigIDBySystemID(Constants.MountDynamicFlightConsts.TRAIT_SYSTEM_ID);
 	GenericTraitFrame:SetTreeID(Constants.MountDynamicFlightConsts.TREE_ID);
 	ToggleFrame(GenericTraitFrame);
 end
@@ -1149,7 +1159,9 @@ function PlayerPreviewToggle:OnClick()
 	else
 		SetCVar("mountJournalShowPlayer", 0);
 	end
-	MountJournal_UpdateMountDisplay(true);
+	local forceSceneChange = false;
+	local refreshPlayer = true;
+	MountJournal_UpdateMountDisplay(forceSceneChange, refreshPlayer);
 end
 
 

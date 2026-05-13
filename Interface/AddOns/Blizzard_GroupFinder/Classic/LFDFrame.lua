@@ -7,8 +7,6 @@ function LFDFrame_OnLoad(self)
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("LFG_ROLE_CHECK_SHOW");
 	self:RegisterEvent("LFG_ROLE_CHECK_HIDE");
-	self:RegisterEvent("LFG_READY_CHECK_SHOW");
-	self:RegisterEvent("LFG_READY_CHECK_HIDE");
 	self:RegisterEvent("LFG_BOOT_PROPOSAL_UPDATE");
 	self:RegisterEvent("VOTE_KICK_REASON_NEEDED");
 	self:RegisterEvent("LFG_UPDATE_RANDOM_INFO");
@@ -38,18 +36,6 @@ function LFDFrame_OnEvent(self, event, ...)
 	elseif ( event == "LFG_ROLE_CHECK_HIDE" ) then
 		StaticPopupSpecial_Hide(LFDRoleCheckPopup);
 		LFDQueueFrameSpecificList_Update();
-	elseif ( event == "LFG_READY_CHECK_SHOW" ) then
-		local _, readyCheckBgQueue = GetLFGReadyCheckUpdate();
-		local displayName;
-		if ( readyCheckBgQueue ) then
-			displayName = GetLFGReadyCheckUpdateBattlegroundInfo();
-		else
-			displayName = UNKNOWN;
-		end
-		LFDReadyCheckPopup.Text:SetFormattedText(CONFIRM_YOU_ARE_READY, displayName);
-		StaticPopupSpecial_Show(LFDReadyCheckPopup);
-	elseif ( event == "LFG_READY_CHECK_HIDE" ) then
-		StaticPopupSpecial_Hide(LFDReadyCheckPopup);
 	elseif ( event == "LFG_BOOT_PROPOSAL_UPDATE" ) then
 		local voteInProgress, didVote, myVote, targetName, totalVotes, bootVotes, timeLeft, reason = GetLFGBootProposal();
 		if ( voteInProgress and not didVote and targetName ) then
@@ -438,15 +424,12 @@ function LFDQueueFrameRandomCooldownFrame_OnLoad(self)
 	self:SetFrameLevel(LFDQueueFrame:GetFrameLevel() + 9);	--This value also needs to be set when SetParent is called in LFDQueueFrameRandomCooldownFrame_Update.
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");	--For logging in/reloading ui
-	self:RegisterEvent("UNIT_AURA");	--The cooldown is still technically a debuff
+	self:RegisterEvent("LFG_COOLDOWNS_UPDATED");
 	self:RegisterEvent("GROUP_ROSTER_UPDATE");
 end
 
 function LFDQueueFrameRandomCooldownFrame_OnEvent(self, event, ...)
-	local arg1 = ...;
-	if ( event ~= "UNIT_AURA" or arg1 == "player" or strsub(arg1, 1, 5) == "party" ) then
-		LFDQueueFrameRandomCooldownFrame_Update();
-	end
+	LFDQueueFrameRandomCooldownFrame_Update();
 end
 
 function LFDQueueFrameRandomCooldownFrame_Update()

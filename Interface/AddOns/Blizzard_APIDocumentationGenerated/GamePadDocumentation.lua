@@ -3,12 +3,14 @@ local GamePad =
 	Name = "GamePad",
 	Type = "System",
 	Namespace = "C_GamePad",
+	Environment = "All",
 
 	Functions =
 	{
 		{
 			Name = "AddSDLMapping",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -24,6 +26,7 @@ local GamePad =
 		{
 			Name = "ApplyConfigs",
 			Type = "Function",
+			HasRestrictions = true,
 		},
 		{
 			Name = "AxisIndexToConfigName",
@@ -88,6 +91,7 @@ local GamePad =
 		{
 			Name = "DeleteConfig",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -178,7 +182,7 @@ local GamePad =
 
 			Returns =
 			{
-				{ Name = "color", Type = "colorRGB", Mixin = "ColorMixin", Nilable = false },
+				{ Name = "color", Type = "colorRGB", Nilable = false },
 			},
 		},
 		{
@@ -207,6 +211,7 @@ local GamePad =
 		{
 			Name = "SetConfig",
 			Type = "Function",
+			HasRestrictions = true,
 
 			Arguments =
 			{
@@ -219,7 +224,7 @@ local GamePad =
 
 			Arguments =
 			{
-				{ Name = "color", Type = "colorRGB", Mixin = "ColorMixin", Nilable = false },
+				{ Name = "color", Type = "colorRGB", Nilable = false },
 			},
 		},
 		{
@@ -258,6 +263,7 @@ local GamePad =
 			Name = "GamePadActiveChanged",
 			Type = "Event",
 			LiteralName = "GAME_PAD_ACTIVE_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "isActive", Type = "bool", Nilable = false },
@@ -267,21 +273,25 @@ local GamePad =
 			Name = "GamePadConfigsChanged",
 			Type = "Event",
 			LiteralName = "GAME_PAD_CONFIGS_CHANGED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "GamePadConnected",
 			Type = "Event",
 			LiteralName = "GAME_PAD_CONNECTED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "GamePadDisconnected",
 			Type = "Event",
 			LiteralName = "GAME_PAD_DISCONNECTED",
+			SynchronousEvent = true,
 		},
 		{
 			Name = "GamePadPowerChanged",
 			Type = "Event",
 			LiteralName = "GAME_PAD_POWER_CHANGED",
+			SynchronousEvent = true,
 			Payload =
 			{
 				{ Name = "powerLevel", Type = "GamePadPowerLevel", Nilable = false },
@@ -405,6 +415,9 @@ local GamePad =
 				{ Name = "comment", Type = "string", Nilable = true },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 

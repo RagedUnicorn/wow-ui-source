@@ -104,7 +104,7 @@ MoneyTypeInfo["PLAYER_TRADE"] = {
 	end,
 
 	PickupFunc = function(self, amount)
-		PickupTradeMoney(amount);
+		C_TradeInfo.PickupTradeMoney(amount);
 	end,
 
 	DropFunc = function(self)
@@ -249,41 +249,85 @@ function MoneyFrame_UpdateTrialErrorButton(self)
 	return money;
 end
 
+local MONEY_FRAME_FONT_SMALL = true;
+local MONEY_FRAME_FONT_LARGE = false;
+local MONEY_FRAME_FONT_USER_SCALED = true;
+local MONEY_FRAME_FONT_FIXED_SCALE = false;
+
+local moneyFrameFonts =
+{
+	[MONEY_FRAME_FONT_SMALL] =
+	{
+		[MONEY_FRAME_FONT_USER_SCALED] =
+		{
+			["default"] = UserScaledFontNumberNormalRight,
+			["yellow"] = UserScaledFontNumberNormalRightYellow,
+			["red"] = UserScaledFontNumberNormalRightRed,
+			["gray"] = UserScaledFontNumberNormalRightGray,
+			["green"] = UserScaledFontNumberNormalRightGreen
+		},
+
+		[MONEY_FRAME_FONT_FIXED_SCALE] =
+		{
+			["default"] = NumberFontNormalRight,
+			["yellow"] = NumberFontNormalRightYellow,
+			["red"] = NumberFontNormalRightRed,
+			["gray"] = NumberFontNormalRightGray,
+			["green"] = NumberFontNormalRightGreen
+		},
+	},
+
+	[MONEY_FRAME_FONT_LARGE] =
+	{
+		-- Not yet supported.
+		[MONEY_FRAME_FONT_USER_SCALED] =
+		{
+			["default"] = NumberFontNormalLargeRight,
+			["yellow"] = NumberFontNormalLargeRightYellow,
+			["red"] = NumberFontNormalLargeRightRed,
+			["gray"] = NumberFontNormalLargeRightGray,
+			["green"] = NumberFontNormalLargeRightGreen
+		},
+
+		[MONEY_FRAME_FONT_FIXED_SCALE] =
+		{
+			["default"] = NumberFontNormalLargeRight,
+			["yellow"] = NumberFontNormalLargeRightYellow,
+			["red"] = NumberFontNormalLargeRightRed,
+			["gray"] = NumberFontNormalLargeRightGray,
+			["green"] = NumberFontNormalLargeRightGreen
+		},
+	},
+};
+
+local function GetMoneyFrameFont(moneyFrame, color)
+	local isSmall = moneyFrame.small ~= nil and moneyFrame.small ~= false and moneyFrame.small ~= 0;
+	local isUserScaled = moneyFrame.isUserScaled ~= nil and moneyFrame.isUserScaled ~= false and moneyFrame.isUserScaled ~= 0;
+	local fonts = moneyFrameFonts[isSmall][isUserScaled];
+	local font = fonts[color];
+	return font or fonts.default;
+end
+
 function SetMoneyFrameColorByFrame(moneyFrame, color)
-	local fontObject;
-	if ( moneyFrame.small ) then
-		if ( color == "yellow" ) then
-			fontObject = NumberFontNormalRightYellow;
-		elseif ( color == "red" ) then
-			fontObject = NumberFontNormalRightRed;
-		elseif ( color == "gray" ) then
-			fontObject = NumberFontNormalRightGray;
-		else
-			fontObject = NumberFontNormalRight;
-		end
-	else
-		if ( color == "yellow"  ) then
-			fontObject = NumberFontNormalLargeRightYellow;
-		elseif ( color == "red" ) then
-			fontObject = NumberFontNormalLargeRightRed;
-		elseif ( color == "gray" ) then
-			fontObject = NumberFontNormalLargeRightGray;
-		else
-			fontObject = NumberFontNormalLargeRight;
-		end
+	local fontObject = GetMoneyFrameFont(moneyFrame, color);
+	moneyFrame.GoldButton:SetNormalFontObject(fontObject);
+	moneyFrame.SilverButton:SetNormalFontObject(fontObject);
+	moneyFrame.CopperButton:SetNormalFontObject(fontObject);
+end
+
+function GetMoneyFrame(frameOrName)
+	local argType = type(frameOrName);
+	if argType == "table" then
+		return frameOrName;
+	elseif argType == "string" then
+		return _G[frameOrName];
 	end
 
-	local goldButton = moneyFrame.GoldButton;
-	local silverButton = moneyFrame.SilverButton;
-	local copperButton = moneyFrame.CopperButton;
-
-	goldButton:SetNormalFontObject(fontObject);
-	silverButton:SetNormalFontObject(fontObject);
-	copperButton:SetNormalFontObject(fontObject);
+	return nil;
 end
 
 function SetMoneyFrameColor(frameName, color)
-	local moneyFrame = _G[frameName];
+	local moneyFrame = GetMoneyFrame(frameName);
 	if ( not moneyFrame ) then
 		return;
 	end
@@ -598,7 +642,7 @@ function SetTooltipMoney(frame, money, type, prefixText, suffixText)
 	else
 		xOffset = 0;
 	end
-	moneyFrame:SetPoint("LEFT", frame:GetName().."TextLeft"..numLines, "LEFT", xOffset, 0);
+	moneyFrame:SetPoint("LEFT", frame:GetLeftLine(numLines), "LEFT", xOffset, 0);
 	moneyFrame:Show();
 	if ( not frame.shownMoneyFrames ) then
 		frame.shownMoneyFrames = 1;

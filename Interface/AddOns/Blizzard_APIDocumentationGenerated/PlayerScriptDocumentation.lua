@@ -2,6 +2,7 @@ local PlayerScript =
 {
 	Name = "PlayerScript",
 	Type = "System",
+	Environment = "All",
 
 	Functions =
 	{
@@ -129,6 +130,10 @@ local PlayerScript =
 			Type = "Function",
 		},
 		{
+			Name = "ConfirmPetUnlearn",
+			Type = "Function",
+		},
+		{
 			Name = "ConfirmTalentWipe",
 			Type = "Function",
 		},
@@ -183,6 +188,15 @@ local PlayerScript =
 		},
 		{
 			Name = "GetAutoDeclineGuildInvites",
+			Type = "Function",
+
+			Returns =
+			{
+				{ Name = "result", Type = "bool", Nilable = false },
+			},
+		},
+		{
+			Name = "GetAutoDeclineNeighborhoodInvites",
 			Type = "Function",
 
 			Returns =
@@ -319,6 +333,27 @@ local PlayerScript =
 			Returns =
 			{
 				{ Name = "result", Type = "number", Nilable = false },
+			},
+		},
+		{
+			Name = "GetPlayerInfoByGUID",
+			Type = "Function",
+			MayReturnNothing = true,
+
+			Arguments =
+			{
+				{ Name = "guid", Type = "WOWGUID", Nilable = false },
+			},
+
+			Returns =
+			{
+				{ Name = "localizedClass", Type = "cstring", Nilable = false },
+				{ Name = "englishClass", Type = "cstring", Nilable = false },
+				{ Name = "localizedRace", Type = "cstring", Nilable = false },
+				{ Name = "englishRace", Type = "cstring", Nilable = false },
+				{ Name = "sex", Type = "number", Nilable = false },
+				{ Name = "name", Type = "cstring", Nilable = false },
+				{ Name = "realmName", Type = "cstring", Nilable = false },
 			},
 		},
 		{
@@ -464,12 +499,30 @@ local PlayerScript =
 			},
 		},
 		{
+			Name = "IsGuildLeader",
+			Type = "Function",
+
+			Returns =
+			{
+				{ Name = "result", Type = "bool", Nilable = false },
+			},
+		},
+		{
+			Name = "IsInGuild",
+			Type = "Function",
+
+			Returns =
+			{
+				{ Name = "result", Type = "bool", Nilable = false },
+			},
+		},
+		{
 			Name = "IsItemPreferredArmorType",
 			Type = "Function",
 
 			Arguments =
 			{
-				{ Name = "itemLocation", Type = "ItemLocation", Mixin = "ItemLocationMixin", Nilable = false },
+				{ Name = "itemLocation", Type = "ItemLocation", Nilable = false },
 			},
 
 			Returns =
@@ -538,6 +591,24 @@ local PlayerScript =
 			Returns =
 			{
 				{ Name = "result", Type = "bool", Nilable = true },
+			},
+		},
+		{
+			Name = "PlayerIsInCombat",
+			Type = "Function",
+
+			Returns =
+			{
+				{ Name = "playerIsInCombat", Type = "bool", Nilable = false },
+			},
+		},
+		{
+			Name = "PlayerIsTimerunning",
+			Type = "Function",
+
+			Returns =
+			{
+				{ Name = "playerIsTimerunning", Type = "bool", Nilable = false },
 			},
 		},
 		{
@@ -612,6 +683,15 @@ local PlayerScript =
 			},
 		},
 		{
+			Name = "SetAutoDeclineNeighborhoodInvites",
+			Type = "Function",
+
+			Arguments =
+			{
+				{ Name = "allow", Type = "bool", Nilable = false, Default = false },
+			},
+		},
+		{
 			Name = "SetCemeteryPreference",
 			Type = "Function",
 
@@ -677,6 +757,7 @@ local PlayerScript =
 		{
 			Name = "SitStandOrDescendStart",
 			Type = "Function",
+			HasRestrictions = true,
 		},
 		{
 			Name = "StartAttack",
@@ -717,6 +798,22 @@ local PlayerScript =
 
 	Events =
 	{
+		{
+			Name = "PlayerInCombatChanged",
+			Type = "Event",
+			LiteralName = "PLAYER_IN_COMBAT_CHANGED",
+			SynchronousEvent = true,
+			Payload =
+			{
+				{ Name = "inCombat", Type = "bool", Nilable = false },
+			},
+		},
+		{
+			Name = "PlayerTargetDied",
+			Type = "Event",
+			LiteralName = "PLAYER_TARGET_DIED",
+			SynchronousEvent = true,
+		},
 	},
 
 	Tables =
@@ -733,6 +830,9 @@ local PlayerScript =
 				{ Name = "baseRangedAttackPower", Type = "number", Nilable = false },
 			},
 		},
+	},
+	Predicates =
+	{
 	},
 };
 
