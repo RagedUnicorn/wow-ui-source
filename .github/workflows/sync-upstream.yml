@@ -1,0 +1,96 @@
+name: Sync fork with upstream
+
+# Weekly mirror of https://github.com/Gethe/wow-ui-source into this fork.
+#
+# - Every upstream branch except `live` is force-pushed 1:1 (upstream rewrites
+#   history, so a fast-forward-only sync is not enough).
+# - Every upstream tag is force-pushed 1:1.
+# - `live` is rebuilt as `upstream/live` + one commit that adds this workflow,
+#   because scheduled workflows only run from the default branch and a pure
+#   mirror would delete this file.
+# - Nothing is ever deleted in the fork: branches/tags that upstream removed
+#   stay in place.
+#
+# Auth: the SYNC_TOKEN secret must be a fine-grained PAT scoped to this repo
+# with Contents + Workflows set to "Read and write" (or a classic PAT with the
+# `repo` and `workflow` scopes). The built-in GITHUB_TOKEN cannot push commits
+# that touch .github/workflows/*, which both upstream's branches and the
+# rebuilt `live` do.
+
+on:
+  schedule:
+    - cron: '17 6 * * 1' # Mondays 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+env:
+  UPSTREAM: https://github.com/Gethe/wow-ui-source.git
+  WORKFLOW_FILE: .github/workflows/sync-upstream.yml
+  WORKFLOW_COMMIT_MESSAGE: 'chore: add weekly upstream sync workflow'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check SYNC_TOKEN secret
+        env:
+          SYNC_TOKEN: ${{ secrets.SYNC_TOKEN }}
+        run: |
+          if [ -z "$SYNC_TOKEN" ]; then
+            echo "::error::Repository secret SYNC_TOKEN is not set (PAT with Contents + Workflows write access required)"
+            exit 1
+          fi
+
+      - name: Checkout fork
+        uses: actions/checkout@v5
+        with:
+          ref: live
+          fetch-depth: 0
+          persist-credentials: true
+          token: ${{ secrets.SYNC_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Fetch upstream
+        run: |
+          git remote add upstream "$UPSTREAM"
+          git fetch upstream --prune \
+            '+refs/heads/*:refs/remotes/upstream/*' \
+            '+refs/tags/*:refs/tags/*'
+
+      - name: Mirror branches (all except live)
+        run: |
+          refspecs=()
+          for branch in $(git for-each-ref --format='%(refname:strip=3)' refs/remotes/upstream/); do
+            case "$branch" in
+              live|HEAD) continue ;;
+            esac
+            refspecs+=("+refs/remotes/upstream/$branch:refs/heads/$branch")
+          done
+          echo "Mirroring ${#refspecs[@]} branches"
+          git push --force origin "${refspecs[@]}"
+
+      - name: Mirror tags
+        run: git push --force origin '+refs/tags/*:refs/tags/*'
+
+      - name: Rebuild live on top of upstream/live
+        run: |
+          if [ "$(git rev-parse live^)" = "$(git rev-parse upstream/live)" ]; then
+            echo "live is already upstream/live + workflow commit; nothing to do"
+            exit 0
+          fi
+          git checkout -B live upstream/live
+          git checkout origin/live -- "$WORKFLOW_FILE"
+          git add "$WORKFLOW_FILE"
+          git commit -m "$WORKFLOW_COMMIT_MESSAGE"
+          git push --force origin live
